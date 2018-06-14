@@ -3,11 +3,11 @@ Scarlet
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
-This README is still **WIP**. Please see the [tutorial](tutorial) for more information.
+This README is still **WIP**. Please see the [tutorial][tutorial] for more information.
 
 Tutorial
 ---
-- [Taming WebSocket with Scarlet](tutorial)
+- [Taming WebSocket with Scarlet][tutorial]
 
 Usage
 ---
