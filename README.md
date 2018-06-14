@@ -3,9 +3,11 @@ Scarlet
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
+This README is still **WIP**. Please see the [tutorial](tutorial) for more information.
+
 Tutorial
 ---
-- [Taming WebSocket with Scarlet](https://tech.gotinder.com/taming-websocket-with-scarlet/)
+- [Taming WebSocket with Scarlet](tutorial)
 
 Usage
 ---
@@ -94,6 +96,8 @@ Scarlet is driven by a [StateMachine](https://github.com/Tinder/StateMachine).
 
 Download
 --------
+**TODO: make the jar public**
+
 Download [the latest JAR][latest-jar] or grab via Maven:
 ```xml
 <dependency>
@@ -139,3 +143,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  [gdax-websocket-feed]: https://docs.gdax.com/#websocket-feed
  [latest-jar]: https://tinder.jfrog.io/tinder/webapp/#/artifacts/browse/tree/General/libs-release-local/com/tinder/scarlet/scarlet
  [demo-app]: https://github.com/Tinder/Scarlet/tree/scarlet-demo-8/demo/src/main/java/com/tinder/app
+ [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
