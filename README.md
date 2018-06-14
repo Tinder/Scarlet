@@ -142,5 +142,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  [gdax-websocket-feed]: https://docs.gdax.com/#websocket-feed
  [latest-jar]: https://tinder.jfrog.io/tinder/webapp/#/artifacts/browse/tree/General/libs-release-local/com/tinder/scarlet/scarlet
- [demo-app]: https://github.com/Tinder/Scarlet/tree/scarlet-demo-8/demo/src/main/java/com/tinder/app
+ [demo-app]: https://github.com/Tinder/Scarlet/tree/master/demo/src/main/java/com/tinder/app
  [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
