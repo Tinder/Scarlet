@@ -1,0 +1,14 @@
+package com.tinder.scarlet.messageadapter.protobuf;
+
+option java_package = "com.tinder.scarlet.messageadapter.protobuf";
+option java_outer_classname = "PhoneProtos";
+
+message Phone {
+  optional string number = 1;
+
+  extensions 2;
+}
+
+extend Phone {
+  optional bool voicemail = 2;
+}

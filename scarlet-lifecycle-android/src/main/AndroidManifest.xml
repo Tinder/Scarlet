@@ -1,0 +1,6 @@
+<!--
+  ~ © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.tinder.scarlet.lifecycle.android"/>
