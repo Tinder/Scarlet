@@ -3,6 +3,10 @@ Scarlet
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
+Tutorial
+---
+- [Taming WebSocket with Scarlet](https://tech.gotinder.com/taming-websocket-with-scarlet/)
+
 Usage
 ---
 In this example, we are reading the realtime Bitcoin price from [Gdax WebSocket Feed][gdax-websocket-feed].
