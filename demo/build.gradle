@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 repositories {
-    maven()
+    mavenCentral()
     google()
 }
 
