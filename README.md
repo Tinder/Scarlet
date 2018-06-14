@@ -68,6 +68,10 @@ gdaxService.observeTicker()
 - Lifecycle
 - BackoffStrategy
 
+### State Machine
+Scarlet is driven by a [StateMachine](https://github.com/Tinder/StateMachine).
+![State Diagram](./example/scarlet-state-machine.png)
+
 Download
 --------
 Download [the latest JAR][latest-jar] or grab via Maven:
