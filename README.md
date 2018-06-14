@@ -61,17 +61,32 @@ gdaxService.observeTicker()
     })
 ~~~
 
+### Built-in Plugins
+`WebSocket.Factory`
+- `OkHttpClient`
+- `MockHttpServer`
+
+`MessageAdapter.Factory`
+- moshi
+- gson
+- protobuf
+
+`StreamAdapter.Factory`
+- RxJava2
+- RxJava1
+
+`Lifecycle`
+- AndroidLifecycle
+
+`BackoffStrategy`
+- Linear
+- Exponential
+- ExponentialWithJitter
+
 ### Android
 TODO:
 - `AndroidLifecycle`
 
-### Customization
-TODO:
-- `WebSocket.Factory`
-- `MessageAdapter.Factory`
-- `StreamAdapter.Factory`
-- `Lifecycle`
-- `BackoffStrategy`
 
 ### State Machine
 Scarlet is driven by a [StateMachine](https://github.com/Tinder/StateMachine).
