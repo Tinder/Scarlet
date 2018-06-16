@@ -12,4 +12,3 @@ import okhttp3.mockwebserver.MockWebServer
 
 fun MockWebServer.newWebSocketFactory(): WebSocket.Factory =
     OkHttpWebSocket.Factory(MockWebServerOkHttpWebSocketConnectionEstablisher(this))
-

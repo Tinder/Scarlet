@@ -71,5 +71,4 @@ internal class FlowableStreamTest {
         // Then
         assertThat(processor.hasSubscribers()).isFalse()
     }
-
 }

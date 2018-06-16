@@ -61,5 +61,4 @@ internal class ConnectionTest {
         // Then
         then(webSocket).should().send(message)
     }
-
 }

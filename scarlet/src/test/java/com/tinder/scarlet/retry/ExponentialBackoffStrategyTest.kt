@@ -44,7 +44,6 @@ internal class ExponentialBackoffStrategyTest {
 
             private fun param(baseDuration: Long, maxDuration: Long) = arrayOf(baseDuration, maxDuration)
         }
-
     }
 
     @RunWith(Parameterized::class)

@@ -77,5 +77,4 @@ internal class MessageAdapterResolverTest {
             }
             .withMessageContaining("Cannot resolve message adapter")
     }
-
 }

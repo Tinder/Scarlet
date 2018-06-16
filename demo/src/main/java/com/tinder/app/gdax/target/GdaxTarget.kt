@@ -10,5 +10,4 @@ import com.tinder.app.gdax.domain.Transaction
 interface GdaxTarget {
 
     fun showTransactions(product: Product, transactions: List<Transaction>)
-
 }

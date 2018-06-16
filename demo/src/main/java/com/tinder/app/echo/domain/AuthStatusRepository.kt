@@ -19,5 +19,4 @@ class AuthStatusRepository @Inject constructor() {
     fun observeAuthStatus(): Flowable<AuthStatus> = authStatusProcessor
 
     fun updateAuthStatus(authStatus: AuthStatus) = authStatusProcessor.onNext(authStatus)
-
 }

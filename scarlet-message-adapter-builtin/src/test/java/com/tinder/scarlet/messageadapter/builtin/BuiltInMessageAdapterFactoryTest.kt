@@ -51,5 +51,4 @@ internal class BuiltInMessageAdapterFactoryTest {
             Collection::class.java
         )
     }
-
 }

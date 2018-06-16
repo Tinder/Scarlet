@@ -28,6 +28,5 @@ interface StreamAdapter<T, out R> {
          * handled by this factory.
          */
         fun create(type: Type): StreamAdapter<Any, Any>
-
     }
 }

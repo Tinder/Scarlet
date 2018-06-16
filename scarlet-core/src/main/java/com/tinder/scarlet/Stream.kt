@@ -40,5 +40,4 @@ interface Stream<T> : Publisher<T> {
 
         fun isDisposed(): Boolean
     }
-
 }

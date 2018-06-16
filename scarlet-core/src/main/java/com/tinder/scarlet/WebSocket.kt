@@ -79,5 +79,4 @@ interface WebSocket {
     interface Factory {
         fun create(): WebSocket
     }
-
 }

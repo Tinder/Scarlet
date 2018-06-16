@@ -13,5 +13,4 @@ internal class DefaultLifecycle(
     init {
         lifecycleRegistry.onNext(Lifecycle.State.Started)
     }
-
 }

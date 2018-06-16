@@ -38,5 +38,4 @@ internal class ByteArrayMessageAdapterTest {
         val (adaptedBytes) = (adaptedMessage as Message.Bytes)
         assertThat(adaptedBytes).isEqualTo(bytes)
     }
-
 }

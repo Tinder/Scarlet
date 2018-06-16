@@ -140,5 +140,4 @@ internal class SendServiceMethodFactoryTest {
             private inline fun <reified T> param() = arrayOf(T::class.java.onlyMethod())
         }
     }
-
 }

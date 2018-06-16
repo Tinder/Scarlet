@@ -16,5 +16,4 @@ internal class StaticUrlRequestFactory(
     override fun createRequest(): Request = Request.Builder()
         .url(url)
         .build()
-
 }

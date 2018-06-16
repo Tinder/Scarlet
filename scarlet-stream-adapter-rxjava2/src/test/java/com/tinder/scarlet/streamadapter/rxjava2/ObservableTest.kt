@@ -140,5 +140,4 @@ class ObservableTest {
         @Send
         fun sendBytesAndConfirm(message: ByteArray): Boolean
     }
-
 }

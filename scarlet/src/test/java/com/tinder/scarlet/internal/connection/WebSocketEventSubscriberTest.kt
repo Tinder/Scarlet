@@ -56,5 +56,4 @@ internal class WebSocketEventSubscriberTest {
         assertThatExceptionOfType(RuntimeException::class.java)
             .isThrownBy { flowable.subscribe(webSocketEventSubscriber) }
     }
-
 }

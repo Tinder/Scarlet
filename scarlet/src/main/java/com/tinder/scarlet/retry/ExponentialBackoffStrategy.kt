@@ -21,5 +21,4 @@ class ExponentialBackoffStrategy(
             initialDurationMillis.toDouble() * Math.pow(2.0, retryCount.toDouble())
         )
             .toLong()
-
 }

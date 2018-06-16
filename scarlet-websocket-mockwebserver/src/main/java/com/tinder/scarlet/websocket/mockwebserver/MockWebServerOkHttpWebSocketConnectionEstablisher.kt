@@ -16,5 +16,4 @@ class MockWebServerOkHttpWebSocketConnectionEstablisher(
     override fun establishConnection(webSocketListener: WebSocketListener) {
         mockWebServer.enqueue(MockResponse().withWebSocketUpgrade(webSocketListener))
     }
-
 }

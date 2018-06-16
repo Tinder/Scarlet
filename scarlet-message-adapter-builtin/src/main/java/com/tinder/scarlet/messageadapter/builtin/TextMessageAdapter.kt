@@ -15,5 +15,4 @@ class TextMessageAdapter : MessageAdapter<String> {
     }
 
     override fun toMessage(data: String): Message = Message.Text(data)
-
 }

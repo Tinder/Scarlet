@@ -55,5 +55,4 @@ class GsonMessageAdapter<T> private constructor(
             private val DEFAULT_GSON = Gson()
         }
     }
-
 }

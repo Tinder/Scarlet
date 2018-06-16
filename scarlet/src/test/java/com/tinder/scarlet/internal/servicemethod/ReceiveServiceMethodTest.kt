@@ -63,5 +63,4 @@ internal class ReceiveServiceMethodTest {
         then(eventMapper).should().mapToData(event2)
         testSubscriber.assertNotTerminated()
     }
-
 }

@@ -67,5 +67,4 @@ interface EchoBotComponent {
     interface ComponentProvider {
         val echoBotComponent: EchoBotComponent
     }
-
 }

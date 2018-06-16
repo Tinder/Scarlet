@@ -46,5 +46,4 @@ class FlowableLifecycleTest {
             Lifecycle.State.Started
         )
     }
-
 }

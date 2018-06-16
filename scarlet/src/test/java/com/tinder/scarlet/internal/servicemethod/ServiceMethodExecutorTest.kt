@@ -56,5 +56,4 @@ internal class ServiceMethodExecutorTest {
                 serviceMethodExecutor.execute(notRegisteredMethod, arrayOf())
             }
     }
-
 }

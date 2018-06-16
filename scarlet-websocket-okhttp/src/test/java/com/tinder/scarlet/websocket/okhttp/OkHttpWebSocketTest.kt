@@ -180,5 +180,4 @@ internal class OkHttpWebSocketTest {
         // Then
         then(webSocketHolder).should().cancel()
     }
-
 }

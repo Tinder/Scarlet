@@ -18,5 +18,4 @@ class RxJavaStreamAdapterFactory : StreamAdapter.Factory {
         Observable::class.java -> ObservableStreamAdapter()
         else -> throw IllegalArgumentException()
     }
-
 }

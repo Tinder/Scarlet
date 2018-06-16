@@ -45,4 +45,3 @@ interface Lifecycle : Publisher<Lifecycle.State> {
         object Destroyed : State()
     }
 }
-

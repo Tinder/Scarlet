@@ -25,5 +25,4 @@ class ExponentialWithJitterBackoffStrategy(
     private fun Long.withJitter(): Long = (0..this).random()
 
     private fun ClosedRange<Long>.random() = random.nextInt((endInclusive - start).toInt()) + start
-
 }

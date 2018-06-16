@@ -73,5 +73,4 @@ interface GdaxComponent {
     interface ComponentProvider {
         val gdaxComponent: GdaxComponent
     }
-
 }

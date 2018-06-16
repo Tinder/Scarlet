@@ -17,5 +17,4 @@ class OkHttpClientWebSocketConnectionEstablisher(
         val request = requestFactory.createRequest()
         okHttpClient.newWebSocket(request, webSocketListener)
     }
-
 }

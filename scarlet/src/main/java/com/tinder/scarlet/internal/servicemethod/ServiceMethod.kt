@@ -106,5 +106,4 @@ internal sealed class ServiceMethod {
 
         private fun Method.getFirstParameterAnnotations(): Array<Annotation> = parameterAnnotations.first()
     }
-
 }

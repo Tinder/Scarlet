@@ -16,5 +16,4 @@ class TransactionBook(
         newHistory.transactions[product] = (newHistory.transactions[product] ?: emptyList()) + transaction
         return newHistory
     }
-
 }
