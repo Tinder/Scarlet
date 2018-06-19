@@ -16,9 +16,15 @@
 
 ./gradlew scarlet-message-adapter-protobuf:build scarlet-message-adapter-protobuf:publishToMavenLocal
 
+./gradlew scarlet-message-adapter-moshi:build scarlet-message-adapter-moshi:publishToMavenLocal
+
+./gradlew scarlet-message-adapter-gson:build scarlet-message-adapter-gson:publishToMavenLocal
+
 ./gradlew scarlet-stream-adapter-builtin:build scarlet-stream-adapter-builtin:publishToMavenLocal
 
 ./gradlew scarlet-stream-adapter-rxjava2:build scarlet-stream-adapter-rxjava2:publishToMavenLocal
+
+./gradlew scarlet-stream-adapter-rxjava:build scarlet-stream-adapter-rxjava:publishToMavenLocal
 
 ./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:publishToMavenLocal
 

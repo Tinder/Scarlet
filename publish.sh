@@ -17,9 +17,15 @@
 
 ./gradlew scarlet-message-adapter-builtin:build scarlet-message-adapter-builtin:artifactoryPublish
 
+./gradlew scarlet-message-adapter-gson:build scarlet-message-adapter-gson:artifactoryPublish
+
+./gradlew scarlet-message-adapter-moshi:build scarlet-message-adapter-moshi:artifactoryPublish
+
 ./gradlew scarlet-message-adapter-protobuf:build scarlet-message-adapter-protobuf:artifactoryPublish
 
 ./gradlew scarlet-stream-adapter-builtin:build scarlet-stream-adapter-builtin:artifactoryPublish
+
+./gradlew scarlet-stream-adapter-rxjava:build scarlet-stream-adapter-rxjava:artifactoryPublish
 
 ./gradlew scarlet-stream-adapter-rxjava2:build scarlet-stream-adapter-rxjava2:artifactoryPublish
 
