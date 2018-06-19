@@ -30,7 +30,6 @@ allprojects {
     apply plugin: 'org.kordamp.gradle.stats'
     apply plugin: "com.jfrog.artifactory"
     // group = 'com.tinder.scarlet' TODO use Bintray
-    apply plugin: 'com.github.dcendents.android-maven'
     group='com.github.tinder'
 
     repositories {
