@@ -1,0 +1,4 @@
+jdk:
+  - oraclejdk8
+install:
+   - ./publish-jitpack.sh
