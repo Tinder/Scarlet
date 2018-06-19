@@ -14,6 +14,7 @@ buildscript {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
         classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
@@ -28,7 +29,9 @@ ktlint {
 allprojects {
     apply plugin: 'org.kordamp.gradle.stats'
     apply plugin: "com.jfrog.artifactory"
-    group = 'com.tinder.scarlet'
+    // group = 'com.tinder.scarlet' TODO use Bintray
+    apply plugin: 'com.github.dcendents.android-maven'
+    group='com.github.tinder'
 
     repositories {
         mavenCentral()
