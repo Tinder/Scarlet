@@ -94,7 +94,7 @@ repositories {
 implementation 'com.github.tinder.scarlet:scarlet:0.1.2'
 ```
 
-### Roadmap
+### Plug-in Roadmap
 `WebSocket.Factory`
 - [x] `OkHttpClient`
 - [x] `MockHttpServer`
