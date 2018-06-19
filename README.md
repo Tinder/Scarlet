@@ -8,6 +8,7 @@ This README is still **WIP**. Please see the [tutorial][tutorial] for more infor
 Tutorial
 ---
 - [Taming WebSocket with Scarlet][tutorial]
+- [A talk][slides] at [Conference for Kotliners][kotliners]
 
 Usage
 ---
@@ -144,3 +145,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  [latest-jar]: https://tinder.jfrog.io/tinder/webapp/#/artifacts/browse/tree/General/libs-release-local/com/tinder/scarlet/scarlet
  [demo-app]: https://github.com/Tinder/Scarlet/tree/master/demo/src/main/java/com/tinder/app
  [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
+ [slides]: https://speakerdeck.com/zhxnlai/taming-websocket-with-scarlet
+ [kotliners]:
+ https://www.conferenceforkotliners.com/
