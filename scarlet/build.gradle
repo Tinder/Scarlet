@@ -2,6 +2,7 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'maven-publish'
+apply plugin: 'kotlin-kapt'
 
 sourceSets {
     main {
