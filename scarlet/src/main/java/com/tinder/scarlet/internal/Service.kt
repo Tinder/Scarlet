@@ -7,6 +7,8 @@ package com.tinder.scarlet.internal
 import com.tinder.scarlet.internal.connection.Connection
 import com.tinder.scarlet.internal.servicemethod.ServiceMethodExecutor
 import java.lang.reflect.Method
+import javax.inject.Inject
+import javax.inject.Singleton
 
 internal class Service(
     private val connection: Connection,
@@ -17,7 +19,8 @@ internal class Service(
 
     fun execute(method: Method, args: Array<Any>) = serviceMethodExecutor.execute(method, args)
 
-    class Factory(
+    @Singleton
+    class Factory @Inject constructor(
         private val connectionFactory: Connection.Factory,
         private val serviceMethodExecutorFactory: ServiceMethodExecutor.Factory
     ) {

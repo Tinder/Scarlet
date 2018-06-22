@@ -6,12 +6,7 @@ package com.tinder.scarlet
 
 import com.tinder.scarlet.Scarlet.Builder
 import com.tinder.scarlet.internal.Service
-import com.tinder.scarlet.internal.connection.Connection
-import com.tinder.scarlet.internal.servicemethod.EventMapper
-import com.tinder.scarlet.internal.servicemethod.MessageAdapterResolver
-import com.tinder.scarlet.internal.servicemethod.ServiceMethod
-import com.tinder.scarlet.internal.servicemethod.ServiceMethodExecutor
-import com.tinder.scarlet.internal.servicemethod.StreamAdapterResolver
+import com.tinder.scarlet.internal.di.DaggerScarletComponent
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.lifecycle.DefaultLifecycle
 import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
@@ -21,6 +16,7 @@ import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
 import io.reactivex.schedulers.Schedulers
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
+import javax.inject.Inject
 
 /**
  * Scarlet is a [Retrofit](http://square.github.io/retrofit/)-inspired [WebSocket](https://tools.ietf.org/html/rfc6455)
@@ -42,7 +38,7 @@ import java.lang.reflect.Proxy
  * val service = scarlet.create<MyService>("wss://example.com")
  * ~~~
  */
-class Scarlet internal constructor(
+class Scarlet @Inject internal constructor(
     private val runtimePlatform: RuntimePlatform,
     private val serviceFactory: Service.Factory
 ) {
@@ -130,22 +126,21 @@ class Scarlet internal constructor(
      * [webSocketFactory] is required. All other methods are optional.
      */
     class Builder {
-        private var webSocketFactory: WebSocket.Factory? = null
-        private var lifecycle: Lifecycle = DEFAULT_LIFECYCLE
-        private var backoffStrategy: BackoffStrategy = DEFAULT_RETRY_STRATEGY
         private val messageAdapterFactories = mutableListOf<MessageAdapter.Factory>()
         private val streamAdapterFactories = mutableListOf<StreamAdapter.Factory>()
-        private val platform = RuntimePlatform.get()
+        private val componentBuilder = DaggerScarletComponent.builder()
+            .lifecycle(DEFAULT_LIFECYCLE)
+            .backoffStrategy(DEFAULT_RETRY_STRATEGY)
 
-        fun webSocketFactory(factory: WebSocket.Factory): Builder = apply { webSocketFactory = factory }
+        fun webSocketFactory(factory: WebSocket.Factory): Builder = apply { componentBuilder.webSocketFactory(factory) }
 
         /**
          * Set the [Lifecycle] that determines when to connect and disconnect.
          */
-        fun lifecycle(lifecycle: Lifecycle): Builder = apply { this.lifecycle = lifecycle }
+        fun lifecycle(lifecycle: Lifecycle): Builder = apply { componentBuilder.lifecycle(lifecycle) }
 
         fun backoffStrategy(backoffStrategy: BackoffStrategy): Builder =
-            apply { this.backoffStrategy = backoffStrategy }
+            apply { componentBuilder.backoffStrategy(backoffStrategy) }
 
         /**
          * Add a [MessageAdapter.Factory] for supporting service method return types other than [String], [ByteArray],
@@ -163,40 +158,21 @@ class Scarlet internal constructor(
         /**
          * Create a [Scarlet] instance using the configured values.
          */
-        fun build(): Scarlet = Scarlet(platform, createServiceFactory())
-
-        private fun createServiceFactory(): Service.Factory = Service.Factory(
-            createConnectionFactory(),
-            createServiceMethodExecutorFactory()
-        )
-
-        private fun createConnectionFactory(): Connection.Factory =
-            Connection.Factory(lifecycle, checkNotNull(webSocketFactory), backoffStrategy, DEFAULT_SCHEDULER)
-
-        private fun createServiceMethodExecutorFactory(): ServiceMethodExecutor.Factory {
-            val messageAdapterResolver = createMessageAdapterResolver()
-            val streamAdapterResolver = createStreamAdapterResolver()
-            val eventMapperFactory = EventMapper.Factory(messageAdapterResolver)
-            val sendServiceMethodFactory = ServiceMethod.Send.Factory(messageAdapterResolver)
-            val receiveServiceMethodFactory = ServiceMethod.Receive.Factory(
-                DEFAULT_SCHEDULER, eventMapperFactory, streamAdapterResolver
-            )
-            return ServiceMethodExecutor.Factory(platform, sendServiceMethodFactory, receiveServiceMethodFactory)
+        fun build(): Scarlet {
+            return componentBuilder
+                .schdeduler(DEFAULT_SCHEDULER)
+                .messageAdapterFactories(messageAdapterFactories + BuiltInMessageAdapterFactory())
+                .streamAdapterFactories(streamAdapterFactories + BuiltInStreamAdapterFactory())
+                .build()
+                .scarlet()
         }
-
-        private fun createMessageAdapterResolver(): MessageAdapterResolver =
-            MessageAdapterResolver(messageAdapterFactories.apply { add(BuiltInMessageAdapterFactory()) }.toList())
-
-        private fun createStreamAdapterResolver(): StreamAdapterResolver =
-            StreamAdapterResolver(streamAdapterFactories.apply { add(BuiltInStreamAdapterFactory()) }.toList())
 
         private companion object {
             private val DEFAULT_LIFECYCLE = DefaultLifecycle()
-            private val RETRY_BASE_DURATION = 1000L
-            private val RETRY_MAX_DURATION = 10000L
-            private val DEFAULT_RETRY_STRATEGY =
-                ExponentialBackoffStrategy(RETRY_BASE_DURATION, RETRY_MAX_DURATION)
-            private val DEFAULT_SCHEDULER = Schedulers.computation() // TODO same thread option for debugging
+            private const val RETRY_BASE_DURATION = 1000L
+            private const val RETRY_MAX_DURATION = 10000L
+            private val DEFAULT_RETRY_STRATEGY = ExponentialBackoffStrategy(RETRY_BASE_DURATION, RETRY_MAX_DURATION)
+            private val DEFAULT_SCHEDULER = Schedulers.computation()
         }
     }
 

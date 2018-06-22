@@ -9,6 +9,8 @@ import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import java.lang.reflect.Method
+import javax.inject.Inject
+import javax.inject.Singleton
 
 internal class ServiceMethodExecutor(
     internal val serviceMethods: Map<Method, ServiceMethod>
@@ -22,7 +24,8 @@ internal class ServiceMethodExecutor(
         }
     }
 
-    class Factory(
+    @Singleton
+    class Factory @Inject constructor(
         private val runtimePlatform: RuntimePlatform,
         private val sendServiceMethodFactory: ServiceMethod.Send.Factory,
         private val receiveServiceMethodFactory: ServiceMethod.Receive.Factory

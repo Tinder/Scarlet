@@ -3,6 +3,12 @@ apply plugin: 'java-library'
 apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'maven-publish'
 
+sourceSets {
+    main {
+        java.srcDir "${buildDir}/generated/source/kapt/"
+    }
+}
+
 dependencies {
     api project(':scarlet-core')
 
@@ -13,6 +19,9 @@ dependencies {
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxKotlin
     implementation rootProject.ext.kotlinStdlib
+    implementation rootProject.ext.dagger
+    kapt rootProject.ext.daggerCompiler
+    compileOnly rootProject.ext.jsr250Annotations
 
     testImplementation project(':scarlet-test-utils')
     testImplementation project(':scarlet-stream-adapter-rxjava2')

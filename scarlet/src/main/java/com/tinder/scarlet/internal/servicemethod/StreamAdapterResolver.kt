@@ -7,8 +7,11 @@ package com.tinder.scarlet.internal.servicemethod
 import com.tinder.scarlet.StreamAdapter
 import io.reactivex.exceptions.CompositeException
 import java.lang.reflect.Type
+import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class StreamAdapterResolver(
+@Singleton
+internal class StreamAdapterResolver @Inject constructor(
     private val streamAdapterFactories: List<StreamAdapter.Factory>
 ) {
 

@@ -8,8 +8,11 @@ import com.tinder.scarlet.MessageAdapter
 import io.reactivex.exceptions.CompositeException
 import java.lang.reflect.Type
 import java.util.Arrays
+import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class MessageAdapterResolver(
+@Singleton
+internal class MessageAdapterResolver @Inject constructor(
     private val messageAdapterFactories: List<MessageAdapter.Factory>
 ) {
 
