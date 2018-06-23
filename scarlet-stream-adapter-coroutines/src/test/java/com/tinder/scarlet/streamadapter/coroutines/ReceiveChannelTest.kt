@@ -1,9 +1,6 @@
 package com.tinder.scarlet.streamadapter.coroutines
 
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.Scarlet
-import com.tinder.scarlet.Stream
-import com.tinder.scarlet.WebSocket
+import com.tinder.scarlet.*
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.testutils.*
 import com.tinder.scarlet.websocket.mockwebserver.newWebSocketFactory
@@ -13,7 +10,8 @@ import com.tinder.scarlet.ws.Send
 import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.*
-import kotlinx.coroutines.experimental.test.withTestContext
+import kotlinx.coroutines.experimental.reactive.asPublisher
+import kotlinx.coroutines.experimental.selects.select
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -37,46 +35,46 @@ class ReceiveChannelTest {
 
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
+        // Given
+        givenConnectionIsEstablished()
+        val textMessage1 = "Hello"
+        val textMessage2 = "Hi"
+        val bytesMessage1 = "Yo".toByteArray()
+        val bytesMessage2 = "Sup".toByteArray()
+        val testTextSubscriber = server.observeText()
+        val testBytesSubscriber = server.observeBytes()
+
+        // When
+        client.sendText(textMessage1)
+        val isSendTextSuccessful = client.sendTextAndConfirm(textMessage2)
+        client.sendBytes(bytesMessage1)
+        val isSendBytesSuccessful = client.sendBytesAndConfirm(bytesMessage2)
+
+        // Then
+        assertThat(isSendTextSuccessful).isTrue()
+        assertThat(isSendBytesSuccessful).isTrue()
+        serverEventObserver.awaitValues(
+                any<WebSocket.Event.OnConnectionOpened<*>>(),
+                any<WebSocket.Event.OnMessageReceived>().containingText(textMessage1),
+                any<WebSocket.Event.OnMessageReceived>().containingText(textMessage2),
+                any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage1),
+                any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage2)
+        )
+
         runBlocking {
-            // Given
-            givenConnectionIsEstablished()
-            val textMessage1 = "Hello"
-            val textMessage2 = "Hi"
-            val bytesMessage1 = "Yo".toByteArray()
-            val bytesMessage2 = "Sup".toByteArray()
-            val testTextSubscriber = server.observeText()
-            val testBytesSubscriber = server.observeBytes()
+            assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage1)
+            assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage2)
+            val textTimeoutResult = withTimeoutOrNull(10, TimeUnit.MILLISECONDS, {
+                testTextSubscriber.receiveOrNull()
+            })
+            assertThat(textTimeoutResult).isNull()
 
-            // When
-            client.sendText(textMessage1)
-            val isSendTextSuccessful = client.sendTextAndConfirm(textMessage2)
-            client.sendBytes(bytesMessage1)
-            val isSendBytesSuccessful = client.sendBytesAndConfirm(bytesMessage2)
-
-            // Then
-            assertThat(isSendTextSuccessful).isTrue()
-            assertThat(isSendBytesSuccessful).isTrue()
-            serverEventObserver.awaitValues(
-                    any<WebSocket.Event.OnConnectionOpened<*>>(),
-                    any<WebSocket.Event.OnMessageReceived>().containingText(textMessage1),
-                    any<WebSocket.Event.OnMessageReceived>().containingText(textMessage2),
-                    any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage1),
-                    any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage2)
-            )
-
-            withTestContext {
-                runBlocking(this) {
-                    assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage1)
-                    assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage2)
-                }
-            }
-
-            withTestContext {
-                runBlocking(this) {
-                    assertThat(testBytesSubscriber.receiveOrNull()).isNotNull()
-                    assertThat(testBytesSubscriber.receiveOrNull()).isNotNull()
-                }
-            }
+            assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage1)
+            assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage2)
+            val byteTimeoutResult = withTimeoutOrNull(10, TimeUnit.MILLISECONDS, {
+                testBytesSubscriber.receiveOrNull()
+            })
+            assertThat(byteTimeoutResult).isNull()
         }
     }
 
