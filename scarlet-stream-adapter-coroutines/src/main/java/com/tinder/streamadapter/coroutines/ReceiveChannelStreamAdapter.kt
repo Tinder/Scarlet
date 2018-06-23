@@ -7,7 +7,5 @@ import kotlinx.coroutines.experimental.reactive.openSubscription
 
 class ReceiveChannelStreamAdapter<T> : StreamAdapter<T, ReceiveChannel<T>> {
 
-    override fun adapt(stream: Stream<T>): ReceiveChannel<T> {
-        return stream.openSubscription()
-    }
+    override fun adapt(stream: Stream<T>) = stream.openSubscription()
 }
