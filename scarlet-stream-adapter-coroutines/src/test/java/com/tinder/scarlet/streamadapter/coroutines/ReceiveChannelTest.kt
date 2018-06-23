@@ -53,6 +53,7 @@ class ReceiveChannelTest {
         // Then
         assertThat(isSendTextSuccessful).isTrue()
         assertThat(isSendBytesSuccessful).isTrue()
+
         serverEventObserver.awaitValues(
                 any<WebSocket.Event.OnConnectionOpened<*>>(),
                 any<WebSocket.Event.OnMessageReceived>().containingText(textMessage1),
@@ -64,17 +65,9 @@ class ReceiveChannelTest {
         runBlocking {
             assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage1)
             assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage2)
-            val textTimeoutResult = withTimeoutOrNull(10, TimeUnit.MILLISECONDS, {
-                testTextSubscriber.receiveOrNull()
-            })
-            assertThat(textTimeoutResult).isNull()
 
             assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage1)
             assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage2)
-            val byteTimeoutResult = withTimeoutOrNull(10, TimeUnit.MILLISECONDS, {
-                testBytesSubscriber.receiveOrNull()
-            })
-            assertThat(byteTimeoutResult).isNull()
         }
     }
 
