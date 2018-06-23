@@ -46,8 +46,8 @@ class ReceiveChannelTest {
         val textMessage2 = "Hi"
         val bytesMessage1 = "Yo".toByteArray()
         val bytesMessage2 = "Sup".toByteArray()
-        val testTextSubscriber = server.observeText()
-        val testBytesSubscriber = server.observeBytes()
+        val testTextChannel = server.observeText()
+        val testBytesChannel = server.observeBytes()
 
         // When
         client.sendText(textMessage1)
@@ -68,11 +68,11 @@ class ReceiveChannelTest {
         )
 
         runBlocking {
-            assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage1)
-            assertThat(testTextSubscriber.receiveOrNull()).isEqualTo(textMessage2)
+            assertThat(testTextChannel.receiveOrNull()).isEqualTo(textMessage1)
+            assertThat(testTextChannel.receiveOrNull()).isEqualTo(textMessage2)
 
-            assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage1)
-            assertThat(testBytesSubscriber.receiveOrNull()).isEqualTo(bytesMessage2)
+            assertThat(testBytesChannel.receiveOrNull()).isEqualTo(bytesMessage1)
+            assertThat(testBytesChannel.receiveOrNull()).isEqualTo(bytesMessage2)
         }
     }
 
