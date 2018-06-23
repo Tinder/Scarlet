@@ -13,8 +13,6 @@ import com.tinder.scarlet.ws.Send
 import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.*
-import kotlinx.coroutines.experimental.reactive.publish
-import kotlinx.coroutines.experimental.selects.select
 import kotlinx.coroutines.experimental.test.withTestContext
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
@@ -73,7 +71,6 @@ class ReceiveChannelTest {
                 }
             }
 
-            var count = 0
             withTestContext {
                 runBlocking(this) {
                     assertThat(testBytesSubscriber.receiveOrNull()).isNotNull()
