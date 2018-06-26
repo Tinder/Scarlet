@@ -109,7 +109,7 @@ implementation 'com.github.tinder.scarlet:scarlet:0.1.2'
 `StreamAdapter.Factory`
 - [x] `RxJava2`
 - [x] `RxJava1`
-- [ ] `Kotlin Coroutine`
+- [x] `Kotlin Coroutine`
 
 `Lifecycle`
 - [x] `AndroidLifecycle`
