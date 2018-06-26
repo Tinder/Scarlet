@@ -1,3 +1,7 @@
+/*
+ * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ */
+
 package com.tinder.streamadapter.coroutines
 
 import com.tinder.scarlet.StreamAdapter
