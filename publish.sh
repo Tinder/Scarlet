@@ -29,6 +29,8 @@
 
 ./gradlew scarlet-stream-adapter-rxjava2:build scarlet-stream-adapter-rxjava2:artifactoryPublish
 
+./gradlew scarlet-stream-adapter-coroutines:build scarlet-stream-adapter-coroutines:artifactoryPublish
+
 ./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:artifactoryPublish
 
 ./gradlew scarlet-websocket-mockwebserver:build scarlet-websocket-mockwebserver:artifactoryPublish

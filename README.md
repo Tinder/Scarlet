@@ -80,7 +80,7 @@ While we are working on Bintray support, Scarlet is available via [JitPack](jitp
 <dependency>
 	<groupId>com.github.tinder.scarlet</groupId>
 	<artifactId>scarlet</artifactId>
-	<version>0.1.2</version>
+	<version>0.1.3</version>
 </dependency>
 ```
 

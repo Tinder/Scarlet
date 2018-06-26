@@ -26,6 +26,8 @@
 
 ./gradlew scarlet-stream-adapter-rxjava:build scarlet-stream-adapter-rxjava:publishToMavenLocal
 
+./gradlew scarlet-stream-adapter-coroutines:build scarlet-stream-adapter-coroutines:publishToMavenLocal
+
 ./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:publishToMavenLocal
 
 ./gradlew scarlet-websocket-mockwebserver:build scarlet-websocket-mockwebserver:publishToMavenLocal
