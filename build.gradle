@@ -28,7 +28,8 @@ ktlint {
 subprojects {
     apply plugin: 'org.kordamp.gradle.stats'
     apply plugin: "com.jfrog.artifactory"
-    group = 'com.tinder.scarlet'
+    // group = 'com.tinder.scarlet' TODO use Bintray
+    group = 'com.github.tinder'
 
     repositories {
         google()

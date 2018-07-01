@@ -63,7 +63,7 @@ task sourcesJar(type: Jar) {
 publishing {
     publications {
         aar(MavenPublication) {
-            groupId 'com.tinder.scarlet'
+            groupId 'com.tinder'
             version version
             artifactId project.getName()
 

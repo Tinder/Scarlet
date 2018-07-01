@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.app.echo.inject
