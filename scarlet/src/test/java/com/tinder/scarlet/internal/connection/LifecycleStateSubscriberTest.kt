@@ -80,5 +80,4 @@ internal class LifecycleStateSubscriberTest {
         assertThatExceptionOfType(RuntimeException::class.java)
             .isThrownBy { flowable.subscribe(lifecycleStateSubscriber) }
     }
-
 }

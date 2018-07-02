@@ -46,5 +46,4 @@ class ScarletDemoApplication : Application(),
         Timber.plant(Timber.DebugTree())
         Stetho.initialize(stethoInitializer)
     }
-
 }

@@ -83,7 +83,6 @@ class MoshiMessageAdapter<T> private constructor(
             val serializeNull: Boolean = false,
             val failOnUnknown: Boolean = false
         )
-
     }
 
     private companion object {

@@ -35,5 +35,4 @@ class ObservableStreamAdapter<T> : StreamAdapter<T, Observable<T>> {
             }
         }
     }
-
 }

@@ -218,5 +218,4 @@ internal class Connection(
         private fun createSharedLifecycle() = LifecycleRegistry()
             .apply { lifecycle.subscribe(this) }
     }
-
 }

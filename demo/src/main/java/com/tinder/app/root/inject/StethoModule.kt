@@ -43,5 +43,4 @@ class StethoModule {
     internal fun provideInspectorModulesProvider(application: Application): InspectorModulesProvider {
         return Stetho.defaultInspectorModulesProvider(application)
     }
-
 }

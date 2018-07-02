@@ -10,17 +10,17 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import com.tinder.scarlet.WebSocket.Event
+import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.WebSocket.Event
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.testutils.TestStreamObserver
+import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.containingText
 import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.websocket.mockwebserver.newWebSocketFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import com.tinder.scarlet.ws.Receive
@@ -225,7 +225,6 @@ internal class GsonMessageAdapterTest {
                     else -> throw IllegalArgumentException("$type is not supported.")
                 }
             }
-
         }
 
         internal interface Service {
@@ -244,7 +243,5 @@ internal class GsonMessageAdapterTest {
             @Send
             fun sendAnInterface(impl: AnInterface): Boolean
         }
-
     }
-
 }

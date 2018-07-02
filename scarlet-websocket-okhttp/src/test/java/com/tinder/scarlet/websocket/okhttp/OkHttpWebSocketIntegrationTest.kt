@@ -233,5 +233,4 @@ internal class OkHttpWebSocketIntegrationTest {
         @Send
         fun sendBytesAndConfirm(message: ByteArray): Boolean
     }
-
 }

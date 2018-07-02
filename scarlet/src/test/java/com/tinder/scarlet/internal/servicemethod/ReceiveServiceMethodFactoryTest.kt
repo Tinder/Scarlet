@@ -196,5 +196,4 @@ internal class ReceiveServiceMethodFactoryTest {
             private inline fun <reified T, reified R> param() = arrayOf(T::class.java.onlyMethod(), R::class.java)
         }
     }
-
 }

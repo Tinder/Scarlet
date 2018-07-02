@@ -158,6 +158,4 @@ class StateMachine<STATE : Any, EVENT : Any> private constructor() {
         fun <STATE : Any, EVENT : Any> create(init: Builder<STATE, EVENT>.() -> Unit) =
             Builder<STATE, EVENT>().apply(init).build()
     }
-
 }
-

@@ -44,5 +44,4 @@ internal class BuiltInStreamAdapterFactoryTest {
             Collection::class.java
         )
     }
-
 }

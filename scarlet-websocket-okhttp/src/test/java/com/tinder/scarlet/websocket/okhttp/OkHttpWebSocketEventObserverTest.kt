@@ -51,5 +51,4 @@ internal class OkHttpWebSocketEventObserverTest {
             WebSocket.Event.OnConnectionFailed(throwable)
         )
     }
-
 }

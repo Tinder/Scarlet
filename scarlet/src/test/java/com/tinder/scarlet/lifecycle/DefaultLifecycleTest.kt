@@ -20,5 +20,4 @@ internal class DefaultLifecycleTest {
         // Then
         testSubscriber.assertValues(Lifecycle.State.Started)
     }
-
 }

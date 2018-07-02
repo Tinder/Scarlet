@@ -37,5 +37,4 @@ internal class OkHttpWebSocketEventObserver : WebSocketListener() {
 
     override fun onFailure(webSocket: okhttp3.WebSocket, t: Throwable, response: Response?) =
         processor.onNext(WebSocket.Event.OnConnectionFailed(t))
-
 }

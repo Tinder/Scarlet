@@ -235,5 +235,4 @@ internal class LifecycleRegistryTest {
         testSubscriber.assertValues(Lifecycle.State.Started, Lifecycle.State.Destroyed)
         testSubscriber.assertComplete()
     }
-
 }

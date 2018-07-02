@@ -24,5 +24,4 @@ internal class IdentityStreamAdapterTest {
         // Then
         assertThat(adaptedStream).isSameAs(stream)
     }
-
 }

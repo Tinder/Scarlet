@@ -16,5 +16,4 @@ class CommonModule {
     fun provideApplicationContext(application: Application): Context {
         return application
     }
-
 }

@@ -10,5 +10,4 @@ import com.tinder.scarlet.StreamAdapter
 class IdentityStreamAdapter<T> : StreamAdapter<T, Stream<T>> {
 
     override fun adapt(stream: Stream<T>): Stream<T> = stream
-
 }

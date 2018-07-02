@@ -26,5 +26,4 @@ internal class FlowableLifecycle(
             .map(List<Timed<Lifecycle.State>>::combine)
         return FlowableLifecycle(flowable, scheduler)
     }
-
 }

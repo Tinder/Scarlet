@@ -11,5 +11,4 @@ import io.reactivex.Flowable
 class FlowableStreamAdapter<T> : StreamAdapter<T, Flowable<T>> {
 
     override fun adapt(stream: Stream<T>): Flowable<T> = Flowable.fromPublisher(stream)
-
 }

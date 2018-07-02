@@ -15,5 +15,4 @@ class ByteArrayMessageAdapter : MessageAdapter<ByteArray> {
     }
 
     override fun toMessage(data: ByteArray): Message = Message.Bytes(data)
-
 }

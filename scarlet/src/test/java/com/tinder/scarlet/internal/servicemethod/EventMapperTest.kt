@@ -389,6 +389,5 @@ internal class EventMapperTest {
             ON_LIFECYCLE_TERMINATED,
             ON_STATE_CHANGE_TO_DESTROYED
         )
-
     }
 }

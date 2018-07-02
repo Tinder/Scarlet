@@ -21,5 +21,4 @@ internal class StaticUrlRequestFactoryTest {
         // Then
         assertThat(request1.url()).isEqualTo(request2.url())
     }
-
 }

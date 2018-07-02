@@ -12,7 +12,10 @@ internal sealed class RuntimePlatform {
     open fun isDefaultMethod(method: Method): Boolean = false
 
     open fun invokeDefaultMethod(
-        method: Method, declaringClass: Class<*>, proxy: Any, vararg args: Array<out Any>?
+        method: Method,
+        declaringClass: Class<*>,
+        proxy: Any,
+        vararg args: Array<out Any>?
     ): Any =
         throw UnsupportedOperationException()
 
@@ -22,7 +25,10 @@ internal sealed class RuntimePlatform {
         override fun isDefaultMethod(method: Method): Boolean = method.isDefault
 
         override fun invokeDefaultMethod(
-            method: Method, declaringClass: Class<*>, proxy: Any, vararg args: Array<out Any>?
+            method: Method,
+            declaringClass: Class<*>,
+            proxy: Any,
+            vararg args: Array<out Any>?
         ): Any {
             // Because the service interface might not be public, we need to use a MethodHandle lookup
             // that ignores the visibility of the declaringClass.

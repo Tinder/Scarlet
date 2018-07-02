@@ -25,5 +25,4 @@ internal class StreamAdapterResolver(
         val compositeException = CompositeException(*throwables.toTypedArray())
         throw IllegalStateException("Cannot resolve stream adapter for type $type.", compositeException)
     }
-
 }

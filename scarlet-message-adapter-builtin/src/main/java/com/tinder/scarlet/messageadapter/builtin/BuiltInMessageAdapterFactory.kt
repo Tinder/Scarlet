@@ -15,5 +15,4 @@ class BuiltInMessageAdapterFactory : MessageAdapter.Factory {
         ByteArray::class.java -> ByteArrayMessageAdapter()
         else -> throw IllegalArgumentException("Type is not supported by this MessageAdapterFactory: $type")
     }
-
 }

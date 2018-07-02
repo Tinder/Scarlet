@@ -127,7 +127,8 @@ internal sealed class EventMapper<T : Any> {
         }
 
         private fun resolveMessageAdapter(
-            returnType: ParameterizedType, annotations: Array<Annotation>
+            returnType: ParameterizedType,
+            annotations: Array<Annotation>
         ): MessageAdapter<Any> {
             val receivingType = returnType.getFirstTypeArgument()
             val messageType = when (receivingType.getRawType()) {
@@ -136,7 +137,6 @@ internal sealed class EventMapper<T : Any> {
             }
             return messageAdapterResolver.resolve(messageType, annotations)
         }
-
     }
 
     companion object {

@@ -15,5 +15,4 @@ class BuiltInStreamAdapterFactory : StreamAdapter.Factory {
         Stream::class.java -> IdentityStreamAdapter()
         else -> throw IllegalArgumentException("$type is not supported.")
     }
-
 }

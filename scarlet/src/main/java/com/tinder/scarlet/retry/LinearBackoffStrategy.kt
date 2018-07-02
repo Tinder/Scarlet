@@ -13,5 +13,4 @@ class LinearBackoffStrategy(
     }
 
     override fun backoffDurationMillisAt(retryCount: Int): Long = durationMillis
-
 }

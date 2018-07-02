@@ -31,5 +31,4 @@ internal class ConnectionFactoryTest {
         // Then
         assertThat(connection1.stateManager.lifecycle).isEqualTo(connection2.stateManager.lifecycle)
     }
-
 }

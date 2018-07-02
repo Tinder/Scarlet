@@ -27,5 +27,4 @@ class LoggedInLifecycle constructor(
             }
             .subscribe(lifecycleRegistry)
     }
-
 }

@@ -68,5 +68,4 @@ class TransactionRepository @Inject constructor(
         transactionBookRef.set(transactionBook)
         transactionBookProcessor.onNext(transactionBook)
     }
-
 }

@@ -37,5 +37,4 @@ internal class TextMessageAdapterTest {
         // Then
         assertThat(adaptedMessage).isEqualTo(textMessage)
     }
-
 }

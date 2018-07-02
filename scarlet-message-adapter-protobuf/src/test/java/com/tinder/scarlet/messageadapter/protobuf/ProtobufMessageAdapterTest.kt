@@ -218,6 +218,5 @@ internal class ProtobufMessageAdapterTest {
             @Receive
             fun receiveWrongClassDeserialization(): Stream<Deserialization<String>>
         }
-
     }
 }

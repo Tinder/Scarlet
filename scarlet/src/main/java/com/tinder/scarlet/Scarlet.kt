@@ -199,5 +199,4 @@ class Scarlet internal constructor(
             private val DEFAULT_SCHEDULER = Schedulers.computation() // TODO same thread option for debugging
         }
     }
-
 }
