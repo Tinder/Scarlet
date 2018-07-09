@@ -61,7 +61,7 @@ gdaxService.observeTicker()
 ~~~
 
 ###  Android
-Scarlet is driven by a [StateMachine](https://github.com/Tinder/StateMachine).
+Scarlet is driven by a [StateMachine][state-machine].
 
 <img width="600 px" src="/example/scarlet-state-machine.png"/>
 
@@ -69,7 +69,7 @@ TODO
 
 Download
 --------
-While we are working on Bintray support, Scarlet is available via [JitPack](jitpack).
+While we are working on Bintray support, Scarlet is available via [JitPack][jitpack].
 
 ##### Maven:
 ```xml
@@ -153,5 +153,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  [demo-app]: /demo/src/main/java/com/tinder/app
  [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
  [slides]: https://speakerdeck.com/zhxnlai/taming-websocket-with-scarlet
- [kotliners]:https://www.conferenceforkotliners.com/
- [jitpack]: https://jitpack.io/
+ [kotliners]: https://www.conferenceforkotliners.com/
+ [state-machine]: https://github.com/Tinder/StateMachine
+ [jitpack]: https://jitpack.io/#tinder/scarlet
