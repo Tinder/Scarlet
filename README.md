@@ -74,24 +74,24 @@ While we are working on Bintray support, Scarlet is available via [JitPack][jitp
 ##### Maven:
 ```xml
 <repository>
-	<id>jitpack.io</id>
-	<url>https://jitpack.io</url>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
 </repository>
 <dependency>
-	<groupId>com.github.tinder.scarlet</groupId>
-	<artifactId>scarlet</artifactId>
-	<version>0.1.3</version>
+    <groupId>com.github.tinder.scarlet</groupId>
+    <artifactId>scarlet</artifactId>
+    <version>0.1.4</version>
 </dependency>
 ```
 
 ##### Gradle:
 ```groovy
 repositories {
-	// ...
-	maven { url "https://jitpack.io" }
+    // ...
+    maven { url "https://jitpack.io" }
 }
 
-implementation 'com.github.tinder.scarlet:scarlet:0.1.2'
+implementation 'com.github.tinder.scarlet:scarlet:0.1.4'
 ```
 
 ### Plug-in Roadmap
