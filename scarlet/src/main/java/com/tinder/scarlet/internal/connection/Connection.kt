@@ -198,7 +198,7 @@ internal class Connection(
         private fun lifecycleStop() =
             any<Event, Event.OnLifecycle.StateChange<*>>().where { state is Lifecycle.State.Stopped }
 
-        private fun webSocketOpen() = any<Event, Event.OnWebSocket.Event<*>>()
+        private fun webSocketOpen() = any<Event, Event.OnWebSocket.WebSocketEvent<*>>()
             .where { event is WebSocket.Event.OnConnectionOpened<*> }
     }
 

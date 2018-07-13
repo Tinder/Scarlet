@@ -39,7 +39,7 @@ class ChatMessageRepository @Inject constructor(
                         Lifecycle.State.Destroyed -> "\uD83D\uDCA5 On Lifecycle Terminate"
                     }
                     Event.OnLifecycle.Terminate -> "\uD83D\uDCA5 On Lifecycle Terminate"
-                    is Event.OnWebSocket.Event<*> -> when (event.event) {
+                    is Event.OnWebSocket.WebSocketEvent<*> -> when (event.event) {
                         is WebSocket.Event.OnConnectionOpened<*> -> "\uD83D\uDEF0️ On WebSocket Connection Opened"
                         is WebSocket.Event.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket Message Received"
                         is WebSocket.Event.OnConnectionClosing -> "\uD83D\uDEF0️ On WebSocket Connection Closing"

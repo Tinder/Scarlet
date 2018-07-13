@@ -234,25 +234,25 @@ internal class EventMapperFactoryTest {
 
             fun streamOfEventSubclassOnLifecycleTerminate(): Stream<Event.OnLifecycle.Terminate>
 
-            fun streamOfEventSubclassOnWebSocketEvent(): Stream<Event.OnWebSocket.Event<WebSocket.Event>>
+            fun streamOfEventSubclassOnWebSocketEvent(): Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event>>
 
             fun streamOfEventSubclassOnWebSocketEventOnConnectionOpenedAny():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionOpened<*>>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>>
 
             fun streamOfEventSubclassOnWebSocketEventOnConnectionOpenedMyWebSocket():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionOpened<MyWebSocket>>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnConnectionOpened<MyWebSocket>>>
 
             fun streamOfEventSubclassOnWebSocketEventOnMessageReceived():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnMessageReceived>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnMessageReceived>>
 
             fun streamOfEventSubclassOnWebSocketEventOnConnectionClosing():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionClosing>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnConnectionClosing>>
 
             fun streamOfEventSubclassOnWebSocketEventOnConnectionClosed():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionClosed>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnConnectionClosed>>
 
             fun streamOfEventSubclassOnWebSocketEventOnConnectionFailed():
-                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionFailed>>
+                    Stream<Event.OnWebSocket.WebSocketEvent<WebSocket.Event.OnConnectionFailed>>
 
             fun streamOfEventSubclassOnWebSocketTerminate(): Stream<Event.OnWebSocket.Terminate>
 

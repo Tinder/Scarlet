@@ -150,7 +150,7 @@ internal class EventMapperTest {
             )
 
             private fun param(events: List<Event>) =
-                arrayOf(events, events.mapNotNull { (it as? Event.OnWebSocket.Event<*>)?.event })
+                arrayOf(events, events.mapNotNull { (it as? Event.OnWebSocket.WebSocketEvent<*>)?.event })
         }
     }
 
@@ -311,16 +311,16 @@ internal class EventMapperTest {
         private val ON_LIFECYCLE_TERMINATED = Event.OnLifecycle.Terminate
 
         private val ON_WEB_SOCKET_CONNECTION_OPENED =
-            Event.OnWebSocket.Event(mock<WebSocket.Event.OnConnectionOpened<*>>())
-        private val ON_WEB_SOCKET_MESSAGE_RECEIVED = Event.OnWebSocket.Event(WEB_SOCKET_EVENT_ON_MESSAGE_RECEIVED)
+            Event.OnWebSocket.WebSocketEvent(mock<WebSocket.Event.OnConnectionOpened<*>>())
+        private val ON_WEB_SOCKET_MESSAGE_RECEIVED = Event.OnWebSocket.WebSocketEvent(WEB_SOCKET_EVENT_ON_MESSAGE_RECEIVED)
         private val ON_WEB_SOCKET_MESSAGE_RECEIVED_MALFORMED =
-            Event.OnWebSocket.Event(WEB_SOCKET_EVENT_ON_MALFORMED_MESSAGE_RECEIVED)
+            Event.OnWebSocket.WebSocketEvent(WEB_SOCKET_EVENT_ON_MALFORMED_MESSAGE_RECEIVED)
         private val ON_WEB_SOCKET_CONNECTION_CLOSING =
-            Event.OnWebSocket.Event(mock<WebSocket.Event.OnConnectionClosing>())
+            Event.OnWebSocket.WebSocketEvent(mock<WebSocket.Event.OnConnectionClosing>())
         private val ON_WEB_SOCKET_CONNECTION_CLOSED =
-            Event.OnWebSocket.Event(mock<WebSocket.Event.OnConnectionClosed>())
+            Event.OnWebSocket.WebSocketEvent(mock<WebSocket.Event.OnConnectionClosed>())
         private val ON_WEB_SOCKET_CONNECTION_FAILED =
-            Event.OnWebSocket.Event(mock<WebSocket.Event.OnConnectionFailed>())
+            Event.OnWebSocket.WebSocketEvent(mock<WebSocket.Event.OnConnectionFailed>())
         private val ON_WEB_SOCKET_CONNECTION_TERMINATED = Event.OnWebSocket.Terminate
 
         private val ON_RETRY = Event.OnRetry

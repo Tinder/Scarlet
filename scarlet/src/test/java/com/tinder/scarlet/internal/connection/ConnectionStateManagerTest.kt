@@ -67,7 +67,7 @@ internal class ConnectionStateManagerTest {
         events.awaitValues(
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>()
         )
     }
@@ -134,7 +134,7 @@ internal class ConnectionStateManagerTest {
         events.awaitValues(
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Stopped.WithReason>(),
             any<Event.OnStateChange<*>>().withState<State.Disconnecting>(),
@@ -173,7 +173,7 @@ internal class ConnectionStateManagerTest {
         events.awaitValues(
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Stopped.WithReason>(),
@@ -211,7 +211,7 @@ internal class ConnectionStateManagerTest {
         events.awaitValues(
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Stopped.AndAborted>(),
             any<Event.OnStateChange<*>>().withState<State.Disconnecting>(),
@@ -260,7 +260,7 @@ internal class ConnectionStateManagerTest {
         events.awaitValues(
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Stopped.WithReason>(),
             any<Event.OnStateChange<*>>().withState<State.Disconnecting>(),
@@ -268,7 +268,7 @@ internal class ConnectionStateManagerTest {
             any<Event.OnStateChange<*>>().withState<State.Disconnected>(),
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
-            any<Event.OnWebSocket.Event<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
+            any<Event.OnWebSocket.WebSocketEvent<*>>().withWebSocketEvent<WebSocket.Event.OnConnectionOpened<*>>(),
             any<Event.OnStateChange<*>>().withState<State.Connected>()
         )
     }

@@ -12,7 +12,7 @@ sealed class Event {
     }
 
     sealed class OnWebSocket : Event() {
-        data class Event<out T : WebSocket.Event> internal constructor(val event: T) : OnWebSocket()
+        data class WebSocketEvent<out T : WebSocket.Event> internal constructor(val event: T) : OnWebSocket()
 
         object Terminate : OnWebSocket()
     }

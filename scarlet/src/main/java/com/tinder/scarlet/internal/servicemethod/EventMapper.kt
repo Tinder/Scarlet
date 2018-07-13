@@ -41,7 +41,7 @@ internal sealed class EventMapper<T : Any> {
     }
 
     object ToWebSocketEvent : EventMapper<WebSocket.Event>() {
-        private val filterEventType = FilterEventType(Event.OnWebSocket.Event::class.java)
+        private val filterEventType = FilterEventType(Event.OnWebSocket.WebSocketEvent::class.java)
 
         override fun mapToData(event: Event): Maybe<WebSocket.Event> = filterEventType.mapToData(event).map { it.event }
     }

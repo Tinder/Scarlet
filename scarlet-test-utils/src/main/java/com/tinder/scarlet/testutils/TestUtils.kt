@@ -26,7 +26,7 @@ inline fun <reified T : Lifecycle.State> ValueAssert<Event.OnLifecycle.StateChan
         assertThat(state).isInstanceOf(T::class.java)
     }
 
-inline fun <reified T : WebSocket.Event> ValueAssert<Event.OnWebSocket.Event<*>>.withWebSocketEvent() = assert {
+inline fun <reified T : WebSocket.Event> ValueAssert<Event.OnWebSocket.WebSocketEvent<*>>.withWebSocketEvent() = assert {
     assertThat(event).isInstanceOf(T::class.java)
 }
 

@@ -31,7 +31,7 @@ internal class WebSocketEventSubscriberTest {
 
         // Then
         then(connectionStateManager).should().handleEvent(
-            argThat<Event.OnWebSocket.Event<*>> { this.event == event })
+            argThat<Event.OnWebSocket.WebSocketEvent<*>> { this.event == event })
     }
 
     @Test

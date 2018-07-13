@@ -13,7 +13,7 @@ internal class WebSocketEventSubscriber(
     private val stateManager: Connection.StateManager
 ) : DisposableSubscriber<WebSocket.Event>() {
     override fun onNext(webSocketEvent: WebSocket.Event) =
-        stateManager.handleEvent(Event.OnWebSocket.Event(webSocketEvent))
+        stateManager.handleEvent(Event.OnWebSocket.WebSocketEvent(webSocketEvent))
 
     override fun onComplete() = stateManager.handleEvent(Event.OnWebSocket.Terminate)
 
