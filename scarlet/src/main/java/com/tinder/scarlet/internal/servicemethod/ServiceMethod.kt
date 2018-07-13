@@ -14,6 +14,8 @@ import io.reactivex.Scheduler
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import javax.inject.Inject
+import javax.inject.Singleton
 
 internal sealed class ServiceMethod {
 
@@ -31,7 +33,11 @@ internal sealed class ServiceMethod {
             return connection.send(message)
         }
 
-        class Factory(private val messageAdapterResolver: MessageAdapterResolver) : ServiceMethod.Factory {
+        @Singleton
+        class Factory @Inject constructor(
+            private val messageAdapterResolver: MessageAdapterResolver
+        ) : ServiceMethod.Factory {
+
             override fun create(connection: Connection, method: Method): Send {
                 method.requireParameterTypes(Any::class.java) {
                     "Send method must have one and only one parameter: $method"
@@ -63,11 +69,13 @@ internal sealed class ServiceMethod {
             return streamAdapter.adapt(stream)
         }
 
-        class Factory(
+        @Singleton
+        class Factory @Inject constructor(
             private val scheduler: Scheduler,
             private val eventMapperFactory: EventMapper.Factory,
             private val streamAdapterResolver: StreamAdapterResolver
         ) : ServiceMethod.Factory {
+
             override fun create(connection: Connection, method: Method): Receive {
                 method.requireParameterTypes { "Receive method must have zero parameter: $method" }
                 method.requireReturnTypeIsOneOf(ParameterizedType::class.java) {

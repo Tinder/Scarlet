@@ -31,6 +31,8 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.processors.PublishProcessor
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
 internal class Connection(
     val stateManager: StateManager
@@ -202,7 +204,8 @@ internal class Connection(
             .where { event is WebSocket.Event.OnConnectionOpened<*> }
     }
 
-    class Factory(
+    @Singleton
+    class Factory @Inject constructor(
         private val lifecycle: Lifecycle,
         private val webSocketFactory: WebSocket.Factory,
         private val backoffStrategy: BackoffStrategy,

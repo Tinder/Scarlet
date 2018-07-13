@@ -16,6 +16,8 @@ import com.tinder.scarlet.utils.getRawType
 import io.reactivex.Maybe
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import javax.inject.Inject
+import javax.inject.Singleton
 
 internal sealed class EventMapper<T : Any> {
 
@@ -76,7 +78,8 @@ internal sealed class EventMapper<T : Any> {
             .map { (it as Deserialization.Success).value }
     }
 
-    class Factory(
+    @Singleton
+    class Factory @Inject constructor(
         private val messageAdapterResolver: MessageAdapterResolver
     ) {
 
