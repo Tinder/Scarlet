@@ -48,15 +48,7 @@ interface SseComponent {
         @Provides
         @SseScope
         fun provideOkHttpClient(): OkHttpClient {
-            return OkHttpClient.Builder()
-//            .addInterceptor { chain ->
-//                val request = chain.request().newBuilder()
-//                    .addHeader("X-Sd-Token", "ZTUxYjBiZGEtZjEzOS00MDExLWE5ODktYjAxOTI4ZDhkZDk5")
-//                    .build()
-//                chain.proceed(request)
-//            }
-//                TODO: this will break the connection addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .build()
+            return OkHttpClient.Builder().build()
         }
 
         @Provides
@@ -91,7 +83,9 @@ interface SseComponent {
     abstract class SseAbstractModule {
         @Binds
         @SseScope
-        abstract fun bindSockPriceRepository(sseStockPriceRepository: SseStockPriceRepository): StockPriceRepository
+        abstract fun bindSockPriceRepository(
+            sseStockPriceRepository: SseStockPriceRepository
+        ): StockPriceRepository
     }
 
     interface ComponentProvider {
