@@ -25,12 +25,15 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LGPL-3.0.txt'
     }
 }
 
 dependencies {
     implementation project(':scarlet')
     implementation project(':scarlet-websocket-okhttp')
+    implementation project(':scarlet-websocket-oksse')
     implementation project(':scarlet-lifecycle-android')
     implementation project(':scarlet-message-adapter-moshi')
     implementation project(':scarlet-message-adapter-protobuf')
@@ -38,6 +41,7 @@ dependencies {
 
     implementation rootProject.ext.supportAppCompat
     implementation rootProject.ext.supportDesign
+    implementation rootProject.ext.constraintLayout
     implementation rootProject.ext.multiDex
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxAndroid
@@ -55,6 +59,8 @@ dependencies {
     implementation rootProject.ext.chatMessageView
     implementation rootProject.ext.filePicker
     implementation rootProject.ext.glide
+    implementation rootProject.ext.jacksonDatabind
+    implementation rootProject.ext.jsonPatch
 
     testImplementation rootProject.ext.junit
 }

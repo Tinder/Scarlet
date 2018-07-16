@@ -8,13 +8,15 @@ import android.app.Application
 import com.tinder.app.echo.inject.EchoBotComponent
 import com.tinder.app.gdax.inject.GdaxComponent
 import com.tinder.app.root.ScarletDemoApplication
+import com.tinder.app.sse.inject.SseComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [(CommonModule::class), (StethoModule::class)])
-interface ApplicationComponent : GdaxComponent.Dependency, EchoBotComponent.Dependency {
+interface ApplicationComponent : GdaxComponent.Dependency, EchoBotComponent.Dependency,
+    SseComponent.Dependency {
 
     fun inject(application: ScarletDemoApplication)
 
