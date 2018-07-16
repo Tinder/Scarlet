@@ -4,4 +4,4 @@
 
 package com.tinder.scarlet.websocket.oksse.model
 
-data class ServerSentMessage(val event: String, val data: String)
+internal data class ServerSentMessage(val event: String, val data: String)

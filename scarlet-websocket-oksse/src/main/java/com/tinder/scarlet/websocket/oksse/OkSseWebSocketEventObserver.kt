@@ -15,7 +15,7 @@ import io.reactivex.processors.PublishProcessor
 import okhttp3.Request
 import okhttp3.Response
 
-class OkSseWebSocketEventObserver : ServerSentEvent.Listener {
+internal class OkSseWebSocketEventObserver : ServerSentEvent.Listener {
     private val processor = PublishProcessor.create<WebSocket.Event>().toSerialized()
 
     fun observe(): Flowable<WebSocket.Event> = processor

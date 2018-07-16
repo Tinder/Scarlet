@@ -12,7 +12,7 @@ import com.tinder.scarlet.websocket.oksse.request.StaticUrlRequestFactory
 import okhttp3.OkHttpClient
 
 fun OkHttpClient.newSseWebSocketFactory(requestFactory: RequestFactory): WebSocket.Factory {
-    return OkSseWebSocket.Factory(OkHttpClientSSEConnectionEstablisher(this, requestFactory))
+    return OkSseWebSocket.Factory(OkHttpClientSseConnectionEstablisher(this, requestFactory))
 }
 
 fun OkHttpClient.newSseWebSocketFactory(url: String): WebSocket.Factory {
