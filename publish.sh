@@ -31,6 +31,8 @@
 
 ./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:artifactoryPublish
 
+./gradlew scarlet-websocket-oksse:build scarlet-websocket-oksse:artifactoryPublish
+
 ./gradlew scarlet-websocket-mockwebserver:build scarlet-websocket-mockwebserver:artifactoryPublish
 
 ./gradlew scarlet-lifecycle-android:assemble scarlet-lifecycle-android:generatePomFileForAarPublication

@@ -28,6 +28,8 @@
 
 ./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:publishToMavenLocal
 
+./gradlew scarlet-websocket-oksse:build scarlet-websocket-oksse:publishToMavenLocal
+
 ./gradlew scarlet-websocket-mockwebserver:build scarlet-websocket-mockwebserver:publishToMavenLocal
 
 ./gradlew scarlet-lifecycle-android:assemble scarlet-lifecycle-android:generatePomFileForAarPublication
