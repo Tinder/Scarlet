@@ -14,7 +14,7 @@ class AuthStatusRepository @Inject constructor() {
 
     private val authStatusProcessor = BehaviorProcessor.createDefault<AuthStatus>(AuthStatus.LOGGED_IN)
 
-    fun getAuthStatus(): AuthStatus = authStatusProcessor.value
+    fun getAuthStatus(): AuthStatus = authStatusProcessor.value!!
 
     fun observeAuthStatus(): Flowable<AuthStatus> = authStatusProcessor
 
