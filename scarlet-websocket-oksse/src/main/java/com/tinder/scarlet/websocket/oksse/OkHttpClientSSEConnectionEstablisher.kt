@@ -10,7 +10,7 @@ import com.tinder.scarlet.websocket.okhttp.request.RequestFactory
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class OkHttpClientSSEConnectionEstablisher(
+class OkHttpClientSseConnectionEstablisher(
     okHttpClient: OkHttpClient,
     private val requestFactory: RequestFactory
 ) : OkSseWebSocket.ConnectionEstablisher {
