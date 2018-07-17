@@ -5,11 +5,14 @@
 package com.tinder.scarlet.websocket.oksse
 
 import com.here.oksse.ServerSentEvent
+import com.squareup.moshi.KotlinJsonAdapterFactory
+import com.squareup.moshi.Moshi
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.ShutdownReason
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.utils.toStream
+import com.tinder.scarlet.websocket.oksse.model.ServerSentMessage
 
 class OkSseWebSocket internal constructor(
     private val serverSentEventHolder: ServerSentEventHolder,
@@ -64,9 +67,16 @@ class OkSseWebSocket internal constructor(
         override fun create(): WebSocket {
             return OkSseWebSocket(
                 ServerSentEventHolder(),
-                OkSseWebSocketEventObserver(),
+                OkSseWebSocketEventObserver(MESSAGE_JSON_ADAPTER),
                 connectionEstablisher
             )
+        }
+
+        private companion object {
+            private val MOSHI = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+            private val MESSAGE_JSON_ADAPTER = MOSHI.adapter(ServerSentMessage::class.java)
         }
     }
 }

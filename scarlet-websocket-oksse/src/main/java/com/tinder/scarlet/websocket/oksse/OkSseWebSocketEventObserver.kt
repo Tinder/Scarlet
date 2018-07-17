@@ -5,6 +5,7 @@
 package com.tinder.scarlet.websocket.oksse
 
 import com.here.oksse.ServerSentEvent
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.tinder.scarlet.Message
@@ -15,7 +16,9 @@ import io.reactivex.processors.PublishProcessor
 import okhttp3.Request
 import okhttp3.Response
 
-internal class OkSseWebSocketEventObserver : ServerSentEvent.Listener {
+internal class OkSseWebSocketEventObserver(
+    private val jsonAdapter: JsonAdapter<ServerSentMessage>
+) : ServerSentEvent.Listener {
     private val processor = PublishProcessor.create<WebSocket.Event>().toSerialized()
 
     fun observe(): Flowable<WebSocket.Event> = processor
@@ -48,11 +51,7 @@ internal class OkSseWebSocketEventObserver : ServerSentEvent.Listener {
     }
 
     override fun onMessage(sse: ServerSentEvent, id: String, event: String, message: String) {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        val stringAdapter = moshi.adapter(ServerSentMessage::class.java)
-        val jsonString = stringAdapter.toJson(
+        val jsonString = jsonAdapter.toJson(
             ServerSentMessage(
                 event,
                 message
