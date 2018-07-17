@@ -18,7 +18,6 @@ class OkSseWebSocket internal constructor(
     private val serverSentEventHolder: ServerSentEventHolder,
     private val okSseWebSocketEventObserver: OkSseWebSocketEventObserver,
     private val connectionEstablisher: ConnectionEstablisher
-
 ) : WebSocket {
 
     override fun open(): Stream<WebSocket.Event> {
