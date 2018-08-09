@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.servicemethod
@@ -185,5 +185,4 @@ internal class ServiceMethodExecutorFactoryTest {
                 arrayOf(T::class.java, numberOfSendMethods, numberOfReceiveMethods)
         }
     }
-
 }

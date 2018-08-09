@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.streamadapter.rxjava
@@ -18,5 +18,4 @@ class RxJavaStreamAdapterFactory : StreamAdapter.Factory {
         Observable::class.java -> ObservableStreamAdapter()
         else -> throw IllegalArgumentException()
     }
-
 }

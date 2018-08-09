@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.servicemethod
@@ -106,5 +106,4 @@ internal sealed class ServiceMethod {
 
         private fun Method.getFirstParameterAnnotations(): Array<Annotation> = parameterAnnotations.first()
     }
-
 }

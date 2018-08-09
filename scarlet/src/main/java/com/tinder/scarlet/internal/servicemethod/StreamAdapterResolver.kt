@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.servicemethod
@@ -25,5 +25,4 @@ internal class StreamAdapterResolver(
         val compositeException = CompositeException(*throwables.toTypedArray())
         throw IllegalStateException("Cannot resolve stream adapter for type $type.", compositeException)
     }
-
 }

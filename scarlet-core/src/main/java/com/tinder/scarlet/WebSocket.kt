@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet
@@ -79,5 +79,4 @@ interface WebSocket {
     interface Factory {
         fun create(): WebSocket
     }
-
 }

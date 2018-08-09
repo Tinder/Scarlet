@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.statemachine
@@ -158,6 +158,4 @@ class StateMachine<STATE : Any, EVENT : Any> private constructor() {
         fun <STATE : Any, EVENT : Any> create(init: Builder<STATE, EVENT>.() -> Unit) =
             Builder<STATE, EVENT>().apply(init).build()
     }
-
 }
-

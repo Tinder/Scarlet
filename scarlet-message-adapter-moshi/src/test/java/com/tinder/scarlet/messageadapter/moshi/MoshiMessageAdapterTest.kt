@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.messageadapter.moshi
@@ -302,7 +302,8 @@ internal class MoshiMessageAdapterTest {
 
         class VerifyJsonQualifierJsonAdapterFactory : JsonAdapter.Factory {
             override fun create(
-                type: Type, annotations: Set<Annotation>,
+                type: Type,
+                annotations: Set<Annotation>,
                 moshi: Moshi
             ): JsonAdapter<*>? {
                 for (annotation in annotations) {
@@ -381,7 +382,5 @@ internal class MoshiMessageAdapterTest {
             @NonQualifer
             fun observeAnnotatedString(): Stream<String>
         }
-
     }
-
 }

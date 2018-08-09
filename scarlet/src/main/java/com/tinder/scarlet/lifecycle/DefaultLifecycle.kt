@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.lifecycle
@@ -13,5 +13,4 @@ internal class DefaultLifecycle(
     init {
         lifecycleRegistry.onNext(Lifecycle.State.Started)
     }
-
 }

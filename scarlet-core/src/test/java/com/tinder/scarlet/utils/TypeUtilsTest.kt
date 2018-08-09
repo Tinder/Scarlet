@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.utils
@@ -70,7 +70,6 @@ internal class TypeUtilsTest {
             private fun param(type: Type, expectedHasUnresolvableType: Boolean) =
                 arrayOf(type, expectedHasUnresolvableType)
         }
-
     }
 
     @RunWith(Parameterized::class)
@@ -102,7 +101,6 @@ internal class TypeUtilsTest {
             private fun param(type: ParameterizedType, expectedParameterUpperBound: Array<Type>) =
                 arrayOf(type, expectedParameterUpperBound)
         }
-
     }
 
     private companion object {
@@ -146,5 +144,4 @@ internal class TypeUtilsTest {
             }
         }
     }
-
 }

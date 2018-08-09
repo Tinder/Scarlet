@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.websocket.okhttp.request
@@ -21,5 +21,4 @@ internal class StaticUrlRequestFactoryTest {
         // Then
         assertThat(request1.url()).isEqualTo(request2.url())
     }
-
 }

@@ -25,7 +25,7 @@ artifacts {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId 'com.tinder.scarlet'
+            groupId 'com.tinder'
             version version
             artifactId project.getName()
             artifact sourcesJar

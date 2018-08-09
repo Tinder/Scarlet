@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.app.gdax.target
@@ -10,5 +10,4 @@ import com.tinder.app.gdax.domain.Transaction
 interface GdaxTarget {
 
     fun showTransactions(product: Product, transactions: List<Transaction>)
-
 }

@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.servicemethod
@@ -127,7 +127,8 @@ internal sealed class EventMapper<T : Any> {
         }
 
         private fun resolveMessageAdapter(
-            returnType: ParameterizedType, annotations: Array<Annotation>
+            returnType: ParameterizedType,
+            annotations: Array<Annotation>
         ): MessageAdapter<Any> {
             val receivingType = returnType.getFirstTypeArgument()
             val messageType = when (receivingType.getRawType()) {
@@ -136,7 +137,6 @@ internal sealed class EventMapper<T : Any> {
             }
             return messageAdapterResolver.resolve(messageType, annotations)
         }
-
     }
 
     companion object {

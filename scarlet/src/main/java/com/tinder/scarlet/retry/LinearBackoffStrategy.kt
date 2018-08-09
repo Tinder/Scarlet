@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.retry
@@ -13,5 +13,4 @@ class LinearBackoffStrategy(
     }
 
     override fun backoffDurationMillisAt(retryCount: Int): Long = durationMillis
-
 }

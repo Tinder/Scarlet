@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.streamadapter.builtin
@@ -15,5 +15,4 @@ class BuiltInStreamAdapterFactory : StreamAdapter.Factory {
         Stream::class.java -> IdentityStreamAdapter()
         else -> throw IllegalArgumentException("$type is not supported.")
     }
-
 }

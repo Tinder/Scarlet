@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet
@@ -28,6 +28,5 @@ interface StreamAdapter<T, out R> {
          * handled by this factory.
          */
         fun create(type: Type): StreamAdapter<Any, Any>
-
     }
 }
