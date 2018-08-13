@@ -52,7 +52,7 @@ internal class GsonMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val data = AnImplementation("value")
-        val expectedString = "{\"name\":\"value\"}"
+        val expectedString = """{"name":"value"}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -72,7 +72,7 @@ internal class GsonMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val data = AnImplementation("value")
-        val expectedString = "{\"name\":\"value\"}"
+        val expectedString = """{"name":"value"}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
