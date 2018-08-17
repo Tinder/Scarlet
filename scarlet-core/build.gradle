@@ -5,6 +5,7 @@ apply plugin: 'maven-publish'
 
 dependencies {
     api rootProject.ext.reactiveStreams
+    api rootProject.ext.stateMachine
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation rootProject.ext.junit

@@ -12,7 +12,6 @@ import com.tinder.scarlet.Event.OnWebSocket
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Session
-import com.tinder.scarlet.SideEffect
 import com.tinder.scarlet.State
 import com.tinder.scarlet.State.Connected
 import com.tinder.scarlet.State.Connecting
@@ -28,6 +27,7 @@ import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.retry.BackoffStrategy
 import com.tinder.StateMachine.Matcher.Companion.any
 import com.tinder.StateMachine.Transition.Valid
+import com.tinder.scarlet.SideEffect
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable

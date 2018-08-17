@@ -21,11 +21,6 @@ dependencies {
     testImplementation rootProject.ext.kotlinReflect
     testImplementation rootProject.ext.assertJ
 }
-repositories {
-    maven { url "https://jitpack.io" }
-    mavenCentral()
-    google()
-}
 
 dokka {
     outputFormat = 'javadoc'
