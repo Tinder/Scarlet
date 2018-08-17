@@ -7,9 +7,9 @@ dependencies {
     api project(':scarlet-core')
 
     implementation project(':scarlet-core-internal')
-    implementation project(':state-machine')
     implementation project(':scarlet-message-adapter-builtin')
     implementation project(':scarlet-stream-adapter-builtin')
+    implementation rootProject.ext.stateMachine
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxKotlin
     implementation rootProject.ext.kotlinStdlib
@@ -22,6 +22,7 @@ dependencies {
     testImplementation rootProject.ext.assertJ
 }
 repositories {
+    maven { url "https://jitpack.io" }
     mavenCentral()
     google()
 }

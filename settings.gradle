@@ -1,6 +1,5 @@
 include ':scarlet-core'
 include ':scarlet-core-internal'
-include ':state-machine'
 include ':scarlet'
 include ':scarlet-test-utils'
 include ':scarlet-message-adapter-builtin'
