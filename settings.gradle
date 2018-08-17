@@ -1,4 +1,4 @@
-include ':scarlet-core'
+include ':scarlet-core', ':scarlet-webcoket'
 include ':scarlet-core-internal'
 include ':scarlet'
 include ':scarlet-test-utils'
