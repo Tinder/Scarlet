@@ -38,6 +38,16 @@ interface Scarlet2 {
 
     sealed class ClientEvent {
 
+        // method invocation
+        data class OnSendMethodCalled(
+            val data: Any
+        ) : ClientEvent()
+
+        data class OnReceiveMethodCalled(
+            // TODO this is important
+            val dataMapper: Any
+        ) : ClientEvent()
+
         data class OnLifecycleChanged(
             val lifecycleState: LifecycleState
         ) : ClientEvent()
@@ -66,9 +76,13 @@ interface Scarlet2 {
     }
 
     sealed class SideEffect {
-        object ScheduleTimerTick : SideEffect()
+        data class ScheduleTimer(val duration: Long) : SideEffect()
 
-
+        data class OpenConnection(val reason: ClientOpenReason) : SideEffect()
+        data class CloseConnection(val reason: ClientCloseReason) : SideEffect()
+        data class SendMessage(val topic: Topic, val message: Message) : SideEffect()
+        data class Subscribe(val topic: Topic) : SideEffect()
+        data class Unsubscribe(val topic: Topic) : SideEffect()
     }
 
     sealed class LifecycleState {
@@ -99,7 +113,6 @@ interface Scarlet2 {
     class WebSocketState {
 
     }
-
 
 
     interface Connection {
