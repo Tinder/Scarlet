@@ -20,6 +20,15 @@ sealed class Event {
         val topic: Topic
     ) : Event()
 
+    data class OnTopicSubscribed(
+        val topic: Topic
+    ) : Event()
+
+    data class OnTopicUnsubscribed(
+        val topic: Topic
+    ) : Event()
+
+
     object OnLifecycleStarted: Event()
 
     object OnLifecycleStopped: Event()

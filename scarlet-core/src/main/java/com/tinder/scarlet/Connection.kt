@@ -22,5 +22,7 @@ interface Connection {
 //        fun onMessageEnqueued(message: Message, clientMessageInfo: ClientMessageInfo)
 //        fun onMessageSent(message: Message, clientMessageInfo: ClientMessageInfo)
 //        fun onMessageDelivered(message: Message, clientMessageInfo: ClientMessageInfo)
+//        fun onTopicSubscribed
+//        fun onTopicUnsubscribed
     }
 }
