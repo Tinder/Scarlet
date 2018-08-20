@@ -5,15 +5,15 @@
 package com.tinder.scarlet
 
 sealed class SideEffect {
-    data class ScheduleTimer(val retryCount: Int) : SideEffect()
+    data class ScheduleConnection(val retryCount: Int) : SideEffect()
 
-    data class OpenConnection(val option: ClientOpenOption? = null) : SideEffect()
-    data class CloseConnection(val option: ClientCloseOption? = null) : SideEffect()
-    data class ForceCloseConnection(val option: ClientCloseOption? = null) : SideEffect()
+    data class OpenConnection(val option: Any? = null) : SideEffect()
+    data class CloseConnection(val option: Any? = null) : SideEffect()
+    data class ForceCloseConnection(val option: Any? = null) : SideEffect()
     data class SendMessage(
         val topic: Topic,
         val message: Message,
-        val clientMessageInfo: ClientMessageInfo? = null
+        val option: Any? = null
     ) : SideEffect()
 
     data class Subscribe(val topic: Topic) : SideEffect()

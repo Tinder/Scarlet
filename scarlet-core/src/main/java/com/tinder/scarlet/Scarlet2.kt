@@ -37,13 +37,6 @@ interface Scarlet2 {
     }
 
 
-    //    data class ConnectionStateTransition(
-//        val from: ConnectionState,
-//        val to: ConnectionState,
-//        val event: Event,
-//        val sideEffect: SideEffect?
-//    )
-
     interface ReasonFactory {
 
     }

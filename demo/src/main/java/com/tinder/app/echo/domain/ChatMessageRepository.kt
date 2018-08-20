@@ -48,7 +48,7 @@ class ChatMessageRepository @Inject constructor(
                     }
                     Event.OnWebSocket.Terminate -> "\uD83D\uDEF0️ On WebSocket Terminate"
                     is Event.OnStateChange<*> -> when (event.state) {
-                        is State.WaitingToRetry -> "\uD83D\uDCA4 WaitingToRetry"
+                        is State.WillOpen -> "\uD83D\uDCA4 WaitingToRetry"
                         is State.Connecting -> "⏳ Connecting"
                         is State.Connected -> "\uD83D\uDEEB Connected"
                         State.Disconnecting -> "⏳ Disconnecting"
