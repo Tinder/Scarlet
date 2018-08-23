@@ -5,8 +5,6 @@
 package com.tinder.scarlet.state
 
 import com.tinder.StateMachine
-import com.tinder.StateMachine.Companion.create
-import com.tinder.scarlet.ConfigFactory
 import com.tinder.scarlet.RequestFactory
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleDestroyed
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleStarted
@@ -29,15 +27,15 @@ import com.tinder.scarlet.state.Worker.State.WillStart
 
 internal object Worker {
 
-    fun <REQUEST : Any, RESPONSE : Any> create(
+    fun <START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any> create(
         // request factory
-        startRequestFactory: RequestFactory<REQUEST>,
-        stopRequestFactory: RequestFactory<REQUEST>,
+        startRequestFactory: RequestFactory<START_REQUEST>,
+        stopRequestFactory: RequestFactory<STOP_REQUEST>,
         listener: (StateMachine.Transition.Valid<Worker.State, Worker.Event, Worker.SideEffect>) -> Unit
     ): StateMachine<State, Event, SideEffect> {
-        return create {
-            initialState(Stopped<REQUEST, RESPONSE>())
-            state<Stopped<REQUEST, RESPONSE>> {
+        return StateMachine.create {
+            initialState(Stopped<STOP_REQUEST, STOP_RESPONSE>())
+            state<Stopped<STOP_REQUEST, STOP_RESPONSE>> {
                 on<OnLifecycleStarted> {
                     transitionTo(
                         WillStart(retryCount = 0),
@@ -54,15 +52,15 @@ internal object Worker {
                     transitionTo(Starting(retryCount, clientOption), StartWork(clientOption))
                 }
                 on<OnLifecycleStopped> {
-                    transitionTo(Stopped<REQUEST, RESPONSE>(), UnscheduleRetry)
+                    transitionTo(Stopped<STOP_REQUEST, STOP_RESPONSE>(), UnscheduleRetry)
                 }
                 on<OnLifecycleDestroyed> {
                     transitionTo(Destroyed, UnscheduleRetry)
                 }
             }
-            state<Starting<REQUEST>> {
-                on<OnWorkStarted<RESPONSE>> {
-                    transitionTo(Started<REQUEST, RESPONSE>())
+            state<Starting<START_REQUEST>> {
+                on<OnWorkStarted<START_REQUEST>> {
+                    transitionTo(Started<START_REQUEST, START_RESPONSE>())
                 }
                 on<OnWorkFailed> {
                     transitionTo(
@@ -71,13 +69,13 @@ internal object Worker {
                     )
                 }
             }
-            state<Started<REQUEST, RESPONSE>> {
+            state<Started<START_REQUEST, START_RESPONSE>> {
                 on<OnLifecycleStopped> {
                     val clientOption = stopRequestFactory.createRequest()
                     transitionTo(Stopping(clientOption), StopWork(clientOption))
                 }
                 on<OnLifecycleDestroyed> {
-                    transitionTo(Destroyed, ForceStopWork<REQUEST>())
+                    transitionTo(Destroyed, ForceStopWork<STOP_REQUEST>())
                 }
                 on<OnWorkFailed> {
                     transitionTo(
@@ -86,8 +84,8 @@ internal object Worker {
                     )
                 }
             }
-            state<Stopping<REQUEST>> {
-                on<OnWorkStopped<RESPONSE>> {
+            state<Stopping<STOP_REQUEST>> {
+                on<OnWorkStopped<STOP_RESPONSE>> {
                     transitionTo(Stopped(request, it.response))
                 }
             }

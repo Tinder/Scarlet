@@ -338,6 +338,26 @@ class Coordinator(
         ) {
             messages.forEach { (topic, messagesInTopic) ->
                 messagesInTopic.forEach { message ->
+                    val s = GroupWorker.createMessager(message) {
+                        val sideEffect2 = it.sideEffect!!
+                        when (sideEffect2) {
+                            is Worker.SideEffect.ScheduleRetry -> {
+                                // TODO timer
+                            }
+                            is Worker.SideEffect.UnscheduleRetry -> {
+                                // TODO timer
+                            }
+                            is Worker.SideEffect.StartWork<*> -> {
+                                protocol.send(topic, message, null)
+                            }
+                            is Worker.SideEffect.StopWork<*> -> {
+                                clientStateCoordinator.finishSending(topic, message)
+                            }
+                        }
+                    }
+
+//                    s.transition(Worker.Event.OnWorkStarted(Unit))
+
                     messageStateMachines[(topic to message)] =
                             Messenger.create(topic, message) {
                                 val sideEffect2 = it.sideEffect!!
