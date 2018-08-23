@@ -7,6 +7,7 @@ package com.tinder.scarlet.state
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Companion.create
 import com.tinder.scarlet.ConfigFactory
+import com.tinder.scarlet.RequestFactory
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleDestroyed
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleStarted
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleStopped
@@ -30,7 +31,8 @@ internal object Worker {
 
     fun <REQUEST : Any, RESPONSE : Any> create(
         // request factory
-        configFactory: ConfigFactory,
+        startRequestFactory: RequestFactory<REQUEST>,
+        stopRequestFactory: RequestFactory<REQUEST>,
         listener: (StateMachine.Transition.Valid<Worker.State, Worker.Event, Worker.SideEffect>) -> Unit
     ): StateMachine<State, Event, SideEffect> {
         return create {
@@ -48,7 +50,7 @@ internal object Worker {
             }
             state<WillStart> {
                 on<OnShouldStart> {
-                    val clientOption = configFactory.createClientOpenOption()
+                    val clientOption = startRequestFactory.createRequest()
                     transitionTo(Starting(retryCount, clientOption), StartWork(clientOption))
                 }
                 on<OnLifecycleStopped> {
@@ -71,7 +73,7 @@ internal object Worker {
             }
             state<Started<REQUEST, RESPONSE>> {
                 on<OnLifecycleStopped> {
-                    val clientOption = configFactory.createClientCloseOption()
+                    val clientOption = stopRequestFactory.createRequest()
                     transitionTo(Stopping(clientOption), StopWork(clientOption))
                 }
                 on<OnLifecycleDestroyed> {
