@@ -12,22 +12,6 @@ sealed class Event {
         val message: Message
     ) : Event()
 
-    data class OnShouldSubscribe(
-        val topic: Topic
-    ) : Event()
-
-    data class OnShouldUnsubscribe(
-        val topic: Topic
-    ) : Event()
-
-    data class OnTopicSubscribed(
-        val topic: Topic
-    ) : Event()
-
-    data class OnTopicUnsubscribed(
-        val topic: Topic
-    ) : Event()
-
 
     object OnLifecycleStarted: Event()
 

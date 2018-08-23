@@ -16,8 +16,6 @@ sealed class SideEffect {
         val option: Any? = null
     ) : SideEffect()
 
-    data class Subscribe(val topic: Topic) : SideEffect()
-    data class Unsubscribe(val topic: Topic) : SideEffect()
 
     // maybe side effect for the user?
 

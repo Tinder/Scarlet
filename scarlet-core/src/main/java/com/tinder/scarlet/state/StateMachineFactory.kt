@@ -2,10 +2,12 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet
+package com.tinder.scarlet.state
 
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Companion.create
+import com.tinder.scarlet.ConfigFactory
+import com.tinder.scarlet.Event
 import com.tinder.scarlet.Event.OnConnectionClosed
 import com.tinder.scarlet.Event.OnConnectionFailed
 import com.tinder.scarlet.Event.OnConnectionOpened
@@ -20,6 +22,7 @@ import com.tinder.scarlet.Event.OnShouldSendMessage
 import com.tinder.scarlet.Event.OnShouldOpenConnection
 import com.tinder.scarlet.Event.OnShouldSubscribe
 import com.tinder.scarlet.Event.OnShouldUnsubscribe
+import com.tinder.scarlet.SideEffect
 import com.tinder.scarlet.SideEffect.CloseConnection
 import com.tinder.scarlet.SideEffect.ForceCloseConnection
 import com.tinder.scarlet.SideEffect.OpenConnection
@@ -27,6 +30,7 @@ import com.tinder.scarlet.SideEffect.ScheduleConnection
 import com.tinder.scarlet.SideEffect.SendMessage
 import com.tinder.scarlet.SideEffect.Subscribe
 import com.tinder.scarlet.SideEffect.Unsubscribe
+import com.tinder.scarlet.State
 import com.tinder.scarlet.State.Closed
 import com.tinder.scarlet.State.Closing
 import com.tinder.scarlet.State.Destroyed
