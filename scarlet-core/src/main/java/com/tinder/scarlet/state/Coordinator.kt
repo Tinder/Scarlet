@@ -18,7 +18,8 @@ internal typealias MessengerStateMachine = StateMachine<Messenger.State, Messeng
 class Coordinator(
     val configFactory: ConfigFactory,
     val lifecycle: Lifecycle,
-    val protocolFactory: Protocol.Factory
+    val protocolFactory: Protocol.Factory,
+    val
 ) {
 
     private lateinit var clientStateCoordinator: ClientStateCoordinator
@@ -304,103 +305,68 @@ class Coordinator(
     }
 
     private inner class MessageCoordinator {
-        private val messageStateMachines: MutableMap<Pair<Topic, Message>, MessengerStateMachine> =
-            emptyMap<Pair<Topic, Message>, MessengerStateMachine>().toMutableMap()
+        private val messageGroupWorker = GroupWorker<Pair<Topic, Message>, Unit, Unit, Unit, Unit>()
 
         fun start() {
-            messageStateMachines.forEach { (_, stateMachine) ->
-                stateMachine.transition(Messenger.Event.OnLifecycleStarted)
-            }
+            messageGroupWorker.onLifecycleStarted()
         }
 
         fun stop() {
-            messageStateMachines.forEach { (_, stateMachine) ->
-                stateMachine.transition(Messenger.Event.OnLifecycleStopped)
-            }
+            messageGroupWorker.onLifecycleStopped()
         }
 
-        fun sendAndRetry(
-            topic: Topic,
-            message: Message
-        ) {
-            sendAndRetry(mapOf(topic to listOf(message)))
-        }
-
-        fun clear(
-            topic: Topic,
-            message: Message
-        ) {
-            clear(mapOf(topic to listOf(message)))
-        }
-
-        fun sendAndRetry(
-            messages: Map<Topic, List<Message>>
-        ) {
-            messages.forEach { (topic, messagesInTopic) ->
-                messagesInTopic.forEach { message ->
-                    val s = GroupWorker.createMessager(message) {
-                        val sideEffect2 = it.sideEffect!!
-                        when (sideEffect2) {
-                            is Worker.SideEffect.ScheduleRetry -> {
-                                // TODO timer
-                            }
-                            is Worker.SideEffect.UnscheduleRetry -> {
-                                // TODO timer
-                            }
-                            is Worker.SideEffect.StartWork<*> -> {
-                                protocol.send(topic, message, null)
-                            }
-                            is Worker.SideEffect.StopWork<*> -> {
-                                clientStateCoordinator.finishSending(topic, message)
-                            }
-                        }
+        fun sendAndRetry(topic: Topic, message: Message) {
+            messageGroupWorker.add(topic to message, Unit, Unit) {
+                val sideEffect2 = it.sideEffect!!
+                when (sideEffect2) {
+                    is Worker.SideEffect.ScheduleRetry -> {
+                        // TODO timer
                     }
-
-//                    s.transition(Worker.Event.OnWorkStarted(Unit))
-
-                    messageStateMachines[(topic to message)] =
-                            Messenger.create(topic, message) {
-                                val sideEffect2 = it.sideEffect!!
-                                when (sideEffect2) {
-                                    is Messenger.SideEffect.ScheduleRetry -> {
-                                        // TODO timer
-                                    }
-                                    is Messenger.SideEffect.UnscheduleRetry -> {
-                                        // TODO timer
-                                    }
-                                    is Messenger.SideEffect.SendMessage -> {
-                                        protocol.send(topic, message, null)
-                                    }
-                                    is Messenger.SideEffect.MarkAsSent -> {
-                                        clientStateCoordinator.finishSending(topic, message)
-                                    }
-                                }
-                            }
+                    is Worker.SideEffect.UnscheduleRetry -> {
+                        // TODO timer
+                    }
+                    is Worker.SideEffect.StartWork -> {
+                        protocol.send(topic, message, null)
+                    }
+                    is Worker.SideEffect.StopWork -> {
+                        clientStateCoordinator.finishSending(topic, message)
+                    }
                 }
             }
+        }
+
+        fun sendAndRetry(messages: Map<Topic, List<Message>>) {
+            messages.forEach { (topic, messagesInTopic) ->
+                messagesInTopic.forEach { message ->
+                    sendAndRetry(topic, message)
+                }
+            }
+        }
+
+        fun clear(topic: Topic, message: Message) {
+            messageGroupWorker.remove(topic to message)
         }
 
         fun clear(messages: Map<Topic, List<Message>>) {
             messages.forEach { (topic, messagesInTopic) ->
                 messagesInTopic.forEach {
-                    messageStateMachines.remove(topic to it)
+                    clear(topic, it)
                 }
             }
         }
 
-        fun onMessageSent(
-            topic: Topic,
-            message: Message
-        ) {
-            messageStateMachines[(topic to message)]!!.transition(Messenger.Event.OnMessageSent)
+        fun onMessageSent(topic: Topic, message: Message) {
+            messageGroupWorker.onWorkStopped(topic to message)
         }
 
-        fun onMessageFailedToSend(
-            topic: Topic,
-            message: Message
-        ) {
-            messageStateMachines[(topic to message)]!!.transition(Messenger.Event.OnMessageFailed)
+        fun onMessageFailedToSend(topic: Topic, message: Message) {
+            messageGroupWorker.onWorkFailed(topic to message, RuntimeException())
         }
     }
 
+    data class MessageRequest(
+        val protocol: Protocol,
+        val topic: Topic,
+        val message: Message
+    )
 }
