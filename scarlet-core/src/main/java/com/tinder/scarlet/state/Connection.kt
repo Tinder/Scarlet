@@ -5,6 +5,7 @@
 package com.tinder.scarlet.state
 
 import com.tinder.StateMachine
+import com.tinder.StateMachine.Companion.create
 import com.tinder.scarlet.ConfigFactory
 import com.tinder.scarlet.Topic
 import com.tinder.scarlet.state.Connection.Event.OnConnectionClosed
@@ -18,6 +19,7 @@ import com.tinder.scarlet.state.Connection.SideEffect.CloseConnection
 import com.tinder.scarlet.state.Connection.SideEffect.ForceCloseConnection
 import com.tinder.scarlet.state.Connection.SideEffect.OpenConnection
 import com.tinder.scarlet.state.Connection.SideEffect.ScheduleRetry
+import com.tinder.scarlet.state.Connection.SideEffect.UnscheduleRetry
 import com.tinder.scarlet.state.Connection.State.Closed
 import com.tinder.scarlet.state.Connection.State.Closing
 import com.tinder.scarlet.state.Connection.State.Destroyed
@@ -27,8 +29,11 @@ import com.tinder.scarlet.state.Connection.State.WillOpen
 
 internal object Connection {
 
-    fun create(configFactory: ConfigFactory, listener: (StateMachine.Transition.Valid<Connection.State, Connection.Event, Connection.SideEffect>) -> Unit): StateMachine<State, Event, SideEffect> {
-        return StateMachine.create {
+    fun create(
+        configFactory: ConfigFactory,
+        listener: (StateMachine.Transition.Valid<Connection.State, Connection.Event, Connection.SideEffect>) -> Unit
+    ): StateMachine<State, Event, SideEffect> {
+        return create {
             initialState(Closed())
             state<Closed> {
                 on<OnLifecycleStarted> {
@@ -47,10 +52,10 @@ internal object Connection {
                     transitionTo(Opening(retryCount, clientOption), OpenConnection(clientOption))
                 }
                 on<OnLifecycleStopped> {
-                    transitionTo(Closed(), CloseConnection())
+                    transitionTo(Closed(), UnscheduleRetry)
                 }
                 on<OnLifecycleDestroyed> {
-                    transitionTo(Destroyed, ForceCloseConnection())
+                    transitionTo(Destroyed, UnscheduleRetry)
                 }
             }
             state<Opening> {
@@ -103,7 +108,7 @@ internal object Connection {
         data class Opened internal constructor(
             val clientOption: Any? = null,
             val serverOption: Any? = null,
-            val topics: Set<Topic>  = emptySet()
+            val topics: Set<Topic> = emptySet()
         ) : State()
 
         data class Closing internal constructor(
@@ -123,11 +128,11 @@ internal object Connection {
     }
 
     sealed class Event {
-        object OnLifecycleStarted: Event()
+        object OnLifecycleStarted : Event()
 
-        object OnLifecycleStopped: Event()
+        object OnLifecycleStopped : Event()
 
-        object OnLifecycleDestroyed: Event()
+        object OnLifecycleDestroyed : Event()
 
         object OnShouldOpenConnection : Event()
 
@@ -149,13 +154,11 @@ internal object Connection {
 
     sealed class SideEffect {
         data class ScheduleRetry(val retryCount: Int) : SideEffect()
+        object UnscheduleRetry : SideEffect()
 
         data class OpenConnection(val option: Any? = null) : SideEffect()
         data class CloseConnection(val option: Any? = null) : SideEffect()
         data class ForceCloseConnection(val option: Any? = null) : SideEffect()
-
-        // maybe side effect for the user?
-
     }
 
 }

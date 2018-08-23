@@ -77,6 +77,8 @@ object Messenger {
     sealed class SideEffect {
         data class ScheduleRetry(val retryCount: Int) : SideEffect()
 
+        object UnscheduleRetry : SideEffect()
+
         data class SendMessage(val topic: Topic, val message: Message) : SideEffect()
 
         data class MarkAsSent(val topic: Topic, val message: Message) : SideEffect()

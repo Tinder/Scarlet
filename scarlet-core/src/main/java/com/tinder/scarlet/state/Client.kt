@@ -45,14 +45,14 @@ internal object Client {
                     when (isOpen) {
                         true -> dontTransition()
                         false -> transitionTo(
-                            copy(isOpen = true), SideEffect.OpenAndSubscribe(topics)
+                            copy(isOpen = true), SideEffect.Open(topics, messages)
                         )
                     }
                 }
                 on<Event.OnShouldClose> {
                     when (isOpen) {
                         true -> transitionTo(
-                            copy(isOpen = false), SideEffect.CloseAndUnsubscribe(topics)
+                            copy(isOpen = false), SideEffect.Close(topics, messages)
                         )
                         false -> dontTransition()
                     }
@@ -100,8 +100,8 @@ internal object Client {
 
         data class ReceiveMessage(val topic: Topic, val message: Message) : SideEffect()
 
-        data class OpenAndSubscribe(val topics: Set<Topic>) : SideEffect()
-        data class CloseAndUnsubscribe(val topics: Set<Topic>) : SideEffect()
+        data class Open(val topics: Set<Topic>, val messages: Map<Topic, List<Message>>) : SideEffect()
+        data class Close(val topics: Set<Topic>, val messages: Map<Topic, List<Message>>) : SideEffect()
 
         data class Subscribe(val topic: Topic) : SideEffect()
         data class Unsubscribe(val topic: Topic) : SideEffect()
