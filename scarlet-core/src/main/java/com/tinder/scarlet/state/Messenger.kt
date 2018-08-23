@@ -8,6 +8,7 @@ import com.tinder.StateMachine
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Topic
 
+// Action<Payload>
 object Messenger {
 
     fun create(
@@ -16,12 +17,26 @@ object Messenger {
         listener: (StateMachine.Transition.Valid<State, Event, SideEffect>) -> Unit
     ): StateMachine<State, Event, SideEffect> {
         return StateMachine.create {
-            initialState(State.WillSend(topic, message))
+            initialState(State.Paused(topic, message))
+            state<State.Paused> {
+                on<Event.OnLifecycleStarted> {
+                    transitionTo(
+                        State.WillSend(topic, message, retryCount),
+                        SideEffect.ScheduleRetry(0)
+                    )
+                }
+            }
             state<State.WillSend> {
                 on<Event.OnShouldSendMessage> {
                     transitionTo(
                         State.Sending(topic, message, retryCount),
                         SideEffect.SendMessage(topic, message)
+                    )
+                }
+                on<Event.OnLifecycleStopped> {
+                    transitionTo(
+                        State.Paused(topic, message, retryCount),
+                        SideEffect.UnscheduleRetry
                     )
                 }
             }
@@ -50,6 +65,12 @@ object Messenger {
     }
 
     sealed class State {
+        data class Paused internal constructor(
+            val topic: Topic,
+            val message: Message,
+            val retryCount: Int = 0
+        ) : State()
+
         data class WillSend internal constructor(
             val topic: Topic,
             val message: Message,
@@ -69,6 +90,9 @@ object Messenger {
     }
 
     sealed class Event {
+        object OnLifecycleStarted : Event()
+        object OnLifecycleStopped : Event()
+
         object OnShouldSendMessage : Event()
         object OnMessageSent : Event()
         object OnMessageFailed : Event()

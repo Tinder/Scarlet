@@ -25,7 +25,6 @@ class Coordinator(
     private lateinit var protocolCoordinator: ProtocolCoordinator
     private lateinit var topicCoordinator: TopicCoordinator
     private lateinit var messageCoordinator: MessageCoordinator
-    private lateinit var protocol: Protocol
 
     fun start() {
 
@@ -121,6 +120,7 @@ class Coordinator(
     }
 
     private inner class ProtocolCoordinator {
+        var protocol: Protocol? = null
         private val connectionStateMachine = Connection.create(configFactory) { transition ->
             val sideEffect = transition.sideEffect!!
             when (sideEffect) {
@@ -131,17 +131,17 @@ class Coordinator(
                     // TODO timer
                 }
                 is Connection.SideEffect.OpenConnection -> {
-                    protocol.open(ProtocolListener())
+                    protocol = protocolFactory.create()
+                    protocol?.open(ProtocolListener())
                 }
                 is Connection.SideEffect.CloseConnection -> {
-                    protocol.close()
+                    protocol?.close()
                 }
                 is Connection.SideEffect.ForceCloseConnection -> {
-                    protocol.close()
+                    protocol?.close()
                 }
             }
         }
-
 
         fun openAndRetry() {
             connectionStateMachine.transition(Connection.Event.OnLifecycleStarted)
@@ -257,6 +257,7 @@ class Coordinator(
                             // TODO timer
                         }
                         is Connection.SideEffect.OpenConnection -> {
+                            // TODO make clientOption the protocol?
                             protocol.subscribe(sideEffect.option as Topic, null)
                         }
                         is Connection.SideEffect.CloseConnection -> {
@@ -307,11 +308,15 @@ class Coordinator(
             emptyMap<Pair<Topic, Message>, MessengerStateMachine>().toMutableMap()
 
         fun start() {
-
+            messageStateMachines.forEach { (_, stateMachine) ->
+                stateMachine.transition(Messenger.Event.OnLifecycleStarted)
+            }
         }
 
         fun stop() {
-
+            messageStateMachines.forEach { (_, stateMachine) ->
+                stateMachine.transition(Messenger.Event.OnLifecycleStopped)
+            }
         }
 
         fun sendAndRetry(
@@ -338,6 +343,9 @@ class Coordinator(
                                 val sideEffect2 = it.sideEffect!!
                                 when (sideEffect2) {
                                     is Messenger.SideEffect.ScheduleRetry -> {
+                                        // TODO timer
+                                    }
+                                    is Messenger.SideEffect.UnscheduleRetry -> {
                                         // TODO timer
                                     }
                                     is Messenger.SideEffect.SendMessage -> {

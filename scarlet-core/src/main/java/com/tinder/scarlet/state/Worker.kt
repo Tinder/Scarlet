@@ -7,31 +7,30 @@ package com.tinder.scarlet.state
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Companion.create
 import com.tinder.scarlet.ConfigFactory
-import com.tinder.scarlet.state.Connection.Event.OnConnectionClosed
-import com.tinder.scarlet.state.Connection.Event.OnConnectionFailed
-import com.tinder.scarlet.state.Connection.Event.OnConnectionOpened
-import com.tinder.scarlet.state.Connection.Event.OnLifecycleDestroyed
-import com.tinder.scarlet.state.Connection.Event.OnLifecycleStarted
-import com.tinder.scarlet.state.Connection.Event.OnLifecycleStopped
-import com.tinder.scarlet.state.Connection.Event.OnShouldOpenConnection
-import com.tinder.scarlet.state.Connection.SideEffect.CloseConnection
-import com.tinder.scarlet.state.Connection.SideEffect.ForceCloseConnection
-import com.tinder.scarlet.state.Connection.SideEffect.OpenConnection
-import com.tinder.scarlet.state.Connection.SideEffect.ScheduleRetry
-import com.tinder.scarlet.state.Connection.SideEffect.UnscheduleRetry
-import com.tinder.scarlet.state.Connection.State.Closed
-import com.tinder.scarlet.state.Connection.State.Closing
-import com.tinder.scarlet.state.Connection.State.Destroyed
-import com.tinder.scarlet.state.Connection.State.Opened
-import com.tinder.scarlet.state.Connection.State.Opening
-import com.tinder.scarlet.state.Connection.State.WillOpen
+import com.tinder.scarlet.state.Worker.Event.OnConnectionClosed
+import com.tinder.scarlet.state.Worker.Event.OnConnectionFailed
+import com.tinder.scarlet.state.Worker.Event.OnConnectionOpened
+import com.tinder.scarlet.state.Worker.Event.OnLifecycleDestroyed
+import com.tinder.scarlet.state.Worker.Event.OnLifecycleStarted
+import com.tinder.scarlet.state.Worker.Event.OnLifecycleStopped
+import com.tinder.scarlet.state.Worker.Event.OnShouldOpenConnection
+import com.tinder.scarlet.state.Worker.SideEffect.CloseConnection
+import com.tinder.scarlet.state.Worker.SideEffect.ForceCloseConnection
+import com.tinder.scarlet.state.Worker.SideEffect.OpenConnection
+import com.tinder.scarlet.state.Worker.SideEffect.ScheduleRetry
+import com.tinder.scarlet.state.Worker.SideEffect.UnscheduleRetry
+import com.tinder.scarlet.state.Worker.State.Closed
+import com.tinder.scarlet.state.Worker.State.Closing
+import com.tinder.scarlet.state.Worker.State.Destroyed
+import com.tinder.scarlet.state.Worker.State.Opened
+import com.tinder.scarlet.state.Worker.State.Opening
+import com.tinder.scarlet.state.Worker.State.WillOpen
 
-// Connection<clientOption, serverOption>
-internal object Connection {
+internal object Worker {
 
     fun create(
         configFactory: ConfigFactory,
-        listener: (StateMachine.Transition.Valid<Connection.State, Connection.Event, Connection.SideEffect>) -> Unit
+        listener: (StateMachine.Transition.Valid<Worker.State, Worker.Event, Worker.SideEffect>) -> Unit
     ): StateMachine<State, Event, SideEffect> {
         return create {
             initialState(Closed())

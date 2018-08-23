@@ -25,7 +25,7 @@ interface Protocol {
     }
 
     interface Factory {
-        fun create()
+        fun create(): Protocol
     }
 }
 
