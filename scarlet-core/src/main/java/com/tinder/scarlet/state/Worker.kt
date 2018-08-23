@@ -7,47 +7,43 @@ package com.tinder.scarlet.state
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Companion.create
 import com.tinder.scarlet.ConfigFactory
-import com.tinder.scarlet.state.Worker.Event.OnWorkStopped
-import com.tinder.scarlet.state.Worker.Event.OnWorkFailed
-import com.tinder.scarlet.state.Worker.Event.OnWorkStarted
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleDestroyed
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleStarted
 import com.tinder.scarlet.state.Worker.Event.OnLifecycleStopped
 import com.tinder.scarlet.state.Worker.Event.OnShouldStart
-import com.tinder.scarlet.state.Worker.SideEffect.StopWork
-import com.tinder.scarlet.state.Worker.SideEffect.ForceStopWork
-import com.tinder.scarlet.state.Worker.SideEffect.StartWork
+import com.tinder.scarlet.state.Worker.Event.OnWorkFailed
+import com.tinder.scarlet.state.Worker.Event.OnWorkStarted
+import com.tinder.scarlet.state.Worker.Event.OnWorkStopped
 import com.tinder.scarlet.state.Worker.SideEffect.ScheduleRetry
-import com.tinder.scarlet.state.Worker.SideEffect.UnscheduleRetry
-import com.tinder.scarlet.state.Worker.State.Stopped
-import com.tinder.scarlet.state.Worker.State.Stopping
 import com.tinder.scarlet.state.Worker.State.Destroyed
 import com.tinder.scarlet.state.Worker.State.Started
 import com.tinder.scarlet.state.Worker.State.Starting
+import com.tinder.scarlet.state.Worker.State.Stopped
+import com.tinder.scarlet.state.Worker.State.Stopping
 import com.tinder.scarlet.state.Worker.State.WillStart
 
 internal object Worker {
 
-    fun create(
+    fun <REQUEST : Any, RESPONSE : Any> create(
         // request factory
         configFactory: ConfigFactory,
-        listener: (StateMachine.Transition.Valid<Worker.State, Worker.Event, Worker.SideEffect>) -> Unit
-    ): StateMachine<State, Event, SideEffect> {
+        listener: (StateMachine.Transition.Valid<Worker.State<REQUEST, RESPONSE>, Worker.Event<REQUEST, RESPONSE>, Worker.SideEffect<REQUEST, RESPONSE>>) -> Unit
+    ): StateMachine<State<REQUEST, RESPONSE>, Event<REQUEST, RESPONSE>, SideEffect<REQUEST, RESPONSE>> {
         return create {
             initialState(Stopped())
-            state<Stopped> {
-                on<OnLifecycleStarted> {
+            state<Stopped<REQUEST, RESPONSE>> {
+                on<OnLifecycleStarted<REQUEST, RESPONSE>> {
                     transitionTo(
                         WillStart(retryCount = 0),
                         ScheduleRetry(0)
                     )
                 }
-                on<OnLifecycleDestroyed> {
-                    transitionTo(Destroyed)
+                on<OnLifecycleDestroyed<REQUEST, RESPONSE>> {
+                    transitionTo(Destroyed())
                 }
             }
-            state<WillStart> {
-                on<OnShouldStart> {
+            state<WillStart<REQUEST, RESPONSE>> {
+                on<OnShouldStart<REQUEST, RESPONSE>> {
                     val clientOption = configFactory.createClientOpenOption()
                     transitionTo(Starting(retryCount, clientOption), StartWork(clientOption))
                 }
@@ -99,64 +95,65 @@ internal object Worker {
         }
     }
 
-    sealed class State {
-        data class Starting internal constructor(
+    sealed class State<REQUEST : Any, RESPONSE : Any> {
+        data class Starting<REQUEST : Any, RESPONSE : Any> internal constructor(
             val retryCount: Int,
-            val request: Any? = null
-        ) : State()
+            val request: REQUEST? = null
+        ) : State<REQUEST, RESPONSE>()
 
-        data class Started internal constructor(
-            val request: Any? = null,
-            val response: Any? = null
-        ) : State()
+        data class Started<REQUEST : Any, RESPONSE : Any> internal constructor(
+            val request: REQUEST? = null,
+            val response: RESPONSE? = null
+        ) : State<REQUEST, RESPONSE>()
 
-        data class Stopping internal constructor(
-            val request: Any? = null
-        ) : State()
+        data class Stopping<REQUEST : Any, RESPONSE : Any> internal constructor(
+            val request: REQUEST? = null
+        ) : State<REQUEST, RESPONSE>()
 
-        data class Stopped internal constructor(
-            val request: Any? = null,
-            val response: Any? = null
-        ) : State()
+        data class Stopped<REQUEST : Any, RESPONSE : Any> internal constructor(
+            val request: REQUEST? = null,
+            val response: RESPONSE? = null
+        ) : State<REQUEST, RESPONSE>()
 
-        data class WillStart internal constructor(
+        data class WillStart<REQUEST : Any, RESPONSE : Any> internal constructor(
             val retryCount: Int
-        ) : State()
+        ) : State<REQUEST, RESPONSE>()
 
-        object Destroyed : State()
+        class Destroyed<REQUEST : Any, RESPONSE : Any> : State<REQUEST, RESPONSE>()
     }
 
-    sealed class Event {
-        object OnLifecycleStarted : Event()
+    sealed class Event<REQUEST : Any, RESPONSE : Any> {
+        class OnLifecycleStarted<REQUEST : Any, RESPONSE : Any> : Event<REQUEST, RESPONSE>()
 
-        object OnLifecycleStopped : Event()
+        class OnLifecycleStopped<REQUEST : Any, RESPONSE : Any> : Event<REQUEST, RESPONSE>()
 
-        object OnLifecycleDestroyed : Event()
+        class OnLifecycleDestroyed<REQUEST : Any, RESPONSE : Any> : Event<REQUEST, RESPONSE>()
 
-        object OnShouldStart : Event()
+        class OnShouldStart<REQUEST : Any, RESPONSE : Any> : Event<REQUEST, RESPONSE>()
 
         // task?
-        data class OnWorkStarted(
-            val response: Any?
-        ) : Event()
+        data class OnWorkStarted<REQUEST : Any, RESPONSE : Any>(
+            val response: RESPONSE?
+        ) : Event<REQUEST, RESPONSE>()
 
-        data class OnWorkStopped(
-            val response: Any?
-        ) : Event()
+        data class OnWorkStopped<REQUEST : Any, RESPONSE : Any>(
+            val response: RESPONSE?
+        ) : Event<REQUEST, RESPONSE>()
 
-        data class OnWorkFailed(
+        data class OnWorkFailed<REQUEST : Any, RESPONSE : Any>(
             val throwable: Throwable
-        ) : Event()
+        ) : Event<REQUEST, RESPONSE>()
 
     }
 
-    sealed class SideEffect {
-        data class ScheduleRetry(val retryCount: Int) : SideEffect()
-        object UnscheduleRetry : SideEffect()
+    sealed class SideEffect<REQUEST : Any, RESPONSE : Any> {
+        data class ScheduleRetry<REQUEST: Any, RESPONSE: Any> (val retryCount: Int) : SideEffect<REQUEST, RESPONSE>()
+        class UnscheduleRetry<REQUEST: Any, RESPONSE: Any>  : SideEffect<REQUEST, RESPONSE>()
 
-        data class StartWork(val request: Any? = null) : SideEffect()
-        data class StopWork(val request: Any? = null) : SideEffect()
-        data class ForceStopWork(val request: Any? = null) : SideEffect()
+        data class StartWork<REQUEST : Any, RESPONSE : Any>(val request: REQUEST? = null) : SideEffect<REQUEST, RESPONSE>()
+        data class StopWork<REQUEST : Any, RESPONSE : Any>(val request: REQUEST? = null) : SideEffect<REQUEST, RESPONSE>()
+        data class ForceStopWork<REQUEST : Any, RESPONSE : Any>(val request: REQUEST? = null) :
+            SideEffect<REQUEST, RESPONSE>()
     }
 
 }

@@ -4,5 +4,5 @@
 
 package com.tinder.scarlet.state
 
-object WorkerGroup {
+object GroupWorker {
 }
