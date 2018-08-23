@@ -4,22 +4,15 @@
 
 package com.tinder.scarlet.state
 
-import com.tinder.StateMachine
-import com.tinder.scarlet.ConfigFactory
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.RequestFactory
 import com.tinder.scarlet.Topic
 
-internal typealias ClientStateMachine = StateMachine<Client.State, Client.Event, Client.SideEffect>
-internal typealias ConnectionStateMachine = StateMachine<Connection.State, Connection.Event, Connection.SideEffect>
-internal typealias MessengerStateMachine = StateMachine<Messenger.State, Messenger.Event, Messenger.SideEffect>
-
 class Coordinator(
-    val configFactory: ConfigFactory,
     val lifecycle: Lifecycle,
-    val protocolFactory: Protocol.Factory,
-    val
+    val protocolFactory: Protocol.Factory
 ) {
 
     private lateinit var clientStateCoordinator: ClientStateCoordinator
@@ -28,7 +21,7 @@ class Coordinator(
     private lateinit var messageCoordinator: MessageCoordinator
 
     fun start() {
-
+        protocolCoordinator.start()
     }
 
     fun observeEvent() {
@@ -121,72 +114,78 @@ class Coordinator(
     }
 
     private inner class ProtocolCoordinator {
-        var protocol: Protocol? = null
-        private val connectionStateMachine = Connection.create(configFactory) { transition ->
-            val sideEffect = transition.sideEffect!!
-            when (sideEffect) {
-                is Connection.SideEffect.ScheduleRetry -> {
-                    // TODO timer
+        private val protocolGroupWorker = GroupWorker<Unit, Context, Unit, Context, Unit>()
+
+        fun start() {
+            protocolGroupWorker.add(
+                Unit,
+                object : RequestFactory<Context> {
+                    override fun createRequest(): Context {
+                        return Context(protocolFactory.create())
+                    }
+                },
+                object : RequestFactory<Context> {
+                    override fun createRequest(): Context {
+                        return Context(protocolFactory.create())
+                    }
                 }
-                is Connection.SideEffect.UnscheduleRetry -> {
-                    // TODO timer
-                }
-                is Connection.SideEffect.OpenConnection -> {
-                    protocol = protocolFactory.create()
-                    protocol?.open(ProtocolListener())
-                }
-                is Connection.SideEffect.CloseConnection -> {
-                    protocol?.close()
-                }
-                is Connection.SideEffect.ForceCloseConnection -> {
-                    protocol?.close()
+            ) { transition ->
+                val sideEffect = transition.sideEffect!!
+                when (sideEffect) {
+                    is Worker.SideEffect.ScheduleRetry -> {
+                        // TODO timer
+                    }
+                    is Worker.SideEffect.UnscheduleRetry -> {
+                        // TODO timer
+                    }
+                    is Worker.SideEffect.StartWork -> {
+                        sideEffect.request?.apply {
+                            protocol.open(ProtocolListener())
+                        }
+                    }
+                    is Worker.SideEffect.StopWork -> {
+                        sideEffect.request?.apply {
+                            protocol.close()
+                        }
+                    }
+                    is Worker.SideEffect.ForceStopWork -> {
+                        sideEffect.request?.apply {
+                            protocol.close()
+                        }
+                    }
                 }
             }
         }
 
         fun openAndRetry() {
-            connectionStateMachine.transition(Connection.Event.OnLifecycleStarted)
+            protocolGroupWorker.onLifecycleStarted()
         }
 
         fun close() {
-            connectionStateMachine.transition(Connection.Event.OnLifecycleStopped)
+            protocolGroupWorker.onLifecycleStopped()
         }
 
         private inner class ProtocolListener : Protocol.Listener {
             override fun onProtocolOpened(
-                clientOption: Any?,
-                serverOption: Any?
+                request: Any?,
+                response: Any?
             ) {
-                connectionStateMachine.transition(
-                    Connection.Event.OnConnectionOpened(
-                        clientOption,
-                        serverOption
-                    )
-                )
+                protocolGroupWorker.onWorkStarted(Unit)
                 topicCoordinator.start()
                 messageCoordinator.start()
             }
 
             override fun onProtocolClosed(
-                clientOption: Any?,
-                serverOption: Any?
+                request: Any?,
+                response: Any?
             ) {
-                connectionStateMachine.transition(
-                    Connection.Event.OnConnectionClosed(
-                        clientOption,
-                        serverOption
-                    )
-                )
+                protocolGroupWorker.onWorkStopped(Unit)
                 topicCoordinator.stop()
                 messageCoordinator.stop()
             }
 
             override fun onProtocolFailed(error: Throwable) {
-                connectionStateMachine.transition(
-                    Connection.Event.OnConnectionFailed(
-                        error
-                    )
-                )
+                protocolGroupWorker.onWorkFailed(Unit, error)
                 topicCoordinator.stop()
                 messageCoordinator.stop()
             }
@@ -227,87 +226,80 @@ class Coordinator(
     }
 
     private inner class TopicCoordinator {
-        private val topicStateMachines: MutableMap<Topic, ConnectionStateMachine> =
-            emptyMap<Topic, ConnectionStateMachine>().toMutableMap()
+        private val topicGroupWorker = GroupWorker<Topic, Context, Unit, Context, Unit>()
 
-        fun start() {
-            topicStateMachines.forEach { (_, stateMachine) ->
-                stateMachine.transition(Connection.Event.OnLifecycleStarted)
-            }
+        fun start(context: Context) {
+            topicGroupWorker.onLifecycleStarted()
         }
 
         fun stop() {
-            topicStateMachines.forEach { (_, stateMachine) ->
-                stateMachine.transition(Connection.Event.OnLifecycleStopped)
-            }
+            topicGroupWorker.onLifecycleStopped()
         }
 
         fun subscribeAndRetry(topic: Topic) {
-            subscribeAndRetry(setOf(topic))
+            topicGroupWorker.add(
+                topic,
+                object : RequestFactory<Context> {
+                    override fun createRequest(): Context {
+                        return Context(protocolFactory.create())
+                    }
+                },
+                object : RequestFactory<Context> {
+                    override fun createRequest(): Context {
+                        return Context(protocolFactory.create())
+                    }
+                }
+            ) { transition ->
+                val sideEffect = transition.sideEffect!!
+                when (sideEffect) {
+                    is Worker.SideEffect.ScheduleRetry -> {
+                        // TODO timer
+                    }
+                    is Worker.SideEffect.UnscheduleRetry -> {
+                        // TODO timer
+                    }
+                    is Worker.SideEffect.StartWork -> {
+                        // TODO make clientOption the protocol?
+
+                        protocol.subscribe(sideEffect.request as Topic, null)
+                    }
+                    is Worker.SideEffect.StopWork -> {
+                        protocol.unsubscribe(sideEffect.option as Topic, null)
+                    }
+                    is Worker.SideEffect.ForceStopWork -> {
+                        protocol.unsubscribe(sideEffect.option as Topic, null)
+                    }
+                }
+            }
         }
 
         fun subscribeAndRetry(topics: Set<Topic>) {
             topics.forEach { topic ->
-                topicStateMachines[topic] = Connection.create(configFactory) { transition ->
-                    val sideEffect = transition.sideEffect!!
-                    when (sideEffect) {
-                        is Connection.SideEffect.ScheduleRetry -> {
-                            // TODO timer
-                        }
-                        is Connection.SideEffect.UnscheduleRetry -> {
-                            // TODO timer
-                        }
-                        is Connection.SideEffect.OpenConnection -> {
-                            // TODO make clientOption the protocol?
-                            protocol.subscribe(sideEffect.option as Topic, null)
-                        }
-                        is Connection.SideEffect.CloseConnection -> {
-                            protocol.unsubscribe(sideEffect.option as Topic, null)
-                        }
-                        is Connection.SideEffect.ForceCloseConnection -> {
-                            protocol.unsubscribe(sideEffect.option as Topic, null)
-                        }
-                    }
-                }
-                topicStateMachines[topic]!!.transition(Connection.Event.OnLifecycleStarted)
+                subscribeAndRetry(topic)
             }
         }
 
         fun unsubscribe(topic: Topic) {
-            unsubscribe(setOf(topic))
+            topicGroupWorker.remove(topic)
         }
 
         fun unsubscribe(topics: Set<Topic>) {
-            topics.forEach { topic ->
-                topicStateMachines[topic]!!.transition(Connection.Event.OnLifecycleStopped)
-                topicStateMachines.remove(topic)
-            }
+            topics.forEach { topic -> unsubscribe(topic) }
         }
 
         fun onTopicSubscribed(topic: Topic) {
-            topicStateMachines[topic]!!.transition(
-                Connection.Event.OnConnectionOpened(
-                    null,
-                    null
-                )
-            )
+            topicGroupWorker.onWorkStarted(topic)
         }
 
         fun onTopicUnsubscribed(topic: Topic) {
-            topicStateMachines[topic]!!.transition(
-                Connection.Event.OnConnectionClosed(
-                    null,
-                    null
-                )
-            )
-
+            topicGroupWorker.onWorkStopped(topic)
         }
     }
 
     private inner class MessageCoordinator {
         private val messageGroupWorker = GroupWorker<Pair<Topic, Message>, Unit, Unit, Unit, Unit>()
 
-        fun start() {
+        fun start(context: Context) {
             messageGroupWorker.onLifecycleStarted()
         }
 
@@ -317,8 +309,8 @@ class Coordinator(
 
         fun sendAndRetry(topic: Topic, message: Message) {
             messageGroupWorker.add(topic to message, Unit, Unit) {
-                val sideEffect2 = it.sideEffect!!
-                when (sideEffect2) {
+                val sideEffect = it.sideEffect!!
+                when (sideEffect) {
                     is Worker.SideEffect.ScheduleRetry -> {
                         // TODO timer
                     }
@@ -364,9 +356,9 @@ class Coordinator(
         }
     }
 
-    data class MessageRequest(
+    data class Context(
         val protocol: Protocol,
-        val topic: Topic,
-        val message: Message
+        val topic: Topic? = null,
+        val message: Message? = null
     )
 }

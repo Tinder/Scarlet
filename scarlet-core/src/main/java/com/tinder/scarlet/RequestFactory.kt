@@ -6,7 +6,7 @@ package com.tinder.scarlet
 
 interface RequestFactory<REQUEST : Any> {
 
-    fun createRequest(): REQUEST?
+    fun createRequest(): REQUEST
 }
 
 

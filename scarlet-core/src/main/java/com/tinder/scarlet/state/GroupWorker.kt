@@ -13,6 +13,7 @@ internal class GroupWorker<WORKER_ID : Any, START_REQUEST : Any, START_RESPONSE 
     private val workers =
         emptyMap<WORKER_ID, Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>>().toMutableMap()
 
+    // TODO keep the latest lifecycle state
     fun add(
         workerId: WORKER_ID,
         startRequestFactory: RequestFactory<START_REQUEST>,

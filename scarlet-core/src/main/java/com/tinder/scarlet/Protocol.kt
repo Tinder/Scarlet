@@ -13,8 +13,8 @@ interface Protocol {
     fun unsubscribe(topic: Topic, option: Any?)
 
     interface Listener {
-        fun onProtocolOpened(clientOption: Any?, serverOption: Any?)
-        fun onProtocolClosed(clientOption: Any?, serverOption: Any?)
+        fun onProtocolOpened(request: Any?, response: Any?)
+        fun onProtocolClosed(request: Any?, response: Any?)
         fun onProtocolFailed(error: Throwable)
 
         fun onMessageReceived(topic: Topic, message: Message, serverMessageInfo: Any?)
