@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.messageadapter.moshi
@@ -53,7 +53,7 @@ internal class MoshiMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val data = AnImplementation("value")
-        val expectedSerializedData = "{\"name\":\"value\"}"
+        val expectedSerializedData = """{"name":"value"}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -75,7 +75,7 @@ internal class MoshiMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val data = AnImplementation("value")
-        val expectedSerializedData = "{\"name\":\"value\"}"
+        val expectedSerializedData = """{"name":"value"}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -97,7 +97,7 @@ internal class MoshiMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val data = "value"
-        val expectedSerializedData = "\"qualified!\""
+        val expectedSerializedData = """"qualified!""""
         val expectedDeserializedSerializedData = "it worked!"
         val serverAnnotatedStringObserver = server.observeAnnotatedString().test()
 
@@ -119,7 +119,7 @@ internal class MoshiMessageAdapterTest {
     fun sendRawString_givenJsonIsMalformed_andFactoryIsLenient_shouldBeReceivedByTheServer() {
         // Given
         givenConnectionIsEstablished(Factory.Config(lenient = true))
-        val malformedJson = "{\"name\":value}"
+        val malformedJson = """{"name":value}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -139,7 +139,7 @@ internal class MoshiMessageAdapterTest {
     fun sendRawString_givenJsonIsMalformed_andFactoryIsNotLenient_shouldNotBeReceivedByTheServer() {
         // Given
         givenConnectionIsEstablished()
-        val malformedJson = "{\"name\":value}"
+        val malformedJson = """{"name":value}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -177,7 +177,7 @@ internal class MoshiMessageAdapterTest {
     fun sendRawString_givenJsonHasUnknownKeys_andFactoryFailsOnUnknown_shouldNotBeReceivedByTheServer() {
         // Given
         givenConnectionIsEstablished(Factory.Config(lenient = true, serializeNull = true, failOnUnknown = true))
-        val jsonWithUnknownKeys = "{\"taco\":\"delicious\"}"
+        val jsonWithUnknownKeys = """{"taco":"delicious"}"""
         val serverAnImplementationObserver = server.observeAnImplementation().test()
 
         // When
@@ -197,7 +197,7 @@ internal class MoshiMessageAdapterTest {
         givenConnectionIsEstablished(Factory.Config())
         val jsonWithUtf8Bom = Buffer()
             .write(ByteString.decodeHex("EFBBBF"))
-            .writeUtf8("{\"name\":\"value\"}")
+            .writeUtf8("""{"name":"value"}""")
             .readByteString()
             .toByteArray()
         val serverAnImplementationObserver = server.observeAnImplementation().test()
@@ -221,7 +221,7 @@ internal class MoshiMessageAdapterTest {
         givenConnectionIsEstablished(Factory.Config())
         val jsonWithUtf16Bom = Buffer()
             .write(ByteString.decodeHex("FEFF"))
-            .writeString("{\"name\":\"value\"}", Charset.forName("UTF-16"))
+            .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
             .readByteString()
             .toByteArray()
         val serverAnImplementationObserver = server.observeAnImplementation().test()
@@ -302,12 +302,13 @@ internal class MoshiMessageAdapterTest {
 
         class VerifyJsonQualifierJsonAdapterFactory : JsonAdapter.Factory {
             override fun create(
-                type: Type, annotations: Set<Annotation>,
+                type: Type,
+                annotations: Set<Annotation>,
                 moshi: Moshi
             ): JsonAdapter<*>? {
                 for (annotation in annotations) {
                     assert(annotation.annotationClass.java.isAnnotationPresent(JsonQualifier::class.java)) {
-                        "Non-@JsonQualifier annotation: " + annotation
+                        "Non-@JsonQualifier annotation: $annotation"
                     }
                 }
                 return null
@@ -350,7 +351,7 @@ internal class MoshiMessageAdapterTest {
                 if (string == "qualified!") {
                     return "it worked!"
                 }
-                throw AssertionError("Found: " + string)
+                throw AssertionError("Found: $string")
             }
         }
 
@@ -381,7 +382,5 @@ internal class MoshiMessageAdapterTest {
             @NonQualifer
             fun observeAnnotatedString(): Stream<String>
         }
-
     }
-
 }

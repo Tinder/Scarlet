@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet
@@ -199,5 +199,4 @@ class Scarlet internal constructor(
             private val DEFAULT_SCHEDULER = Schedulers.computation() // TODO same thread option for debugging
         }
     }
-
 }

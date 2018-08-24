@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.app.root
@@ -46,5 +46,4 @@ class ScarletDemoApplication : Application(),
         Timber.plant(Timber.DebugTree())
         Stetho.initialize(stethoInitializer)
     }
-
 }

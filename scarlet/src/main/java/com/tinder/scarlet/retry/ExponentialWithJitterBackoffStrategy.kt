@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.retry
@@ -25,5 +25,4 @@ class ExponentialWithJitterBackoffStrategy(
     private fun Long.withJitter(): Long = (0..this).random()
 
     private fun ClosedRange<Long>.random() = random.nextInt((endInclusive - start).toInt()) + start
-
 }

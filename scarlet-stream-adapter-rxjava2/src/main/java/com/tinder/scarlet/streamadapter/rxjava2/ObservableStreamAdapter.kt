@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.streamadapter.rxjava2
@@ -11,5 +11,4 @@ import io.reactivex.Observable
 class ObservableStreamAdapter<T> : StreamAdapter<T, Observable<T>> {
 
     override fun adapt(stream: Stream<T>): Observable<T> = Observable.fromPublisher(stream)
-
 }

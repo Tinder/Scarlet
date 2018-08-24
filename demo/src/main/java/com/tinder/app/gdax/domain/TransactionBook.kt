@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.app.gdax.domain
@@ -16,5 +16,4 @@ class TransactionBook(
         newHistory.transactions[product] = (newHistory.transactions[product] ?: emptyList()) + transaction
         return newHistory
     }
-
 }

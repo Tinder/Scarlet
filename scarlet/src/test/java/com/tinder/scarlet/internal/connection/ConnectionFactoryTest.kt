@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.connection
@@ -31,5 +31,4 @@ internal class ConnectionFactoryTest {
         // Then
         assertThat(connection1.stateManager.lifecycle).isEqualTo(connection2.stateManager.lifecycle)
     }
-
 }

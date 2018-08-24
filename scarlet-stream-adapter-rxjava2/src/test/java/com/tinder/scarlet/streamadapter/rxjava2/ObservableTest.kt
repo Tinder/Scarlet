@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.streamadapter.rxjava2
@@ -140,5 +140,4 @@ class ObservableTest {
         @Send
         fun sendBytesAndConfirm(message: ByteArray): Boolean
     }
-
 }

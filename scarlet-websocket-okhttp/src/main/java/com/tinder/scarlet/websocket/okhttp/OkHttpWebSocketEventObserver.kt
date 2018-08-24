@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.websocket.okhttp
@@ -37,5 +37,4 @@ internal class OkHttpWebSocketEventObserver : WebSocketListener() {
 
     override fun onFailure(webSocket: okhttp3.WebSocket, t: Throwable, response: Response?) =
         processor.onNext(WebSocket.Event.OnConnectionFailed(t))
-
 }

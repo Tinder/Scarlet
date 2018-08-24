@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 @file:JvmName("MockWebServerUtils")
@@ -12,4 +12,3 @@ import okhttp3.mockwebserver.MockWebServer
 
 fun MockWebServer.newWebSocketFactory(): WebSocket.Factory =
     OkHttpWebSocket.Factory(MockWebServerOkHttpWebSocketConnectionEstablisher(this))
-

@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.connection
@@ -218,5 +218,4 @@ internal class Connection(
         private fun createSharedLifecycle() = LifecycleRegistry()
             .apply { lifecycle.subscribe(this) }
     }
-
 }

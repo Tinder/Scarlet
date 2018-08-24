@@ -18,28 +18,23 @@ buildscript {
 }
 
 plugins {
-    id 'org.jlleitschuh.gradle.ktlint' version '2.2.0'
+    id 'org.jlleitschuh.gradle.ktlint' version '4.1.0'
 }
 
 ktlint {
-    version = '0.9.2'
+    version = '0.24.0'
 }
 
-allprojects {
+subprojects {
     apply plugin: 'org.kordamp.gradle.stats'
     apply plugin: "com.jfrog.artifactory"
-    group = 'com.tinder.scarlet'
+    // group = 'com.tinder.scarlet' TODO use Bintray
+    group = 'com.github.tinder'
 
     repositories {
-        mavenCentral()
-        maven { url "https://jitpack.io" }
         google()
         jcenter()
     }
-}
-
-clean {
-    delete rootProject.buildDir
 }
 
 apply from: rootProject.file('dependencies.gradle')

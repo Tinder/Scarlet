@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.messageadapter.builtin
@@ -15,5 +15,4 @@ class TextMessageAdapter : MessageAdapter<String> {
     }
 
     override fun toMessage(data: String): Message = Message.Text(data)
-
 }

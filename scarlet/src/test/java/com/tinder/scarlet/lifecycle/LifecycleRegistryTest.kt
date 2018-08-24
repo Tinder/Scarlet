@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.lifecycle
@@ -235,5 +235,4 @@ internal class LifecycleRegistryTest {
         testSubscriber.assertValues(Lifecycle.State.Started, Lifecycle.State.Destroyed)
         testSubscriber.assertComplete()
     }
-
 }

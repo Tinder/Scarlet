@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.retry
@@ -44,7 +44,6 @@ internal class ExponentialBackoffStrategyTest {
 
             private fun param(baseDuration: Long, maxDuration: Long) = arrayOf(baseDuration, maxDuration)
         }
-
     }
 
     @RunWith(Parameterized::class)

@@ -1,5 +1,5 @@
 /*
- * © 2013 - 2018 Tinder, Inc., ALL RIGHTS RESERVED
+ * © 2018 Match Group, LLC.
  */
 
 package com.tinder.scarlet.websocket.okhttp
@@ -233,5 +233,4 @@ internal class OkHttpWebSocketIntegrationTest {
         @Send
         fun sendBytesAndConfirm(message: ByteArray): Boolean
     }
-
 }
