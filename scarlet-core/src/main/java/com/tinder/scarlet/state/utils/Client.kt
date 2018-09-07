@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state
+package com.tinder.scarlet.state.utils
 
 import com.tinder.StateMachine
 import com.tinder.scarlet.Message
@@ -20,7 +20,10 @@ internal object Client {
                     val messagesInTopic = messages[it.topic] ?: emptyList()
                     transitionTo(
                         copy(messages = messages + (it.topic to messagesInTopic + it.message)),
-                        SideEffect.SendMessage(it.topic, it.message)
+                        SideEffect.SendMessage(
+                            it.topic,
+                            it.message
+                        )
                     )
                 }
                 on<Event.OnShouldFinishSendingMessage> {
@@ -33,38 +36,49 @@ internal object Client {
                     }
                     transitionTo(
                         copy(messages = currentMessages),
-                        SideEffect.FinishSendingMessage(it.topic, it.message)
+                        SideEffect.FinishSendingMessage(
+                            it.topic,
+                            it.message
+                        )
                     )
                 }
                 on<Event.OnShouldReceiveMessage> {
                     transitionTo(
-                        this, SideEffect.ReceiveMessage(it.topic, it.message)
+                        this,
+                        SideEffect.ReceiveMessage(
+                            it.topic,
+                            it.message
+                        )
                     )
                 }
                 on<Event.OnShouldOpen> {
                     when (isOpen) {
                         true -> dontTransition()
                         false -> transitionTo(
-                            copy(isOpen = true), SideEffect.Open(topics, messages)
+                            copy(isOpen = true),
+                            SideEffect.Open(topics, messages)
                         )
                     }
                 }
                 on<Event.OnShouldClose> {
                     when (isOpen) {
                         true -> transitionTo(
-                            copy(isOpen = false), SideEffect.Close(topics, messages)
+                            copy(isOpen = false),
+                            SideEffect.Close(topics, messages)
                         )
                         false -> dontTransition()
                     }
                 }
                 on<Event.OnShouldSubscribe> {
                     transitionTo(
-                        copy(topics = topics + it.topic), SideEffect.Subscribe(it.topic)
+                        copy(topics = topics + it.topic),
+                        SideEffect.Subscribe(it.topic)
                     )
                 }
                 on<Event.OnShouldUnsubscribe> {
                     transitionTo(
-                        copy(topics = topics - it.topic), SideEffect.Unsubscribe(it.topic)
+                        copy(topics = topics - it.topic),
+                        SideEffect.Unsubscribe(it.topic)
                     )
                 }
             }

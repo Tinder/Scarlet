@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state
+package com.tinder.scarlet.state.utils
 
 import com.tinder.scarlet.RequestFactory
 import com.tinder.scarlet.StaticRequestFactory

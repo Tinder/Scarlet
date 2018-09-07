@@ -2,23 +2,23 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state
+package com.tinder.scarlet.state.utils
 
 import com.tinder.StateMachine
 import com.tinder.scarlet.RequestFactory
-import com.tinder.scarlet.state.Worker.Event.OnLifecycleDestroyed
-import com.tinder.scarlet.state.Worker.Event.OnLifecycleStarted
-import com.tinder.scarlet.state.Worker.Event.OnLifecycleStopped
-import com.tinder.scarlet.state.Worker.Event.OnShouldStart
-import com.tinder.scarlet.state.Worker.Event.OnWorkFailed
-import com.tinder.scarlet.state.Worker.Event.OnWorkStarted
-import com.tinder.scarlet.state.Worker.Event.OnWorkStopped
-import com.tinder.scarlet.state.Worker.State.Destroyed
-import com.tinder.scarlet.state.Worker.State.Started
-import com.tinder.scarlet.state.Worker.State.Starting
-import com.tinder.scarlet.state.Worker.State.Stopped
-import com.tinder.scarlet.state.Worker.State.Stopping
-import com.tinder.scarlet.state.Worker.State.WillStart
+import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleDestroyed
+import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleStarted
+import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleStopped
+import com.tinder.scarlet.state.utils.Worker.Event.OnShouldStart
+import com.tinder.scarlet.state.utils.Worker.Event.OnWorkFailed
+import com.tinder.scarlet.state.utils.Worker.Event.OnWorkStarted
+import com.tinder.scarlet.state.utils.Worker.Event.OnWorkStopped
+import com.tinder.scarlet.state.utils.Worker.State.Destroyed
+import com.tinder.scarlet.state.utils.Worker.State.Started
+import com.tinder.scarlet.state.utils.Worker.State.Starting
+import com.tinder.scarlet.state.utils.Worker.State.Stopped
+import com.tinder.scarlet.state.utils.Worker.State.Stopping
+import com.tinder.scarlet.state.utils.Worker.State.WillStart
 
 internal class Worker<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
     private val startRequestFactory: RequestFactory<START_REQUEST>,
@@ -131,10 +131,10 @@ internal class Worker<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, 
     }
 
     data class Transition<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
-        val fromState: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
+        val fromState: Worker<CONTEXT,START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
         val event: Event,
-        val toState: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
-        val sideEffect: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.SideEffect?
+        val toState: Worker<CONTEXT,START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
+        val sideEffect: Worker<CONTEXT,START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.SideEffect?
     )
 
     open inner class State {
@@ -207,7 +207,11 @@ internal class Worker<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, 
             stopRequestFactory: RequestFactory<STOP_REQUEST>,
             listener: (Transition<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
         ): Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE> {
-            return Worker(startRequestFactory, stopRequestFactory, listener)
+            return Worker(
+                startRequestFactory,
+                stopRequestFactory,
+                listener
+            )
         }
     }
 }
