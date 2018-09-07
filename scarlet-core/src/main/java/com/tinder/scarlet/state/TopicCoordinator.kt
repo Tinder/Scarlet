@@ -9,9 +9,9 @@ import com.tinder.scarlet.Topic
 import com.tinder.scarlet.state.utils.GroupWorker
 import com.tinder.scarlet.state.utils.Worker
 
-class TopicCoordinator(
-    private val serviceLocator: ServiceLocator
-) {
+internal class TopicCoordinator(
+    serviceLocator: ServiceLocator
+) : ServiceLocator by serviceLocator {
     private val topicGroupWorker =
         GroupWorker<Topic, Protocol, Unit, Unit, Unit, Unit>()
 

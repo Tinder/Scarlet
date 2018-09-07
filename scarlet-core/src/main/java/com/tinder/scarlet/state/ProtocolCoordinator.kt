@@ -11,9 +11,9 @@ import com.tinder.scarlet.Topic
 import com.tinder.scarlet.state.utils.GroupWorker
 import com.tinder.scarlet.state.utils.Worker
 
-class ProtocolCoordinator(
-    private val serviceLocator: ServiceLocator
-) {
+internal class ProtocolCoordinator(
+    serviceLocator: ServiceLocator
+) : ServiceLocator by serviceLocator {
     private val protocolGroupWorker =
         GroupWorker<Unit, Unit, Protocol, Unit, Protocol, Unit>()
 
@@ -23,13 +23,13 @@ class ProtocolCoordinator(
             object :
                 RequestFactory<Protocol> {
                 override fun createRequest(): Protocol {
-                    return serviceLocator.protocolFactory.create()
+                    return protocolFactory.create()
                 }
             },
             object :
                 RequestFactory<Protocol> {
                 override fun createRequest(): Protocol {
-                    return serviceLocator.protocolFactory.create()
+                    return protocolFactory.create()
                 }
             }
         ) { transition ->
@@ -77,8 +77,8 @@ class ProtocolCoordinator(
             response: Any?
         ) {
             protocolGroupWorker.onWorkStarted(Unit)
-            serviceLocator.topicCoordinator.start(protocol)
-            serviceLocator.messageCoordinator.start(protocol)
+            topicCoordinator.start(protocol)
+            messageCoordinator.start(protocol)
         }
 
         override fun onProtocolClosed(
@@ -86,14 +86,14 @@ class ProtocolCoordinator(
             response: Any?
         ) {
             protocolGroupWorker.onWorkStopped(Unit)
-            serviceLocator.topicCoordinator.stop()
-            serviceLocator.messageCoordinator.stop()
+            topicCoordinator.stop()
+            messageCoordinator.stop()
         }
 
         override fun onProtocolFailed(error: Throwable) {
             protocolGroupWorker.onWorkFailed(Unit, error)
-            serviceLocator.topicCoordinator.stop()
-            serviceLocator.messageCoordinator.stop()
+            topicCoordinator.stop()
+            messageCoordinator.stop()
         }
 
         override fun onMessageReceived(
@@ -101,7 +101,7 @@ class ProtocolCoordinator(
             message: Message,
             serverMessageInfo: Any?
         ) {
-            serviceLocator.clientStateCoordinator.receive(topic, message)
+            engineCoordinator.receive(topic, message)
         }
 
         override fun onMessageSent(
@@ -109,7 +109,7 @@ class ProtocolCoordinator(
             message: Message,
             clientMessageInfo: Any?
         ) {
-            serviceLocator.messageCoordinator.onMessageSent(topic, message)
+            messageCoordinator.onMessageSent(topic, message)
         }
 
         override fun onMessageFailedToSend(
@@ -117,16 +117,16 @@ class ProtocolCoordinator(
             message: Message,
             clientMessageInfo: Any?
         ) {
-            serviceLocator.messageCoordinator.onMessageFailedToSend(topic, message)
+            messageCoordinator.onMessageFailedToSend(topic, message)
 
         }
 
         override fun onTopicSubscribed(topic: Topic) {
-            serviceLocator.topicCoordinator.onTopicSubscribed(topic)
+            topicCoordinator.onTopicSubscribed(topic)
         }
 
         override fun onTopicUnsubscribed(topic: Topic) {
-            serviceLocator.topicCoordinator.onTopicUnsubscribed(topic)
+            topicCoordinator.onTopicUnsubscribed(topic)
         }
     }
 }

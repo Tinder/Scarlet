@@ -7,15 +7,13 @@ package com.tinder.scarlet.state
 import com.tinder.scarlet.Protocol
 
 // coordinator context?
-class ServiceLocator {
+internal interface ServiceLocator {
 
-    val clientStateCoordinator: ClientStateCoordinator by lazy {
-        ClientStateCoordinator(this)
-    }
-    lateinit var protocolCoordinator: ProtocolCoordinator
-    lateinit var topicCoordinator: TopicCoordinator
-    lateinit var messageCoordinator: MessageCoordinator
-
-    lateinit var protocolFactory: Protocol.Factory
+    val engineCoordinator: EngineCoordinator
+    val protocolCoordinator: ProtocolCoordinator
+    val topicCoordinator: TopicCoordinator
+    val messageCoordinator: MessageCoordinator
+    val protocolFactory: Protocol.Factory
 
 }
+

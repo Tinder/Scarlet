@@ -10,9 +10,9 @@ import com.tinder.scarlet.Topic
 import com.tinder.scarlet.state.utils.GroupWorker
 import com.tinder.scarlet.state.utils.Worker
 
-class MessageCoordinator(
-    private val serviceLocator: ServiceLocator
-) {
+internal class MessageCoordinator(
+    serviceLocator: ServiceLocator
+) : ServiceLocator by serviceLocator {
     private val messageGroupWorker =
         GroupWorker<Pair<Topic, Message>, Protocol, Unit, Unit, Unit, Unit>()
 
@@ -38,7 +38,7 @@ class MessageCoordinator(
                     sideEffect.context.send(topic, message, null)
                 }
                 is Worker.SideEffect.StopWork -> {
-                    serviceLocator.clientStateCoordinator.finishSending(topic, message)
+                    engineCoordinator.finishSending(topic, message)
                 }
             }
         }

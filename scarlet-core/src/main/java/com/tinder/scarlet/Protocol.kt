@@ -28,4 +28,3 @@ interface Protocol {
         fun create(): Protocol
     }
 }
-
