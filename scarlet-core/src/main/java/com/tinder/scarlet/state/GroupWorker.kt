@@ -7,18 +7,18 @@ package com.tinder.scarlet.state
 import com.tinder.scarlet.RequestFactory
 import com.tinder.scarlet.StaticRequestFactory
 
-internal class GroupWorker<WORKER_ID : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any> {
+internal class GroupWorker<WORKER_ID : Any, CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any> {
     private val workerFactory =
-        Worker.Factory<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>()
+        Worker.Factory<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>()
     private val workers =
-        emptyMap<WORKER_ID, Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>>().toMutableMap()
+        emptyMap<WORKER_ID, Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>>().toMutableMap()
 
     // TODO keep the latest lifecycle state
     fun add(
         workerId: WORKER_ID,
         startRequestFactory: RequestFactory<START_REQUEST>,
         stopRequestFactory: RequestFactory<STOP_REQUEST>,
-        listener: (Worker.Transition<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
+        listener: (Worker.Transition<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
     ) {
         workers[workerId] = workerFactory.create(
             startRequestFactory,
@@ -31,7 +31,7 @@ internal class GroupWorker<WORKER_ID : Any, START_REQUEST : Any, START_RESPONSE 
         workerId: WORKER_ID,
         startRequest: START_REQUEST,
         stopRequest: STOP_REQUEST,
-        listener: (Worker.Transition<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
+        listener: (Worker.Transition<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
     ) {
         workers[workerId] = workerFactory.create(
             StaticRequestFactory(startRequest),
@@ -40,16 +40,15 @@ internal class GroupWorker<WORKER_ID : Any, START_REQUEST : Any, START_RESPONSE 
         )
     }
 
-
     fun remove(
         workerId: WORKER_ID
     ) {
         workers.remove(workerId)
     }
 
-    fun onLifecycleStarted() {
+    fun onLifecycleStarted(context: CONTEXT) {
         workers.forEach {
-            it.value.onLifecycleStarted()
+            it.value.onLifecycleStarted(context)
         }
     }
 
@@ -88,7 +87,6 @@ internal class GroupWorker<WORKER_ID : Any, START_REQUEST : Any, START_RESPONSE 
     ) {
         workers[workerId]?.onWorkFailed(throwable)
     }
-
 }
 
 

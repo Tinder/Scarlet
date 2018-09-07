@@ -20,19 +20,19 @@ import com.tinder.scarlet.state.Worker.State.Stopped
 import com.tinder.scarlet.state.Worker.State.Stopping
 import com.tinder.scarlet.state.Worker.State.WillStart
 
-internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
+internal class Worker<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
     private val startRequestFactory: RequestFactory<START_REQUEST>,
     private val stopRequestFactory: RequestFactory<STOP_REQUEST>,
-    listener: (Transition<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
+    listener: (Transition<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
 ) {
 
     private val sideEffect = SideEffect()
     private val stateMachine = StateMachine.create<State, Event, SideEffect> {
         initialState(State().Stopped())
         state<Stopped> {
-            on<OnLifecycleStarted> {
+            on<OnLifecycleStarted<CONTEXT>> {
                 transitionTo(
-                    WillStart(retryCount = 0),
+                    WillStart(context = it.context, retryCount = 0),
                     sideEffect.ScheduleRetry(0)
                 )
             }
@@ -43,7 +43,10 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         state<WillStart> {
             on<OnShouldStart> {
                 val request = startRequestFactory.createRequest()
-                transitionTo(Starting(retryCount, request), sideEffect.StartWork(request))
+                transitionTo(
+                    Starting(context, retryCount, request),
+                    sideEffect.StartWork(context, request)
+                )
             }
             on<OnLifecycleStopped> {
                 transitionTo(Stopped(), sideEffect.UnscheduleRetry())
@@ -54,11 +57,11 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         }
         state<Starting> {
             on<OnWorkStarted<START_RESPONSE>> {
-                transitionTo(Started(request, it.response))
+                transitionTo(Started(context, request, it.response))
             }
             on<OnWorkFailed> {
                 transitionTo(
-                    WillStart(retryCount + 1),
+                    WillStart(context, retryCount + 1),
                     sideEffect.ScheduleRetry(retryCount)
                 )
             }
@@ -66,14 +69,14 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         state<Started> {
             on<OnLifecycleStopped> {
                 val request = stopRequestFactory.createRequest()
-                transitionTo(Stopping(request), sideEffect.StopWork(request))
+                transitionTo(Stopping(context, request), sideEffect.StopWork(context, request))
             }
             on<OnLifecycleDestroyed> {
-                transitionTo(Destroyed(), sideEffect.ForceStopWork())
+                transitionTo(Destroyed(), sideEffect.ForceStopWork(context))
             }
             on<OnWorkFailed> {
                 transitionTo(
-                    WillStart(retryCount = 0),
+                    WillStart(context, retryCount = 0),
                     sideEffect.ScheduleRetry(0)
                 )
             }
@@ -99,8 +102,8 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         }
     }
 
-    fun onLifecycleStarted() {
-        stateMachine.transition(OnLifecycleStarted)
+    fun onLifecycleStarted(context: CONTEXT) {
+        stateMachine.transition(OnLifecycleStarted(context))
     }
 
     fun onLifecycleStopped() {
@@ -127,25 +130,28 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         stateMachine.transition(OnWorkFailed(throwable))
     }
 
-    data class Transition<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
-        val fromState: Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
+    data class Transition<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
+        val fromState: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
         val event: Event,
-        val toState: Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
-        val sideEffect: Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.SideEffect?
+        val toState: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.State,
+        val sideEffect: Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>.SideEffect?
     )
 
     open inner class State {
         inner class Starting internal constructor(
+            val context: CONTEXT,
             val retryCount: Int,
             val request: START_REQUEST? = null
         ) : State()
 
         inner class Started internal constructor(
+            val context: CONTEXT,
             val request: START_REQUEST? = null,
             val response: START_RESPONSE? = null
         ) : State()
 
         inner class Stopping internal constructor(
+            val context: CONTEXT,
             val request: STOP_REQUEST? = null
         ) : State()
 
@@ -155,6 +161,7 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
         ) : State()
 
         inner class WillStart internal constructor(
+            val context: CONTEXT,
             val retryCount: Int
         ) : State()
 
@@ -162,7 +169,7 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
     }
 
     sealed class Event {
-        object OnLifecycleStarted : Event()
+        data class OnLifecycleStarted<CONTEXT : Any>(val context: CONTEXT) : Event()
 
         object OnLifecycleStopped : Event()
 
@@ -187,19 +194,19 @@ internal class Worker<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : 
     open inner class SideEffect {
         inner class ScheduleRetry(val retryCount: Int) : SideEffect()
         inner class UnscheduleRetry : SideEffect()
-        inner class StartWork(val request: START_REQUEST? = null) : SideEffect()
-        inner class StopWork(val request: STOP_REQUEST? = null) : SideEffect()
-        inner class ForceStopWork(val request: STOP_REQUEST? = null) : SideEffect()
+        inner class StartWork(val context: CONTEXT, val request: START_REQUEST? = null) : SideEffect()
+        inner class StopWork(val context: CONTEXT, val request: STOP_REQUEST? = null) : SideEffect()
+        inner class ForceStopWork(val context: CONTEXT, val request: STOP_REQUEST? = null) : SideEffect()
     }
 
-    class Factory<START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
+    class Factory<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
     ) {
 
         fun create(
             startRequestFactory: RequestFactory<START_REQUEST>,
             stopRequestFactory: RequestFactory<STOP_REQUEST>,
-            listener: (Transition<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
-        ): Worker<START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE> {
+            listener: (Transition<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE>) -> Unit
+        ): Worker<CONTEXT, START_REQUEST, START_RESPONSE, STOP_REQUEST, STOP_RESPONSE> {
             return Worker(startRequestFactory, stopRequestFactory, listener)
         }
     }

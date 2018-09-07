@@ -48,6 +48,7 @@ class Coordinator(
         clientStateCoordinator.unsubscribe(topic)
     }
 
+    // TODO service locator?
     private inner class ClientStateCoordinator {
         private val clientStateMachine = Client.create { transition ->
             val sideEffect = transition.sideEffect!!
@@ -114,7 +115,7 @@ class Coordinator(
     }
 
     private inner class ProtocolCoordinator {
-        private val protocolGroupWorker = GroupWorker<Unit, Context, Unit, Context, Unit>()
+        private val protocolGroupWorker = GroupWorker<Unit, Unit, Context, Unit, Context, Unit>()
 
         fun start() {
             protocolGroupWorker.add(
@@ -140,7 +141,7 @@ class Coordinator(
                     }
                     is Worker.SideEffect.StartWork -> {
                         sideEffect.request?.apply {
-                            protocol.open(ProtocolListener())
+                            protocol.open(ProtocolListener(protocol))
                         }
                     }
                     is Worker.SideEffect.StopWork -> {
@@ -158,21 +159,23 @@ class Coordinator(
         }
 
         fun openAndRetry() {
-            protocolGroupWorker.onLifecycleStarted()
+            protocolGroupWorker.onLifecycleStarted(Unit)
         }
 
         fun close() {
             protocolGroupWorker.onLifecycleStopped()
         }
 
-        private inner class ProtocolListener : Protocol.Listener {
+        private inner class ProtocolListener(
+            private val protocol: Protocol
+        ) : Protocol.Listener {
             override fun onProtocolOpened(
                 request: Any?,
                 response: Any?
             ) {
                 protocolGroupWorker.onWorkStarted(Unit)
-                topicCoordinator.start()
-                messageCoordinator.start()
+                topicCoordinator.start(protocol)
+                messageCoordinator.start(protocol)
             }
 
             override fun onProtocolClosed(
@@ -226,10 +229,10 @@ class Coordinator(
     }
 
     private inner class TopicCoordinator {
-        private val topicGroupWorker = GroupWorker<Topic, Context, Unit, Context, Unit>()
+        private val topicGroupWorker = GroupWorker<Topic, Protocol, Unit, Unit, Unit, Unit>()
 
-        fun start(context: Context) {
-            topicGroupWorker.onLifecycleStarted()
+        fun start(context: Protocol) {
+            topicGroupWorker.onLifecycleStarted(context)
         }
 
         fun stop() {
@@ -239,16 +242,8 @@ class Coordinator(
         fun subscribeAndRetry(topic: Topic) {
             topicGroupWorker.add(
                 topic,
-                object : RequestFactory<Context> {
-                    override fun createRequest(): Context {
-                        return Context(protocolFactory.create())
-                    }
-                },
-                object : RequestFactory<Context> {
-                    override fun createRequest(): Context {
-                        return Context(protocolFactory.create())
-                    }
-                }
+                Unit, // generate meta info?
+                Unit
             ) { transition ->
                 val sideEffect = transition.sideEffect!!
                 when (sideEffect) {
@@ -259,15 +254,13 @@ class Coordinator(
                         // TODO timer
                     }
                     is Worker.SideEffect.StartWork -> {
-                        // TODO make clientOption the protocol?
-
-                        protocol.subscribe(sideEffect.request as Topic, null)
+                        sideEffect.context.subscribe(topic, null)
                     }
                     is Worker.SideEffect.StopWork -> {
-                        protocol.unsubscribe(sideEffect.option as Topic, null)
+                        sideEffect.context.unsubscribe(topic, null)
                     }
                     is Worker.SideEffect.ForceStopWork -> {
-                        protocol.unsubscribe(sideEffect.option as Topic, null)
+                        sideEffect.context.unsubscribe(topic, null)
                     }
                 }
             }
@@ -297,10 +290,11 @@ class Coordinator(
     }
 
     private inner class MessageCoordinator {
-        private val messageGroupWorker = GroupWorker<Pair<Topic, Message>, Unit, Unit, Unit, Unit>()
+        private val messageGroupWorker =
+            GroupWorker<Pair<Topic, Message>, Protocol, Unit, Unit, Unit, Unit>()
 
-        fun start(context: Context) {
-            messageGroupWorker.onLifecycleStarted()
+        fun start(protocol: Protocol) {
+            messageGroupWorker.onLifecycleStarted(protocol)
         }
 
         fun stop() {
@@ -318,7 +312,7 @@ class Coordinator(
                         // TODO timer
                     }
                     is Worker.SideEffect.StartWork -> {
-                        protocol.send(topic, message, null)
+                        sideEffect.context.send(topic, message, null)
                     }
                     is Worker.SideEffect.StopWork -> {
                         clientStateCoordinator.finishSending(topic, message)
@@ -357,8 +351,6 @@ class Coordinator(
     }
 
     data class Context(
-        val protocol: Protocol,
-        val topic: Topic? = null,
-        val message: Message? = null
+        val protocol: Protocol
     )
 }
