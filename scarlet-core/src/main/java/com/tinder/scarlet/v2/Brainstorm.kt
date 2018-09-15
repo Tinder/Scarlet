@@ -30,7 +30,7 @@ interface ServiceFactory {
         val lifecycle: Lifecycle,
         val backoffStrategy: BackoffStrategy,
         val streamAdapters: List<Any>,
-        val messageAdatpers: List<Any>
+        val messageAdapters: List<Any>
     )
 
     interface Factory {
@@ -41,9 +41,9 @@ interface ServiceFactory {
 // plugin
 interface Protocol : Channel.Factory, EventAdapter.Factory {
 
-    fun open(request: Any): Stream<Event>
+    fun open(): Stream<Event>
 
-    fun close(request: Any)
+    fun close()
 
     fun forceClose()
 
@@ -69,9 +69,9 @@ interface Protocol : Channel.Factory, EventAdapter.Factory {
 interface Channel {
     val topic: Topic
 
-    fun open(request: Any): Stream<Event>
+    fun open(): Stream<Event>
 
-    fun close(request: Any)
+    fun close()
 
     fun forceClose()
 
@@ -106,7 +106,7 @@ interface EventAdapter<T> {
     }
 }
 
-// plugin
+// plugin of plugin
 interface RequestFactory {
     fun createOpenRequest(from: Any): Any
 
@@ -133,5 +133,6 @@ interface Lifecycle {
 
 }
 
+// plugin
 interface BackoffStrategy {
 }
