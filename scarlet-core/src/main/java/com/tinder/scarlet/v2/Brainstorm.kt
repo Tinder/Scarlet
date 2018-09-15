@@ -48,16 +48,24 @@ interface Protocol : Channel.Factory, EventAdapter.Factory {
     fun forceClose()
 
     sealed class Event {
-        data class OnOpening(val protocol: Protocol, val request: Any) : Event()
-        data class OnOpened(val protocol: Protocol, val request: Any, val response: Any) : Event()
-        data class OnClosing(val protocol: Protocol, val request: Any) : Event()
-        data class OnClosed(val protocol: Protocol, val request: Any, val response: Any) : Event()
+        data class OnOpening(val protocol: Protocol, val request: OpenRequest) : Event()
+        data class OnOpened(val protocol: Protocol, val request: OpenRequest, val response: OpenResponse) : Event()
+        data class OnClosing(val protocol: Protocol, val request: CloseRequest) : Event()
+        data class OnClosed(val protocol: Protocol, val request: CloseRequest, val response: CloseResponse) : Event()
         data class OnCanceled(val protocol: Protocol) : Event()
     }
 
+    interface OpenRequest
+
+    interface OpenResponse
+
+    interface CloseRequest
+
+    interface CloseResponse
+
     data class Configuration(
-        val protocolRequestFactory: RequestFactory,
-        val channelRequestFactory: RequestFactory
+        val protocolRequestFactory: RequestFactory<OpenRequest, CloseRequest>,
+        val channelRequestFactory: RequestFactory<Channel.OpenRequest, Channel.CloseRequest>
     )
 
     interface Factory {
@@ -78,13 +86,21 @@ interface Channel {
     fun send(message: Message)
 
     sealed class Event {
-        data class OnOpening(val channel: Channel, val request: Any) : Event()
-        data class OnOpened(val channel: Channel, val request: Any, val response: Any) : Event()
+        data class OnOpening(val channel: Channel, val request: OpenRequest) : Event()
+        data class OnOpened(val channel: Channel, val request: OpenRequest, val response: OpenResponse) : Event()
         data class OnMessageReceived(val channel: Channel, val message: Message) : Event()
-        data class OnClosing(val channel: Channel, val request: Any) : Event()
-        data class OnClosed(val channel: Channel, val request: Any, val response: Any) : Event()
+        data class OnClosing(val channel: Channel, val request: CloseRequest) : Event()
+        data class OnClosed(val channel: Channel, val request: CloseRequest, val response: CloseResponse) : Event()
         data class OnCanceled(val channel: Channel) : Event()
     }
+
+    interface OpenRequest
+
+    interface OpenResponse
+
+    interface CloseRequest
+
+    interface CloseResponse
 
     data class Configuration(
         val protocol: Protocol,
@@ -107,12 +123,11 @@ interface EventAdapter<T> {
 }
 
 // plugin of plugin
-interface RequestFactory {
-    fun createOpenRequest(from: Any): Any
+interface RequestFactory<OPEN_REQUEST, CLOSE_REQUEST> {
+    fun createOpenRequest(from: Any): OPEN_REQUEST
 
-    fun createCloseRequest(from: Any): Any
+    fun createCloseRequest(from: Any): CLOSE_REQUEST
 }
-
 
 interface Topic {
 
