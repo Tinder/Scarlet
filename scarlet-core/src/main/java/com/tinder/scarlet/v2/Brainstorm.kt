@@ -12,7 +12,8 @@ interface Scarlet: ServiceFactory.Factory {
 
     data class Configuration(
         val protocolFactory: Protocol.Factory,
-        val lifecycle: Lifecycle
+        val lifecycle: Lifecycle,
+        val backoffStrategy: BackoffStrategy
     )
 
     interface Factory {
@@ -27,6 +28,7 @@ interface ServiceFactory {
     data class Configuration(
         val topic: Topic,
         val lifecycle: Lifecycle,
+        val backoffStrategy: BackoffStrategy,
         val streamAdapters: List<Any>,
         val messageAdatpers: List<Any>
     )
@@ -36,6 +38,7 @@ interface ServiceFactory {
     }
 }
 
+// plugin
 interface Protocol {
 
     val channelFactory: Channel.Factory
@@ -104,6 +107,7 @@ interface Protocol {
     }
 }
 
+// plugin
 interface RequestFactory {
     fun createOpenRequest(from: Any): Any
 
@@ -119,7 +123,7 @@ interface Message {
 
 }
 
-
+// plugin
 interface Lifecycle {
 
     // Event
@@ -128,4 +132,7 @@ interface Lifecycle {
 
     // onStop()
 
+}
+
+interface BackoffStrategy {
 }
