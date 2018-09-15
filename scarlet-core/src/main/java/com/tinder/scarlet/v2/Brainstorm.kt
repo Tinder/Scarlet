@@ -5,6 +5,7 @@
 package com.tinder.scarlet.v2
 
 import com.tinder.scarlet.Stream
+import java.lang.reflect.Type
 
 
 interface Scarlet: ServiceFactory.Factory {
@@ -37,11 +38,8 @@ interface ServiceFactory {
 
 interface Protocol {
 
-    // TODO: options
-
     val channelFactory: Channel.Factory
-
-    // event adapter
+    val eventAdapterFactory: EventAdapter.Factory
 
     fun open(request: Any): Stream<Event>
 
@@ -58,7 +56,8 @@ interface Protocol {
     }
 
     data class Configuration(
-        val requestFactory: RequestFactory
+        val protocolRequestFactory: RequestFactory,
+        val channelRequestFactory: RequestFactory
     )
 
     interface Factory {
@@ -94,10 +93,21 @@ interface Protocol {
         }
     }
 
+    interface EventAdapter<T> {
+        fun fromProtocolEvent(event: Protocol.Event): T
+
+        fun fromChannelEvent(event: Channel.Event): T
+
+        interface Factory {
+            fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
+        }
+    }
 }
 
 interface RequestFactory {
+    fun createOpenRequest(from: Any): Any
 
+    fun createCloseRequest(from: Any): Any
 }
 
 
