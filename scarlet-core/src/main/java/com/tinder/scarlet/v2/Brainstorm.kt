@@ -8,7 +8,7 @@ import com.tinder.scarlet.Stream
 import java.lang.reflect.Type
 
 
-interface Scarlet: ServiceFactory.Factory {
+interface Scarlet : ServiceFactory.Factory {
 
     data class Configuration(
         val protocolFactory: Protocol.Factory,
@@ -39,10 +39,7 @@ interface ServiceFactory {
 }
 
 // plugin
-interface Protocol {
-
-    val channelFactory: Channel.Factory
-    val eventAdapterFactory: EventAdapter.Factory
+interface Protocol: Channel.Factory, EventAdapter.Factory {
 
     fun open(request: Any): Stream<Event>
 
@@ -67,43 +64,45 @@ interface Protocol {
         fun create(configuration: Configuration): Protocol
     }
 
-    interface Channel {
-        val topic: Topic
+}
 
-        fun open(request: Any): Stream<Event>
+interface Channel {
+    val topic: Topic
 
-        fun close(request: Any)
+    fun open(request: Any): Stream<Event>
 
-        fun forceClose()
+    fun close(request: Any)
 
-        fun send(message: Message)
+    fun forceClose()
 
-        sealed class Event {
-            data class OnOpening(val channel: Channel, val request: Any)
-            data class OnOpened(val channel: Channel, val request: Any, val response: Any)
-            data class OnMessageReceived(val channel: Channel, val message: Message)
-            data class OnClosing(val channel: Channel, val request: Any)
-            data class OnClosed(val channel: Channel, val request: Any, val response: Any)
-            data class OnCanceled(val channel: Channel)
-        }
+    fun send(message: Message)
 
-        data class Configuration(
-            val protocol: Protocol,
-            val topic: Topic
-        )
-        interface Factory {
-            fun create(configuration: Configuration): Channel
-        }
+    sealed class Event {
+        data class OnOpening(val channel: Channel, val request: Any)
+        data class OnOpened(val channel: Channel, val request: Any, val response: Any)
+        data class OnMessageReceived(val channel: Channel, val message: Message)
+        data class OnClosing(val channel: Channel, val request: Any)
+        data class OnClosed(val channel: Channel, val request: Any, val response: Any)
+        data class OnCanceled(val channel: Channel)
     }
 
-    interface EventAdapter<T> {
-        fun fromProtocolEvent(event: Protocol.Event): T
+    data class Configuration(
+        val protocol: Protocol,
+        val topic: Topic
+    )
 
-        fun fromChannelEvent(event: Channel.Event): T
+    interface Factory {
+        fun create(configuration: Configuration): Channel
+    }
+}
 
-        interface Factory {
-            fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
-        }
+interface EventAdapter<T> {
+    fun fromProtocolEvent(event: Protocol.Event): T
+
+    fun fromChannelEvent(event: Channel.Event): T
+
+    interface Factory {
+        fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
     }
 }
 
