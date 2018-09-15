@@ -39,7 +39,7 @@ interface ServiceFactory {
 }
 
 // plugin
-interface Protocol: Channel.Factory, EventAdapter.Factory {
+interface Protocol : Channel.Factory, EventAdapter.Factory {
 
     fun open(request: Any): Stream<Event>
 
@@ -48,11 +48,11 @@ interface Protocol: Channel.Factory, EventAdapter.Factory {
     fun forceClose()
 
     sealed class Event {
-        data class OnOpening(val protocol: Protocol, val request: Any)
-        data class OnOpened(val protocol: Protocol, val request: Any, val response: Any)
-        data class OnClosing(val protocol: Protocol, val request: Any)
-        data class OnClosed(val protocol: Protocol, val request: Any, val response: Any)
-        data class OnCanceled(val protocol: Protocol)
+        data class OnOpening(val protocol: Protocol, val request: Any) : Event()
+        data class OnOpened(val protocol: Protocol, val request: Any, val response: Any) : Event()
+        data class OnClosing(val protocol: Protocol, val request: Any) : Event()
+        data class OnClosed(val protocol: Protocol, val request: Any, val response: Any) : Event()
+        data class OnCanceled(val protocol: Protocol) : Event()
     }
 
     data class Configuration(
@@ -78,12 +78,12 @@ interface Channel {
     fun send(message: Message)
 
     sealed class Event {
-        data class OnOpening(val channel: Channel, val request: Any)
-        data class OnOpened(val channel: Channel, val request: Any, val response: Any)
-        data class OnMessageReceived(val channel: Channel, val message: Message)
-        data class OnClosing(val channel: Channel, val request: Any)
-        data class OnClosed(val channel: Channel, val request: Any, val response: Any)
-        data class OnCanceled(val channel: Channel)
+        data class OnOpening(val channel: Channel, val request: Any) : Event()
+        data class OnOpened(val channel: Channel, val request: Any, val response: Any) : Event()
+        data class OnMessageReceived(val channel: Channel, val message: Message) : Event()
+        data class OnClosing(val channel: Channel, val request: Any) : Event()
+        data class OnClosed(val channel: Channel, val request: Any, val response: Any) : Event()
+        data class OnCanceled(val channel: Channel) : Event()
     }
 
     data class Configuration(
