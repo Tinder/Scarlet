@@ -41,15 +41,6 @@ internal class Engine(
                     )
                 )
             }
-            on<Event.OnShouldReceiveMessage> {
-                transitionTo(
-                    this,
-                    SideEffect.ReceiveMessage(
-                        it.topic,
-                        it.message
-                    )
-                )
-            }
             on<Event.OnShouldOpen> {
                 when (isOpen) {
                     true -> dontTransition()
@@ -147,7 +138,6 @@ internal class Engine(
     sealed class Event {
         data class OnShouldSendMessage(val topic: Topic, val message: Message) : Event()
         data class OnShouldFinishSendingMessage(val topic: Topic, val message: Message) : Event()
-        data class OnShouldReceiveMessage(val topic: Topic, val message: Message) : Event()
 
         object OnShouldOpen : Event()
         object OnShouldClose : Event()
@@ -159,8 +149,6 @@ internal class Engine(
     sealed class SideEffect {
         data class SendMessage(val topic: Topic, val message: Message) : SideEffect()
         data class FinishSendingMessage(val topic: Topic, val message: Message) : SideEffect()
-
-        data class ReceiveMessage(val topic: Topic, val message: Message) : SideEffect()
 
         data class Open(val topics: Set<Topic>, val messages: Map<Topic, List<Message>>) :
             SideEffect()
