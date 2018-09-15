@@ -64,8 +64,8 @@ interface Protocol : Channel.Factory, EventAdapter.Factory {
     interface CloseResponse
 
     data class Configuration(
-        val protocolRequestFactory: RequestFactory<OpenRequest, CloseRequest>,
-        val channelRequestFactory: RequestFactory<Channel.OpenRequest, Channel.CloseRequest>
+        val protocolRequestFactory: RequestFactory<Protocol, OpenRequest, CloseRequest>,
+        val channelRequestFactory: RequestFactory<Channel, Channel.OpenRequest, Channel.CloseRequest>
     )
 
     interface Factory {
@@ -123,10 +123,10 @@ interface EventAdapter<T> {
 }
 
 // plugin of plugin
-interface RequestFactory<OPEN_REQUEST, CLOSE_REQUEST> {
-    fun createOpenRequest(from: Any): OPEN_REQUEST
+interface RequestFactory<FROM, OPEN_REQUEST, CLOSE_REQUEST> {
+    fun createOpenRequest(from: FROM): OPEN_REQUEST
 
-    fun createCloseRequest(from: Any): CLOSE_REQUEST
+    fun createCloseRequest(from: FROM): CLOSE_REQUEST
 }
 
 interface Topic {
