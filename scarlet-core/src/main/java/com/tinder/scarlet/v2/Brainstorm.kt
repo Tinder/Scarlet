@@ -47,11 +47,14 @@ interface Protocol {
 
     fun close(request: Any)
 
+    fun forceClose()
+
     sealed class Event {
         data class OnOpening(val protocol: Protocol, val request: Any)
         data class OnOpened(val protocol: Protocol, val request: Any, val response: Any)
         data class OnClosing(val protocol: Protocol, val request: Any)
         data class OnClosed(val protocol: Protocol, val request: Any, val response: Any)
+        data class OnCanceled(val protocol: Protocol)
     }
 
     data class Configuration(
@@ -69,6 +72,8 @@ interface Protocol {
 
         fun close(request: Any)
 
+        fun forceClose()
+
         fun send(message: Message)
 
         sealed class Event {
@@ -77,6 +82,7 @@ interface Protocol {
             data class OnMessageReceived(val channel: Channel, val message: Message)
             data class OnClosing(val channel: Channel, val request: Any)
             data class OnClosed(val channel: Channel, val request: Any, val response: Any)
+            data class OnCanceled(val channel: Channel)
         }
 
         data class Configuration(
