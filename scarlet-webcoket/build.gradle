@@ -7,6 +7,7 @@ dependencies {
     api project(':scarlet-core')
     api rootProject.ext.okHttp
     implementation rootProject.ext.okHttpServerSentEvent
+    implementation rootProject.ext.socketIo
 
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava

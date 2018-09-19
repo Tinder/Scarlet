@@ -29,8 +29,8 @@ interface ServiceFactory {
         val topic: Topic,
         val lifecycle: Lifecycle,
         val backoffStrategy: BackoffStrategy,
-        val streamAdapters: List<Any>,
-        val messageAdapters: List<Any>
+        val streamAdapters: List<Any> = emptyList(),
+        val messageAdapters: List<Any> = emptyList()
     )
 
     interface Factory {
@@ -38,161 +38,116 @@ interface ServiceFactory {
     }
 }
 
-sealed class ConnectionEvent {
-    data class OnOpening(
-        val connection: Connection, val request: Connection.OpenRequest
-    ) : ConnectionEvent()
-
-    data class OnOpened(
-        val connection: Connection,
-        val request: Connection.OpenRequest,
-        val response: Connection.OpenResponse
-    ) : ConnectionEvent()
-
-    data class OnClosing(
-        val connection: Connection, val request: Connection.CloseRequest
-    ) : ConnectionEvent()
-
-    data class OnClosed(
-        val connection: Connection,
-        val request: Connection.CloseRequest,
-        val response: Connection.CloseResponse
-    ) : ConnectionEvent()
-
-    data class OnCanceled(val connection: Connection) : ConnectionEvent()
-}
-
-sealed class ChannelEvent {
-    data class OnOpening(
-        val channel: Channel, val request: Channel.OpenRequest
-    ) : ChannelEvent()
-
-    data class OnOpened(
-        val channel: Channel, val request: Channel.OpenRequest, val response: Channel.OpenResponse
-    ) : ChannelEvent()
-
-    data class OnMessageReceived(val channel: Channel, val message: Message) : ChannelEvent()
-    data class OnMessageDelivered(val channel: Channel, val message: Message) : ChannelEvent()
-    data class OnClosing(val channel: Channel, val request: Channel.CloseRequest) : ChannelEvent()
-    data class OnClosed(
-        val channel: Channel, val request: Channel.CloseRequest, val response: Channel.CloseResponse
-    ) : ChannelEvent()
-
-    data class OnCanceled(val channel: Channel) : ChannelEvent()
-}
-
-
 // plugin
 interface Protocol {
-    fun createConnectionFactory(): Connection.Factory
-
-    fun createConnectionRequestFactory(): Connection.RequestFactory
-
     fun createChannelFactory(): Channel.Factory
 
-    fun createChannelRequestFactory(): Channel.RequestFactory
+    fun createMessageQueueFactory(): MessageQueue.Factory
 
-    fun createEventAdapterFactory(): EventAdapter.Factory
-}
+    fun createChannelOpenRequestFactory(channel: Channel): OpenRequest.Factory
 
-// TODO Remove this??
-// TODO Unify with channel?
-interface Connection {
+    fun createChannelCloseRequestFactory(channel: Channel): CloseRequest.Factory
 
-    val defaultTopic: Topic
+    fun createMessageMetaDataFactory(channel: Channel): MessageMetaData.Factory
 
-    fun open(openRequest: OpenRequest)
+    fun createEventAdapterFactory(channel: Channel): EventAdapter.Factory
 
-    fun close(closeRequest: CloseRequest)
-
-    fun forceClose()
-
-    interface Listener {
-        fun onOpening(connection: Connection)
-        fun onOpened(connection: Connection, response: OpenResponse)
-        fun onClosing(connection: Connection)
-        fun onClosed(connection: Connection, response: CloseResponse)
-        fun onCanceled(connection: Connection, throwable: Throwable)
+    interface OpenRequest {
+        interface Factory {
+            fun create(channel: Channel): OpenRequest
+        }
     }
-
-    interface OpenRequest
 
     interface OpenResponse
 
-    interface CloseRequest
+    interface CloseRequest {
+        interface Factory {
+            fun create(channel: Channel): CloseRequest
+        }
+    }
 
     interface CloseResponse
 
-    interface RequestFactory {
-        fun createOpenRequest(connection: Connection): OpenRequest
-
-        fun createCloseRequest(connection: Connection): CloseRequest
+    interface MessageMetaData {
+        interface Factory {
+            fun create(channel: Channel): MessageMetaData? = null
+        }
     }
 
-    interface Factory {
-        fun create(listener: Listener): Connection
+    sealed class Event {
+        data class OnOpening(
+            val channel: Channel, val request: OpenRequest
+        ) : Event()
+
+        data class OnOpened(
+            val channel: Channel, val request: OpenRequest, val response: OpenResponse
+        ) : Event()
+
+        data class OnMessageReceived(
+            val channel: Channel, val message: Message, val messageMetaData: MessageMetaData
+        ) : Event()
+
+        data class OnClosing(
+            val channel: Channel, val request: CloseRequest
+        ) : Event()
+
+        data class OnClosed(
+            val channel: Channel, val request: CloseRequest, val response: CloseResponse
+        ) : Event()
+
+        data class OnCanceled(val channel: Channel, val throwable: Throwable?) : Event()
+    }
+
+    interface EventAdapter<T> {
+        fun fromEvent(event: Protocol.Event): T
+
+        interface Factory {
+            fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
+        }
     }
 }
 
 interface Channel {
     val topic: Topic
 
-    fun open(openRequest: OpenRequest)
+    fun open(openRequest: Protocol.OpenRequest)
 
-    fun close(closeRequest: CloseRequest)
+    fun close(closeRequest: Protocol.CloseRequest)
 
     fun forceClose()
 
-    fun send(message: Message)
-
     interface Listener {
-        fun onOpening(channel: Channel)
-        fun onOpened(channel: Channel, response: OpenResponse)
-        fun onMessageReceived(channel: Channel, message: Message)
+        fun onOpened(channel: Channel, response: Protocol.OpenResponse)
         fun onClosing(channel: Channel)
-        fun onClosed(channel: Channel, response: CloseResponse)
+        fun onClosed(channel: Channel, response: Protocol.CloseResponse)
         fun onCanceled(channel: Channel, throwable: Throwable?)
     }
 
-    interface OpenRequest
-
-    interface OpenResponse
-
-    interface MessageWrapper
-
-    interface CloseRequest
-
-    interface CloseResponse
-
-    interface RequestFactory {
-        fun createOpenRequest(channel: Channel): OpenRequest
-
-        fun createCloseRequest(channel: Channel): CloseRequest
-    }
-
-    data class Configuration(
-        val connection: Connection,
-        val topic: Topic,
-        val listener: Listener
-    )
-
     interface Factory {
-        fun create(configuration: Configuration): Channel
+        fun create(topic: Topic, listener: Listener): Channel? = null
     }
 }
 
-interface EventAdapter<T> {
-    fun fromConnectionEvent(event: ConnectionEvent): T
+interface MessageQueue {
 
-    fun fromChannelEvent(event: ChannelEvent): T
+    fun send(message: Message, messageMetaData: Protocol.MessageMetaData)
+
+    interface Listener {
+        fun onMessageReceived(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
+        fun onMessageDelivered(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
+    }
 
     interface Factory {
-        fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
+        fun create(channel: Channel, listener: Listener): MessageQueue? = null
     }
 }
 
 interface Topic {
+    val id: String
+}
 
+object DefaultTopic : Topic {
+    override val id = ""
 }
 
 // plugin
