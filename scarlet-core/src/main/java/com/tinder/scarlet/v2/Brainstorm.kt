@@ -4,14 +4,14 @@
 
 package com.tinder.scarlet.v2
 
-import com.tinder.scarlet.Stream
+import com.tinder.scarlet.Message
 import java.lang.reflect.Type
 
 
 interface Scarlet : ServiceFactory.Factory {
 
     data class Configuration(
-        val protocolFactory: Protocol.Factory,
+        val protocol: Protocol,
         val lifecycle: Lifecycle,
         val backoffStrategy: BackoffStrategy
     )
@@ -38,21 +38,79 @@ interface ServiceFactory {
     }
 }
 
+sealed class ConnectionEvent {
+    data class OnOpening(
+        val connection: Connection, val request: Connection.OpenRequest
+    ) : ConnectionEvent()
+
+    data class OnOpened(
+        val connection: Connection,
+        val request: Connection.OpenRequest,
+        val response: Connection.OpenResponse
+    ) : ConnectionEvent()
+
+    data class OnClosing(
+        val connection: Connection, val request: Connection.CloseRequest
+    ) : ConnectionEvent()
+
+    data class OnClosed(
+        val connection: Connection,
+        val request: Connection.CloseRequest,
+        val response: Connection.CloseResponse
+    ) : ConnectionEvent()
+
+    data class OnCanceled(val connection: Connection) : ConnectionEvent()
+}
+
+sealed class ChannelEvent {
+    data class OnOpening(
+        val channel: Channel, val request: Channel.OpenRequest
+    ) : ChannelEvent()
+
+    data class OnOpened(
+        val channel: Channel, val request: Channel.OpenRequest, val response: Channel.OpenResponse
+    ) : ChannelEvent()
+
+    data class OnMessageReceived(val channel: Channel, val message: Message) : ChannelEvent()
+    data class OnMessageDelivered(val channel: Channel, val message: Message) : ChannelEvent()
+    data class OnClosing(val channel: Channel, val request: Channel.CloseRequest) : ChannelEvent()
+    data class OnClosed(
+        val channel: Channel, val request: Channel.CloseRequest, val response: Channel.CloseResponse
+    ) : ChannelEvent()
+
+    data class OnCanceled(val channel: Channel) : ChannelEvent()
+}
+
+
 // plugin
-interface Protocol : Channel.Factory, EventAdapter.Factory {
+interface Protocol {
+    fun createConnectionFactory(): Connection.Factory
 
-    fun open(): Stream<Event>
+    fun createConnectionRequestFactory(): Connection.RequestFactory
 
-    fun close()
+    fun createChannelFactory(): Channel.Factory
+
+    fun createChannelRequestFactory(): Channel.RequestFactory
+
+    fun createEventAdapterFactory(): EventAdapter.Factory
+}
+
+interface Connection {
+
+    val defaultTopic: Topic
+
+    fun open(openRequest: OpenRequest)
+
+    fun close(closeRequest: CloseRequest)
 
     fun forceClose()
 
-    sealed class Event {
-        data class OnOpening(val protocol: Protocol, val request: OpenRequest) : Event()
-        data class OnOpened(val protocol: Protocol, val request: OpenRequest, val response: OpenResponse) : Event()
-        data class OnClosing(val protocol: Protocol, val request: CloseRequest) : Event()
-        data class OnClosed(val protocol: Protocol, val request: CloseRequest, val response: CloseResponse) : Event()
-        data class OnCanceled(val protocol: Protocol) : Event()
+    interface Listener {
+        fun onOpening(connection: Connection)
+        fun onOpened(connection: Connection, response: OpenResponse)
+        fun onClosing(connection: Connection)
+        fun onClosed(connection: Connection, response: CloseResponse)
+        fun onCanceled(connection: Connection, throwable: Throwable)
     }
 
     interface OpenRequest
@@ -63,35 +121,36 @@ interface Protocol : Channel.Factory, EventAdapter.Factory {
 
     interface CloseResponse
 
-    data class Configuration(
-        val protocolRequestFactory: RequestFactory<Protocol, OpenRequest, CloseRequest>,
-        val channelRequestFactory: RequestFactory<Channel, Channel.OpenRequest, Channel.CloseRequest>
-    )
+    interface RequestFactory {
+        fun createOpenRequest(connection: Connection): OpenRequest
 
-    interface Factory {
-        fun create(configuration: Configuration): Protocol
+        fun createCloseRequest(connection: Connection): CloseRequest
     }
 
+    interface Factory {
+        fun create(listener: Listener): Connection
+    }
 }
 
 interface Channel {
     val topic: Topic
 
-    fun open(): Stream<Event>
+    fun open(openRequest: OpenRequest)
 
-    fun close()
+    fun close(closeRequest: CloseRequest)
 
     fun forceClose()
 
     fun send(message: Message)
 
-    sealed class Event {
-        data class OnOpening(val channel: Channel, val request: OpenRequest) : Event()
-        data class OnOpened(val channel: Channel, val request: OpenRequest, val response: OpenResponse) : Event()
-        data class OnMessageReceived(val channel: Channel, val message: Message) : Event()
-        data class OnClosing(val channel: Channel, val request: CloseRequest) : Event()
-        data class OnClosed(val channel: Channel, val request: CloseRequest, val response: CloseResponse) : Event()
-        data class OnCanceled(val channel: Channel) : Event()
+    interface Listener {
+        fun onOpening(channel: Channel)
+        fun onOpened(channel: Channel, response: OpenResponse)
+        fun onMessageReceived(channel: Channel, message: Message)
+        fun onMessageDelivered(channel: Channel, message: Message)
+        fun onClosing(channel: Channel)
+        fun onClosed(channel: Channel, response: CloseResponse)
+        fun onCanceled(channel: Channel, throwable: Throwable)
     }
 
     interface OpenRequest
@@ -102,9 +161,16 @@ interface Channel {
 
     interface CloseResponse
 
+    interface RequestFactory {
+        fun createOpenRequest(channel: Channel): OpenRequest
+
+        fun createCloseRequest(channel: Channel): CloseRequest
+    }
+
     data class Configuration(
-        val protocol: Protocol,
-        val topic: Topic
+        val connection: Connection,
+        val topic: Topic,
+        val listener: Listener
     )
 
     interface Factory {
@@ -113,27 +179,16 @@ interface Channel {
 }
 
 interface EventAdapter<T> {
-    fun fromProtocolEvent(event: Protocol.Event): T
+    fun fromConnectionEvent(event: ConnectionEvent): T
 
-    fun fromChannelEvent(event: Channel.Event): T
+    fun fromChannelEvent(event: ChannelEvent): T
 
     interface Factory {
         fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
     }
 }
 
-// plugin of plugin
-interface RequestFactory<FROM, OPEN_REQUEST, CLOSE_REQUEST> {
-    fun createOpenRequest(from: FROM): OPEN_REQUEST
-
-    fun createCloseRequest(from: FROM): CLOSE_REQUEST
-}
-
 interface Topic {
-
-}
-
-interface Message {
 
 }
 

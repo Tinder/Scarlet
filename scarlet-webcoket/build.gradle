@@ -5,6 +5,8 @@ apply plugin: 'maven-publish'
 
 dependencies {
     api project(':scarlet-core')
+    api rootProject.ext.okHttp
+
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.kotlinStdlib
