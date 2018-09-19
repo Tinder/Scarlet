@@ -95,6 +95,8 @@ interface Protocol {
     fun createEventAdapterFactory(): EventAdapter.Factory
 }
 
+// TODO Remove this??
+// TODO Unify with channel?
 interface Connection {
 
     val defaultTopic: Topic
@@ -147,15 +149,16 @@ interface Channel {
         fun onOpening(channel: Channel)
         fun onOpened(channel: Channel, response: OpenResponse)
         fun onMessageReceived(channel: Channel, message: Message)
-        fun onMessageDelivered(channel: Channel, message: Message)
         fun onClosing(channel: Channel)
         fun onClosed(channel: Channel, response: CloseResponse)
-        fun onCanceled(channel: Channel, throwable: Throwable)
+        fun onCanceled(channel: Channel, throwable: Throwable?)
     }
 
     interface OpenRequest
 
     interface OpenResponse
+
+    interface MessageWrapper
 
     interface CloseRequest
 

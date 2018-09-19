@@ -10,15 +10,15 @@ import com.tinder.scarlet.v2.Connection
 import com.tinder.scarlet.v2.EventAdapter
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.Topic
-import com.tinder.scarlet.websocket.ShutdownReason
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
+import okhttp3.sse.EventSource
+import okhttp3.sse.EventSourceListener
+import okhttp3.sse.EventSources
 import okio.ByteString
 
-class OkHttpWebSocket(
+class OkHttpEventSource(
     private val okHttpClient: OkHttpClient,
     private val requestFactory: RequestFactory
 ) : Protocol {
@@ -53,16 +53,11 @@ class OkHttpWebSocket(
 
     data class OpenRequest(val okHttpRequest: Request) : Channel.OpenRequest
 
-    data class OpenResponse(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) : Channel.OpenResponse
+    data class OpenResponse(val okHttpResponse: Response) : Channel.OpenResponse
 
-    data class CloseRequest(val shutdownReason: ShutdownReason) : Channel.CloseRequest
+    data class CloseRequest(val shutdownReason: OkHttpEventSource.ShutdownReason) : Channel.CloseRequest
 
-    data class CloseResponse(val shutdownReason: ShutdownReason) : Channel.CloseResponse
-
-    interface RequestFactory : Channel.RequestFactory {
-        fun createOpenRequest(): OpenRequest
-        fun createCloseRequest(): CloseRequest
-    }
+    data class CloseResponse(val shutdownReason: OkHttpEventSource.ShutdownReason) : Channel.CloseResponse
 
     object DefaultTopic : Topic
 
@@ -70,24 +65,28 @@ class OkHttpWebSocket(
 
     object EmptyResponse : Connection.OpenResponse, Connection.CloseResponse
 
+    interface RequestFactory : Channel.RequestFactory {
+        fun createOpenRequest(): OpenRequest
+        fun createCloseRequest(): CloseRequest
+    }
 }
 
-class OkHttpWebSocketConnection(
+class OkHttpEventSourceConnection(
     val okHttpClient: OkHttpClient,
     private val listener: Connection.Listener
 ) : Connection {
-    override val defaultTopic: Topic = OkHttpWebSocket.DefaultTopic
+    override val defaultTopic: Topic = OkHttpEventSource.DefaultTopic
 
     override fun open(openRequest: Connection.OpenRequest) {
-        listener.onOpened(this, OkHttpWebSocket.EmptyResponse)
+        listener.onOpened(this, OkHttpEventSource.EmptyResponse)
     }
 
     override fun close(closeRequest: Connection.CloseRequest) {
-        listener.onClosed(this, OkHttpWebSocket.EmptyResponse)
+        listener.onClosed(this, OkHttpEventSource.EmptyResponse)
     }
 
     override fun forceClose() {
-        listener.onClosed(this, OkHttpWebSocket.EmptyResponse)
+        listener.onClosed(this, OkHttpEventSource.EmptyResponse)
     }
 
     class Factory(
@@ -100,64 +99,46 @@ class OkHttpWebSocketConnection(
 
 }
 
-class OkHttpWebSocketChannel(
+class OkHttpEventSourceChannel(
     private val connection: OkHttpWebSocketConnection,
     private val listener: Channel.Listener
 ) : Channel {
-    override val topic: Topic = OkHttpWebSocket.DefaultTopic
-    lateinit var webSocket: WebSocket
+    override val topic: Topic = DefaultTopic
+    lateinit var eventSource: EventSource
 
     override fun open(openRequest: Channel.OpenRequest) {
         val openRequest = openRequest as OkHttpWebSocket.OpenRequest
-        webSocket = connection.okHttpClient.newWebSocket(openRequest.okHttpRequest, InnerWebSocketListener())
+        eventSource = EventSources.createFactory(connection.okHttpClient).newEventSource(openRequest.okHttpRequest, InnerEventSourceListener())
     }
 
     override fun close(closeRequest: Channel.CloseRequest) {
-        val closeRequest = closeRequest as OkHttpWebSocket.CloseRequest
-        val (code, reasonText) = closeRequest.shutdownReason
-        webSocket.close(code, reasonText)
+        eventSource.cancel()
     }
 
     override fun forceClose() {
-        webSocket.cancel()
+        eventSource.cancel()
     }
 
     override fun send(message: Message) {
-        when (message) {
-            is Message.Text -> webSocket.send(message.value)
-            is Message.Bytes -> {
-                val bytes = message.value
-                val byteString = ByteString.of(bytes, 0, bytes.size)
-                webSocket.send(byteString)
-            }
-        }
     }
 
-    inner class InnerWebSocketListener : WebSocketListener() {
-        override fun onOpen(webSocket: WebSocket, response: Response) =
-            listener.onOpened(this@OkHttpWebSocketChannel, OkHttpWebSocket.OpenResponse(webSocket, response))
+    inner class InnerEventSourceListener : EventSourceListener() {
+        override fun onOpen(webSocket: EventSource, response: Response) =
+            listener.onOpened(this@OkHttpEventSourceChannel, OkHttpWebSocket.OpenResponse(webSocket, response))
 
-        override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            listener.onMessageReceived(this@OkHttpWebSocketChannel, Message.Bytes(bytes.toByteArray()))
+        override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
+            super.onEvent(eventSource, id, type, Message.Text(data))
         }
 
-        override fun onMessage(webSocket: WebSocket, text: String) {
-            listener.onMessageReceived(this@OkHttpWebSocketChannel, Message.Text(text))
-        }
-
-        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosing(this@OkHttpWebSocketChannel)
-        }
-
-        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        override fun onClosed(webSocket: EventSource?) {
             listener.onClosed(
-                this@OkHttpWebSocketChannel,
-                OkHttpWebSocket.CloseResponse(ShutdownReason(code, reason))
+                this@OkHttpEventSourceChannel,
+                )
             )
         }
 
-        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            listener.onCanceled(this@OkHttpWebSocketChannel, t)
+        override fun onFailure(webSocket: EventSource?, t: Throwable?, response: Response?) {
+            listener.onCanceled(this@OkHttpEventSourceChannel, t)
         }
     }
 
