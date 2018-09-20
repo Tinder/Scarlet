@@ -48,7 +48,7 @@ class OkHttpEventSource(
 class OkHttpEventSourceChannel(
     private val okHttpClient: OkHttpClient,
     private val listener: Channel.Listener
-) : Channel {
+) : Channel, MessageQueue {
     override val topic: Topic = Topic.Main
     private var eventSource: EventSource? = null
     private var messageQueueListener: MessageQueue.Listener? = null
@@ -70,12 +70,10 @@ class OkHttpEventSourceChannel(
     override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {
         require(this.messageQueueListener == null)
         this.messageQueueListener = listener
-        return InnerMessageQueue()
+        return this
     }
 
-    inner class InnerMessageQueue : MessageQueue {
-        override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
-        }
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
     }
 
     inner class InnerEventSourceListener : EventSourceListener() {
@@ -86,6 +84,7 @@ class OkHttpEventSourceChannel(
 
         override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
             messageQueueListener?.onMessageReceived(
+                this@OkHttpEventSourceChannel,
                 this@OkHttpEventSourceChannel,
                 Message.Text(data),
                 OkHttpEventSource.ReceivedMessageMetaData(id, type)

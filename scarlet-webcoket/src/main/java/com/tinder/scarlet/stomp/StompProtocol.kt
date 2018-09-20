@@ -125,6 +125,7 @@ class StompMessageChannel(
             { headers, message ->
                 messageQueueListener?.onMessageReceived(
                     this,
+                    this,
                     Message.Text(message),
                     StompProtocol.MessageMetaData(headers as Map<String, String>)
                 )

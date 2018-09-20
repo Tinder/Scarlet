@@ -60,7 +60,7 @@ internal class Connection(
 
         private val lifecycleStateSubscriber = LifecycleStateSubscriber(this)
         private val eventProcessor = PublishProcessor.create<Event>()
-        private val stateMachine = StateMachine.create<State, Event, SideEffect> {
+        private val stateMachine = StateMachine.create<State, Event, Any> {
             state<Disconnected> {
                 onEnter {
                     requestNextLifecycleState()

@@ -140,6 +140,7 @@ class MqttMessageChannel(
         ) { _, message ->
             messageQueueListener?.onMessageReceived(
                 this,
+                this,
                 Message.Bytes(message.payload),
                 Mqtt.ReceivedMessageMetaData(message.id)
             )

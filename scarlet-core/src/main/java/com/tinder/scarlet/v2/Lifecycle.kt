@@ -30,6 +30,6 @@ interface Lifecycle : Publisher<Lifecycle.State> {
          */
         object Stopped : State()
 
-        object Destroyed : State()
+        object Completed : State()
     }
 }

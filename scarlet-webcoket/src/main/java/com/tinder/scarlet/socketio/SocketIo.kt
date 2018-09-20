@@ -13,6 +13,7 @@ import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
 
+// TODO SocketIo server
 class SocketIo(
     private val url: String,
     private val options: IO.Options
@@ -106,7 +107,7 @@ class SocketIoMessageChannel(
         socket = openRequest.socket
         socket?.on(topic.id) {
             val jsonObject = it[0] as JSONObject
-            messageQueueListener?.onMessageReceived(this, Message.Text(jsonObject.toString()))
+            messageQueueListener?.onMessageReceived(this, this, Message.Text(jsonObject.toString()))
         }
         listener.onOpened(this)
     }

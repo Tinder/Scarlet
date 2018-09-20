@@ -73,10 +73,12 @@ class OkHttpWebSocketChannel(
         val closeRequest = closeRequest as OkHttpWebSocket.CloseRequest
         val (code, reasonText) = closeRequest.shutdownReason
         webSocket?.close(code, reasonText)
+        webSocket = null
     }
 
     override fun forceClose() {
         webSocket?.cancel()
+        webSocket = null
     }
 
     override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {
@@ -103,11 +105,11 @@ class OkHttpWebSocketChannel(
             )
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, Message.Bytes(bytes.toByteArray()))
+            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, this@OkHttpWebSocketChannel,Message.Bytes(bytes.toByteArray()))
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, Message.Text(text))
+            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, this@OkHttpWebSocketChannel,Message.Text(text))
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {

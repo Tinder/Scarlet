@@ -11,8 +11,19 @@ interface MessageQueue {
     fun send(message: Message, messageMetaData: Protocol.MessageMetaData)
 
     interface Listener {
-        fun onMessageReceived(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
-        fun onMessageDelivered(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
+        fun onMessageReceived(
+            channel: Channel,
+            messageQueue: MessageQueue,
+            message: Message,
+            metadata: Protocol.MessageMetaData = Protocol.MessageMetaData.Empty
+        )
+
+        fun onMessageDelivered(
+            channel: Channel,
+            messageQueue: MessageQueue,
+            message: Message,
+            metadata: Protocol.MessageMetaData = Protocol.MessageMetaData.Empty
+        )
     }
 
     interface Factory {

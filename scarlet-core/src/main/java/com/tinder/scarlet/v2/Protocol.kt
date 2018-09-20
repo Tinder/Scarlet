@@ -51,36 +51,48 @@ interface Protocol {
 
     interface MessageMetaData {
         interface Factory {
-            fun create(channel: Channel, message: Message): MessageMetaData? = null
+            fun create(channel: Channel, message: Message): MessageMetaData = MessageMetaData.Empty
         }
+
+        object Empty : MessageMetaData
     }
 
     sealed class Event {
+        abstract val channel: Channel
+
         data class OnOpening(
-            val channel: Channel, val request: OpenRequest
+            override val channel: Channel, val request: OpenRequest
         ) : Event()
 
         data class OnOpened(
-            val channel: Channel, val request: OpenRequest, val response: OpenResponse
+            override val channel: Channel,
+            val messageQueue: MessageQueue?,
+            val response: OpenResponse
         ) : Event()
 
         data class OnMessageReceived(
-            val channel: Channel, val message: Message, val messageMetaData: MessageMetaData
+            override val channel: Channel,
+            val messageQueue: MessageQueue,
+            val message: Message,
+            val messageMetaData: MessageMetaData
         ) : Event()
 
         data class OnMessageDelivered(
-            val channel: Channel, val message: Message, val messageMetaData: MessageMetaData
+            override val channel: Channel,
+            val messageQueue: MessageQueue,
+            val message: Message,
+            val messageMetaData: MessageMetaData
         ) : Event()
 
         data class OnClosing(
-            val channel: Channel, val request: CloseRequest
+            override val channel: Channel
         ) : Event()
 
         data class OnClosed(
-            val channel: Channel, val request: CloseRequest, val response: CloseResponse
+            override val channel: Channel, val response: CloseResponse
         ) : Event()
 
-        data class OnFailed(val channel: Channel, val throwable: Throwable?) : Event()
+        data class OnFailed(override val channel: Channel, val throwable: Throwable?) : Event()
     }
 
     interface EventAdapter<T> {

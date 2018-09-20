@@ -1,0 +1,145 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
+package com.tinder.scarlet.v2.service
+
+import com.tinder.StateMachine
+import com.tinder.StateMachine.Matcher.Companion.any
+import com.tinder.scarlet.v2.Lifecycle
+import com.tinder.scarlet.v2.Protocol
+
+sealed class State {
+    data class WillConnect internal constructor(
+        val retryCount: Int
+    ) : State()
+
+    data class Connecting internal constructor(
+        val retryCount: Int
+    ) : State()
+
+    object Connected : State()
+
+    object Disconnecting : State()
+
+    object Disconnected : State()
+
+    object Destroyed : State()
+}
+
+sealed class Event {
+    data class OnLifecycleStateChange internal constructor(val state: Lifecycle.State) : Event()
+
+    data class OnProtocolEvent internal constructor(val event: Protocol.Event) : Event()
+
+    object OnShouldConnect : Event()
+}
+
+sealed class SideEffect {
+    data class ScheduleRetry(val retryCount: Int) : SideEffect()
+    object CancelRetry : SideEffect()
+    object OpenProtocol : SideEffect()
+    object CloseProtocol : SideEffect()
+    object ForceCloseProtocol : SideEffect()
+}
+
+class StateMachineFactory {
+
+    fun create(): StateMachine<State, Event, SideEffect> {
+        return StateMachine.create {
+            initialState(State.Disconnected)
+            state<State.Disconnected> {
+                on(lifecycleStarted) {
+                    transitionTo(
+                        State.WillConnect(retryCount = 0),
+                        SideEffect.ScheduleRetry(0)
+                    )
+                }
+                on(lifecycleDestroyed) {
+                    transitionTo(State.Destroyed)
+                }
+            }
+            state<State.WillConnect> {
+                on<Event.OnShouldConnect> {
+                    transitionTo(
+                        State.Connecting(retryCount = retryCount + 1),
+                        SideEffect.OpenProtocol
+                    )
+                }
+                on(lifecycleStopped) {
+                    transitionTo(
+                        State.Disconnected,
+                        SideEffect.CancelRetry
+                    )
+                }
+                on(lifecycleDestroyed) {
+                    transitionTo(
+                        State.Destroyed,
+                        SideEffect.CancelRetry
+                    )
+                }
+            }
+            state<State.Connecting> {
+                on(protocolOpened) {
+                    transitionTo(State.Connected)
+                }
+                on(protocolFailed) {
+                    transitionTo(
+                        State.WillConnect(retryCount = retryCount + 1),
+                        SideEffect.ScheduleRetry(retryCount)
+                    )
+                }
+            }
+            state<State.Connected> {
+                on(lifecycleStopped) {
+                    transitionTo(
+                        State.Disconnecting,
+                        SideEffect.CloseProtocol
+                    )
+                }
+                on(lifecycleDestroyed) {
+                    transitionTo(
+                        State.Destroyed,
+                        SideEffect.ForceCloseProtocol
+                    )
+                }
+                on(protocolFailed) {
+                    transitionTo(
+                        State.WillConnect(retryCount = 0),
+                        SideEffect.ScheduleRetry(0)
+                    )
+                }
+            }
+            state<State.Disconnecting> {
+                on(protocolClosed) {
+                    transitionTo(State.Disconnected)
+                }
+            }
+            state<State.Destroyed> {
+                // Terminal state
+            }
+        }
+    }
+
+
+    private companion object {
+        private val lifecycleStarted =
+            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Started }
+
+        private val lifecycleStopped =
+            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Stopped }
+
+        private val lifecycleDestroyed =
+            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Completed }
+
+        private val protocolOpened =
+            any<Event, Event.OnProtocolEvent>().where { event is Protocol.Event.OnOpened }
+
+        private val protocolClosed =
+            any<Event, Event.OnProtocolEvent>().where { event is Protocol.Event.OnClosed }
+
+        private val protocolFailed =
+            any<Event, Event.OnProtocolEvent>().where { event is Protocol.Event.OnFailed }
+
+    }
+}
