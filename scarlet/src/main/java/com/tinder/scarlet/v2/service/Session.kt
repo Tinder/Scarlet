@@ -9,6 +9,7 @@ import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.v2.ProtocolEvent
 import com.tinder.scarlet.v2.Topic
 
 internal class Session(
@@ -65,7 +66,7 @@ internal class Session(
         override fun onOpened(channel: Channel, response: Protocol.OpenResponse) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnOpened(
+                    ProtocolEvent.OnOpened(
                         channel,
                         null,
                         response
@@ -74,11 +75,12 @@ internal class Session(
             )
         }
 
-        override fun onClosing(channel: Channel) {
+        override fun onClosing(channel: Channel, response: Protocol.CloseResponse) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnClosing(
-                        channel
+                    ProtocolEvent.OnClosing(
+                        channel,
+                        response
                     )
                 )
             )
@@ -87,7 +89,7 @@ internal class Session(
         override fun onClosed(channel: Channel, response: Protocol.CloseResponse) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnClosed(
+                    ProtocolEvent.OnClosed(
                         channel,
                         response
                     )
@@ -98,7 +100,7 @@ internal class Session(
         override fun onFailed(channel: Channel, throwable: Throwable?) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnFailed(
+                    ProtocolEvent.OnFailed(
                         channel,
                         throwable
                     )
@@ -114,7 +116,7 @@ internal class Session(
         ) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnMessageReceived(
+                    ProtocolEvent.OnMessageReceived(
                         channel,
                         messageQueue,
                         message,
@@ -132,7 +134,7 @@ internal class Session(
         ) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
-                    Protocol.Event.OnMessageDelivered(
+                    ProtocolEvent.OnMessageDelivered(
                         channel,
                         messageQueue,
                         message,

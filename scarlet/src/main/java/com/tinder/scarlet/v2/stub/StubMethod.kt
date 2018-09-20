@@ -8,7 +8,10 @@ import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.StreamAdapter
 import com.tinder.scarlet.internal.servicemethod.MessageAdapterResolver
 import com.tinder.scarlet.internal.servicemethod.StreamAdapterResolver
+import com.tinder.scarlet.utils.getParameterUpperBound
 import com.tinder.scarlet.utils.hasUnresolvableType
+import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.v2.transitionadapter.StateTransitionAdapterResolver
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -20,13 +23,14 @@ internal sealed class StubMethod {
     ) : StubMethod()
 
     class Receive(
-        // TODO eventAdapter??
+        val stateTransitionAdatper: StateTransition.Adapter<Any>,
         val streamAdapter: StreamAdapter<Any, Any>
     ) : StubMethod()
 
     class Factory(
         private val streamAdapterResolver: StreamAdapterResolver,
-        private val messageAdapterResolver: MessageAdapterResolver
+        private val messageAdapterResolver: MessageAdapterResolver,
+        private val stateTransitionAdapterResolver: StateTransitionAdapterResolver
     ) {
 
         fun create(method: Method): StubMethod? {
@@ -72,11 +76,14 @@ internal sealed class StubMethod {
                 "Method return type must not include a type variable or wildcard: ${method.genericReturnType}"
             }
 
-            val returnType = method.genericReturnType as ParameterizedType
+            val streamType = method.genericReturnType as ParameterizedType
+            val messageType = streamType.getFirstTypeArgument()
             val annotations = method.annotations
 
-            val streamAdapter = streamAdapterResolver.resolve(returnType)
+            val stateTransitionAdatper = stateTransitionAdapterResolver.resolve(messageType, annotations)
+            val streamAdapter = streamAdapterResolver.resolve(streamType)
             return Receive(
+                stateTransitionAdatper,
                 streamAdapter
             )
         }
@@ -97,5 +104,7 @@ internal sealed class StubMethod {
         private fun Method.getFirstParameterType(): Type = genericParameterTypes.first()
 
         private fun Method.getFirstParameterAnnotations(): Array<Annotation> = parameterAnnotations.first()
+
+        private fun ParameterizedType.getFirstTypeArgument(): Type = getParameterUpperBound(0)
     }
 }

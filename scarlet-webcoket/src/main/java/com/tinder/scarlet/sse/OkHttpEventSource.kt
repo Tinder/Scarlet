@@ -8,6 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.v2.ProtocolEvent
 import com.tinder.scarlet.v2.Topic
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,7 +31,7 @@ class OkHttpEventSource(
         }
     }
 
-    override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
+    override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
         return EventSourceEvent.Adapter.Factory()
     }
 

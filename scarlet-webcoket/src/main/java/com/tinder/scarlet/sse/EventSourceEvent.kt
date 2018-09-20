@@ -7,6 +7,7 @@ package com.tinder.scarlet.sse
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.v2.ProtocolEvent
 import okhttp3.Response
 import okhttp3.sse.EventSource
 import java.lang.reflect.Type
@@ -20,28 +21,28 @@ sealed class EventSourceEvent {
 
     data class OnConnectionFailed(val throwable: Throwable) : EventSourceEvent()
 
-    class Adapter : Protocol.EventAdapter<EventSourceEvent> {
-        override fun fromEvent(event: Protocol.Event): EventSourceEvent {
+    class Adapter : ProtocolEvent.Adapter<EventSourceEvent> {
+        override fun fromEvent(event: ProtocolEvent): EventSourceEvent {
             return when (event) {
-                is Protocol.Event.OnOpened -> {
+                is ProtocolEvent.OnOpened -> {
                     val response = event.response as OkHttpEventSource.OpenResponse
                     EventSourceEvent.OnConnectionOpened(response.eventSource, response.okHttpResponse)
                 }
-                is Protocol.Event.OnMessageReceived -> {
+                is ProtocolEvent.OnMessageReceived -> {
                     EventSourceEvent.OnMessageReceived(event.message)
                 }
-                is Protocol.Event.OnClosed -> {
+                is ProtocolEvent.OnClosed -> {
                     EventSourceEvent.OnConnectionClosed
                 }
-                is Protocol.Event.OnFailed -> {
+                is ProtocolEvent.OnFailed -> {
                     EventSourceEvent.OnConnectionFailed(event.throwable ?: Throwable())
                 }
                 else -> throw IllegalArgumentException()
             }
         }
 
-        class Factory : Protocol.EventAdapter.Factory {
-            override fun create(type: Type, annotations: Array<Annotation>): Protocol.EventAdapter<*> {
+        class Factory : ProtocolEvent.Adapter.Factory {
+            override fun create(type: Type, annotations: Array<Annotation>): ProtocolEvent.Adapter<*> {
                 val receivingClazz = type.getRawType()
                 require(EventSourceEvent::class.java.isAssignableFrom(receivingClazz)) {
                     "Only subclasses of EventSourceEvent are supported"

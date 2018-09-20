@@ -7,6 +7,7 @@ package com.tinder.scarlet.websocket
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.v2.ProtocolEvent
 import okhttp3.Response
 import okhttp3.WebSocket
 import java.lang.reflect.Type
@@ -49,33 +50,33 @@ sealed class WebSocketEvent {
      */
     data class OnConnectionFailed(val throwable: Throwable) : WebSocketEvent()
 
-    class Adapter : Protocol.EventAdapter<WebSocketEvent> {
-        override fun fromEvent(event: Protocol.Event): WebSocketEvent {
+    class Adapter : ProtocolEvent.Adapter<WebSocketEvent> {
+        override fun fromEvent(event: ProtocolEvent): WebSocketEvent {
             return when (event) {
-                is Protocol.Event.OnOpened -> {
+                is ProtocolEvent.OnOpened -> {
                     val response = event.response as OkHttpWebSocket.OpenResponse
                     WebSocketEvent.OnConnectionOpened(response.okHttpWebSocket, response.okHttpResponse)
                 }
-                is Protocol.Event.OnMessageReceived -> {
+                is ProtocolEvent.OnMessageReceived -> {
                     WebSocketEvent.OnMessageReceived(event.message)
                 }
-                is Protocol.Event.OnClosing -> {
-                    val response = event.request as OkHttpWebSocket.CloseRequest
+                is ProtocolEvent.OnClosing -> {
+                    val response = event.response as OkHttpWebSocket.CloseResponse
                     WebSocketEvent.OnConnectionClosing(response.shutdownReason)
                 }
-                is Protocol.Event.OnClosed -> {
+                is ProtocolEvent.OnClosed -> {
                     val response = event.response as OkHttpWebSocket.CloseResponse
                     WebSocketEvent.OnConnectionClosed(response.shutdownReason)
                 }
-                is Protocol.Event.OnFailed -> {
+                is ProtocolEvent.OnFailed -> {
                     WebSocketEvent.OnConnectionFailed(event.throwable ?: Throwable())
                 }
                 else -> throw IllegalArgumentException()
             }
         }
 
-        class Factory : Protocol.EventAdapter.Factory {
-            override fun create(type: Type, annotations: Array<Annotation>): Protocol.EventAdapter<*> {
+        class Factory : ProtocolEvent.Adapter.Factory {
+            override fun create(type: Type, annotations: Array<Annotation>): ProtocolEvent.Adapter<*> {
                 val receivingClazz = type.getRawType()
                 require(WebSocketEvent::class.java.isAssignableFrom(receivingClazz)) {
                     "Only subclasses of WebSocketEvent are supported"

@@ -16,7 +16,7 @@ interface Channel : MessageQueue.Factory {
 
     interface Listener {
         fun onOpened(channel: Channel, response: Protocol.OpenResponse = Protocol.OpenResponse.Empty)
-        fun onClosing(channel: Channel)
+        fun onClosing(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
         fun onClosed(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
         fun onFailed(channel: Channel, throwable: Throwable?)
     }

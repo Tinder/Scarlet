@@ -5,13 +5,16 @@
 package com.tinder.scarlet.v2.service
 
 import com.tinder.StateMachine
+import com.tinder.scarlet.utils.toStream
 import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.SideEffect
 import com.tinder.scarlet.v2.State
+import com.tinder.scarlet.v2.StateTransition
 import com.tinder.scarlet.v2.stub.StubInterface
 import com.tinder.scarlet.v2.stub.StubMethod
+import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.processors.PublishProcessor
 
 internal class Coordinator(
     private val stateMachineFactory: StateMachineFactory,
@@ -22,7 +25,7 @@ internal class Coordinator(
 ) : StubInterface.Callback, EventCallback {
 
     private val stateMachine = stateMachineFactory.create()
-    private val publishSubject = PublishSubject.create<StateMachine.Transition.Valid<State, Event, SideEffect>>()
+    private val publishProcessor = PublishProcessor.create<StateTransition>()
 
     fun start() {
         lifecycleEventSource.start(this)
@@ -35,7 +38,11 @@ internal class Coordinator(
     }
 
     override fun receive(stubMethod: StubMethod.Receive): Any {
-        return publishSubject.hide()
+        val stream = Flowable.defer<StateTransition> { publishProcessor }
+            .observeOn(scheduler)
+            .flatMap { stubMethod.stateTransitionAdatper.adapt(it)?.let { Flowable.just(it) } ?: Flowable.empty() }
+            .toStream()
+        return stubMethod.streamAdapter.adapt(stream)
     }
 
     override fun onEvent(event: Event) {
@@ -60,7 +67,15 @@ internal class Coordinator(
                 }
             }
         }
-        publishSubject.onNext(transition)
+
+        publishProcessor.onNext(
+            StateTransition(
+                transition.fromState,
+                transition.event,
+                transition.toState,
+                transition.sideEffect
+            )
+        )
 
         when (transition.toState) {
             is State.WillConnect -> {
@@ -74,7 +89,7 @@ internal class Coordinator(
             }
             is State.Destroyed -> {
                 session.stop()
-                publishSubject.onComplete()
+                publishProcessor.onComplete()
             }
         }
     }

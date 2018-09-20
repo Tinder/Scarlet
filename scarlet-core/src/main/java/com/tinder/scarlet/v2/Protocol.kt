@@ -5,10 +5,10 @@
 package com.tinder.scarlet.v2
 
 import com.tinder.scarlet.Message
-import java.lang.reflect.Type
 
 // plugin
 interface Protocol {
+    // TODO to val?
     fun createChannelFactory(): Channel.Factory
 
     fun createOpenRequestFactory(channel: Channel): OpenRequest.Factory {
@@ -23,7 +23,7 @@ interface Protocol {
         return object : Protocol.MessageMetaData.Factory {}
     }
 
-    fun createEventAdapterFactory(channel: Channel): EventAdapter.Factory
+    fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory
 
     interface OpenRequest {
         interface Factory {
@@ -57,49 +57,6 @@ interface Protocol {
         object Empty : MessageMetaData
     }
 
-    sealed class Event {
-        abstract val channel: Channel
 
-        data class OnOpening(
-            override val channel: Channel, val request: OpenRequest
-        ) : Event()
-
-        data class OnOpened(
-            override val channel: Channel,
-            val messageQueue: MessageQueue?,
-            val response: OpenResponse
-        ) : Event()
-
-        data class OnMessageReceived(
-            override val channel: Channel,
-            val messageQueue: MessageQueue,
-            val message: Message,
-            val messageMetaData: MessageMetaData
-        ) : Event()
-
-        data class OnMessageDelivered(
-            override val channel: Channel,
-            val messageQueue: MessageQueue,
-            val message: Message,
-            val messageMetaData: MessageMetaData
-        ) : Event()
-
-        data class OnClosing(
-            override val channel: Channel
-        ) : Event()
-
-        data class OnClosed(
-            override val channel: Channel, val response: CloseResponse
-        ) : Event()
-
-        data class OnFailed(override val channel: Channel, val throwable: Throwable?) : Event()
-    }
-
-    interface EventAdapter<T> {
-        fun fromEvent(event: Protocol.Event): T
-
-        interface Factory {
-            fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
-        }
-    }
 }
+

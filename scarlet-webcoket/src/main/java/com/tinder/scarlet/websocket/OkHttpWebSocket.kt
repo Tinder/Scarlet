@@ -8,6 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.v2.ProtocolEvent
 import com.tinder.scarlet.v2.Topic
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -38,7 +39,7 @@ class OkHttpWebSocket(
         }
     }
 
-    override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
+    override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
         return WebSocketEvent.Adapter.Factory()
     }
 
@@ -100,20 +101,37 @@ class OkHttpWebSocketChannel(
 
     inner class InnerWebSocketListener : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) =
-            listener.onOpened(this@OkHttpWebSocketChannel,
+            listener.onOpened(
+                this@OkHttpWebSocketChannel,
                 OkHttpWebSocket.OpenResponse(webSocket, response)
             )
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, this@OkHttpWebSocketChannel,Message.Bytes(bytes.toByteArray()))
+            messageQueueListener?.onMessageReceived(
+                this@OkHttpWebSocketChannel,
+                this@OkHttpWebSocketChannel,
+                Message.Bytes(bytes.toByteArray())
+            )
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            messageQueueListener?.onMessageReceived(this@OkHttpWebSocketChannel, this@OkHttpWebSocketChannel,Message.Text(text))
+            messageQueueListener?.onMessageReceived(
+                this@OkHttpWebSocketChannel,
+                this@OkHttpWebSocketChannel,
+                Message.Text(text)
+            )
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosing(this@OkHttpWebSocketChannel)
+            listener.onClosing(
+                this@OkHttpWebSocketChannel,
+                OkHttpWebSocket.CloseResponse(
+                    ShutdownReason(
+                        code,
+                        reason
+                    )
+                )
+            )
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
