@@ -100,7 +100,7 @@ class Scarlet internal constructor(
 
         private fun createStateTransitionAdapterResolver(
             messageAdapterResolver: MessageAdapterResolver,
-            protocolEventAdapterFactory: ProtocolEvent.Adapter.Factory
+            protocolEventAdapterFactory: ProtocolEventAdapter.Factory
         ): StateTransitionAdapterResolver {
             val deserializedValueStateTransitionAdapterFactory =
                 DeserializedValueStateTransitionAdapter.Factory(messageAdapterResolver)

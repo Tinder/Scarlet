@@ -4,15 +4,28 @@
 
 package com.tinder.scarlet.v2.transitionadapter
 
-import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.internal.servicemethod.TypeAnnotationsPair
+import com.tinder.scarlet.v2.StateTransitionAdapter
 import io.reactivex.exceptions.CompositeException
 import java.lang.reflect.Type
 
 class StateTransitionAdapterResolver(
-    private val stateTransitionAdapterFactories: List<StateTransition.Adapter.Factory>
+    private val stateTransitionAdapterFactories: List<StateTransitionAdapter.Factory>
 ) {
 
-    fun resolve(type: Type, annotations: Array<Annotation>): StateTransition.Adapter<Any> {
+    private val stateTransitionAdapterCache = mutableMapOf<TypeAnnotationsPair, StateTransitionAdapter<Any>>()
+
+    fun resolve(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        val key = TypeAnnotationsPair(type, annotations)
+        if (stateTransitionAdapterCache.contains(key)) {
+            return stateTransitionAdapterCache[key]!!
+        }
+        val stateTransitionAdapter = findStateTransitionAdapter(type, annotations)
+        stateTransitionAdapterCache[key] = stateTransitionAdapter
+        return stateTransitionAdapter
+    }
+
+    private fun findStateTransitionAdapter(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
         val throwables = mutableListOf<Throwable>()
         for (adapterFactory in stateTransitionAdapterFactories) {
             try {
@@ -23,6 +36,10 @@ class StateTransitionAdapterResolver(
             }
         }
         val compositeException = CompositeException(*throwables.toTypedArray())
-        throw IllegalStateException("Cannot resolve state transition adapter for type $type.", compositeException)
+        throw IllegalStateException(
+            "Cannot resolve state transition adapter for type: $type, annotations: $annotations.",
+            compositeException
+        )
     }
+
 }

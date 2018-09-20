@@ -4,8 +4,6 @@
 
 package com.tinder.scarlet.v2
 
-import java.lang.reflect.Type
-
 data class StateTransition(
     val fromState: State,
     val event: Event,
@@ -13,12 +11,4 @@ data class StateTransition(
     val sideEffect: SideEffect?
 ) {
 
-    interface Adapter<T : Any> {
-
-        fun adapt(stateTransition: StateTransition): T?
-
-        interface Factory {
-            fun create(type: Type, annotations: Array<Annotation>): Adapter<Any>
-        }
-    }
 }

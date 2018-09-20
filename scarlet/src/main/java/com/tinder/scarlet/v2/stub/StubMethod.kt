@@ -10,7 +10,7 @@ import com.tinder.scarlet.internal.servicemethod.MessageAdapterResolver
 import com.tinder.scarlet.internal.servicemethod.StreamAdapterResolver
 import com.tinder.scarlet.utils.getParameterUpperBound
 import com.tinder.scarlet.utils.hasUnresolvableType
-import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.v2.StateTransitionAdapter
 import com.tinder.scarlet.v2.transitionadapter.StateTransitionAdapterResolver
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -23,7 +23,7 @@ internal sealed class StubMethod {
     ) : StubMethod()
 
     class Receive(
-        val stateTransitionAdatper: StateTransition.Adapter<Any>,
+        val stateTransitionAdatper: StateTransitionAdapter<Any>,
         val streamAdapter: StreamAdapter<Any, Any>
     ) : StubMethod()
 

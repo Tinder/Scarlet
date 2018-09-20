@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.v2.ProtocolEventAdapter
 import com.tinder.scarlet.v2.Topic
 import net.ser1.stomp.Client
 import javax.security.auth.login.LoginException
@@ -44,8 +44,8 @@ class StompProtocol(
         }
     }
 
-    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
-        return object : ProtocolEvent.Adapter.Factory {}
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
+        return object : ProtocolEventAdapter.Factory {}
     }
 
     interface RequestFactory {

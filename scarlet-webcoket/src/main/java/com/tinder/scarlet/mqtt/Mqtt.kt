@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.v2.ProtocolEventAdapter
 import com.tinder.scarlet.v2.Topic
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
@@ -50,8 +50,8 @@ class Mqtt(
         }
     }
 
-    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
-        return object : ProtocolEvent.Adapter.Factory {}
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
+        return object : ProtocolEventAdapter.Factory {}
     }
 
     interface MqttClientFactory {

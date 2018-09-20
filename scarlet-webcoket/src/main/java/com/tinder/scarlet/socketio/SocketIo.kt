@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.v2.ProtocolEventAdapter
 import com.tinder.scarlet.v2.Topic
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -48,8 +48,8 @@ class SocketIo(
         }
     }
 
-    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
-        return object : ProtocolEvent.Adapter.Factory {}
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
+        return object : ProtocolEventAdapter.Factory {}
     }
 
     data class MainChannelOpenRequest(val url: String) : Protocol.OpenRequest

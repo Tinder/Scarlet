@@ -5,7 +5,6 @@
 package com.tinder.scarlet.v2
 
 import com.tinder.scarlet.Message
-import java.lang.reflect.Type
 
 sealed class ProtocolEvent {
 
@@ -34,11 +33,4 @@ sealed class ProtocolEvent {
 
     data class OnFailed(val throwable: Throwable?) : ProtocolEvent()
 
-    interface Adapter {
-        fun fromEvent(event: ProtocolEvent): ProtocolSpecificEvent = ProtocolSpecificEvent.Empty
-
-        interface Factory {
-            fun create(type: Type, annotations: Array<Annotation>): Adapter = object : Adapter {}
-        }
-    }
 }

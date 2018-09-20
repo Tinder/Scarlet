@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.v2.ProtocolEventAdapter
 import com.tinder.scarlet.v2.Topic
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -39,7 +39,7 @@ class OkHttpWebSocket(
         }
     }
 
-    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
         return WebSocketEvent.Adapter.Factory()
     }
 
