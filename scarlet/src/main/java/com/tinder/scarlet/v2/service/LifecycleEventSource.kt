@@ -6,6 +6,7 @@ package com.tinder.scarlet.v2.service
 
 import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.Lifecycle
+import com.tinder.scarlet.v2.LifecycleState
 import io.reactivex.subscribers.DisposableSubscriber
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -25,12 +26,12 @@ internal class LifecycleEventSource(
         lifecycleStateSubscriber.requestNext()
     }
 
-    private inner class LifecycleStateSubscriber : DisposableSubscriber<Lifecycle.State>() {
+    private inner class LifecycleStateSubscriber : DisposableSubscriber<LifecycleState>() {
         private val pendingRequestCount = AtomicInteger()
 
         override fun onStart() = request(1)
 
-        override fun onNext(lifecycleState: Lifecycle.State) {
+        override fun onNext(lifecycleState: LifecycleState) {
             val value = pendingRequestCount.decrementAndGet()
             if (value < 0) {
                 pendingRequestCount.set(0)
@@ -39,7 +40,7 @@ internal class LifecycleEventSource(
         }
 
         override fun onComplete() {
-            eventCallback.onEvent(Event.OnLifecycleStateChange(Lifecycle.State.Completed))
+            eventCallback.onEvent(Event.OnLifecycleStateChange(LifecycleState.Completed))
         }
 
         override fun onError(throwable: Throwable) = throw throwable

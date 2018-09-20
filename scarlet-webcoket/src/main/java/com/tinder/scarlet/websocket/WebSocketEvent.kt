@@ -8,11 +8,12 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.v2.ProtocolSpecificEvent
 import okhttp3.Response
 import okhttp3.WebSocket
 import java.lang.reflect.Type
 
-sealed class WebSocketEvent {
+sealed class WebSocketEvent : ProtocolSpecificEvent {
     /**
      * Invoked when a WebSocket has been accepted by the remote peer and may begin transmitting messages.
      *
@@ -50,7 +51,7 @@ sealed class WebSocketEvent {
      */
     data class OnConnectionFailed(val throwable: Throwable) : WebSocketEvent()
 
-    class Adapter : ProtocolEvent.Adapter<WebSocketEvent> {
+    class Adapter : ProtocolEvent.Adapter {
         override fun fromEvent(event: ProtocolEvent): WebSocketEvent {
             return when (event) {
                 is ProtocolEvent.OnOpened -> {
@@ -76,7 +77,7 @@ sealed class WebSocketEvent {
         }
 
         class Factory : ProtocolEvent.Adapter.Factory {
-            override fun create(type: Type, annotations: Array<Annotation>): ProtocolEvent.Adapter<*> {
+            override fun create(type: Type, annotations: Array<Annotation>): ProtocolEvent.Adapter {
                 val receivingClazz = type.getRawType()
                 require(WebSocketEvent::class.java.isAssignableFrom(receivingClazz)) {
                     "Only subclasses of WebSocketEvent are supported"

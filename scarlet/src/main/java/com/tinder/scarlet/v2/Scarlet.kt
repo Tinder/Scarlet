@@ -19,20 +19,16 @@ import com.tinder.scarlet.v2.service.StateMachineFactory
 import com.tinder.scarlet.v2.service.TimerEventSource
 import com.tinder.scarlet.v2.stub.StubInterface
 import com.tinder.scarlet.v2.stub.StubMethod
+import com.tinder.scarlet.v2.transitionadapter.DeserializationStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.DeserializedValueStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.EventStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.LifecycleStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.NoOpStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.ProtocolEventStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.ProtocolSpecificEventStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.StateStateTransitionAdapter
+import com.tinder.scarlet.v2.transitionadapter.StateTransitionAdapterResolver
 import io.reactivex.schedulers.Schedulers
-
-// TODO transition adapter
-interface EventAdapter {
-
-    interface Factory {
-
-    }
-}
-
-interface EventAdapterResolver {
-
-
-}
 
 class Scarlet internal constructor(
     private val stubInterfaceFactory: StubInterface.Factory
@@ -81,7 +77,8 @@ class Scarlet internal constructor(
                 coordinator,
                 StubMethod.Factory(
                     configuration.createStreamAdapterResolver(),
-                    configuration.createMessageAdapterResolver()
+                    configuration.createMessageAdapterResolver(),
+                    createStateTransitionAdapterResolver()
                 )
             )
 
@@ -96,6 +93,20 @@ class Scarlet internal constructor(
             return MessageAdapterResolver(messageAdapterFactories + BuiltInMessageAdapterFactory())
         }
 
+        private fun createStateTransitionAdapterResolver(): StateTransitionAdapterResolver {
+            return StateTransitionAdapterResolver(
+                listOf(
+                    NoOpStateTransitionAdapter.Factory(),
+                    EventStateTransitionAdapter.Factory(),
+                    StateStateTransitionAdapter.Factory(),
+                    ProtocolEventStateTransitionAdapter.Factory(),
+                    ProtocolSpecificEventStateTransitionAdapter.Factory(),
+                    LifecycleStateTransitionAdapter.Factory(),
+                    DeserializationStateTransitionAdapter.Factory(),
+                    DeserializedValueStateTransitionAdapter.Factory()
+                )
+            )
+        }
     }
 }
 

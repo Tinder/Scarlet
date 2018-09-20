@@ -51,7 +51,7 @@ class Mqtt(
     }
 
     override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return object : ProtocolEvent.Adapter.Factory {}
     }
 
     interface MqttClientFactory {

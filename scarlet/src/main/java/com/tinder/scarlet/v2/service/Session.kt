@@ -67,7 +67,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnOpened(
-                        channel,
                         null,
                         response
                     )
@@ -79,7 +78,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnClosing(
-                        channel,
                         response
                     )
                 )
@@ -90,7 +88,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnClosed(
-                        channel,
                         response
                     )
                 )
@@ -101,7 +98,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnFailed(
-                        channel,
                         throwable
                     )
                 )
@@ -117,8 +113,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnMessageReceived(
-                        channel,
-                        messageQueue,
                         message,
                         metadata
                     )
@@ -135,8 +129,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnMessageDelivered(
-                        channel,
-                        messageQueue,
                         message,
                         metadata
                     )
