@@ -4,7 +4,6 @@
 
 package com.tinder.scarlet.websocket
 
-import com.tinder.scarlet.v2.Connection
 
 /**
  * Used to initiate a shutdown of a WebSocket.
@@ -13,7 +12,7 @@ import com.tinder.scarlet.v2.Connection
  * or `0`.
  * @property reason Reason for shutting down.
  */
-data class ShutdownReason(val code: Int, val reason: String): Connection.CloseRequest {
+data class ShutdownReason(val code: Int, val reason: String) {
     companion object {
         private val NORMAL_CLOSURE_STATUS_CODE = 1000
         private val NORMAL_CLOSURE_REASON = "Normal closure"
