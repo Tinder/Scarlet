@@ -2,13 +2,13 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state
+package com.tinder.scarlet.v2.v3
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.Topic
-import com.tinder.scarlet.state.utils.GroupWorker
-import com.tinder.scarlet.state.utils.Worker
+import com.tinder.scarlet.v2.v3.utils.GroupWorker
+import com.tinder.scarlet.v2.v3.utils.Worker
 
 internal class MessageCoordinator(
     serviceLocator: ServiceLocator

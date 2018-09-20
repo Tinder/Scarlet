@@ -2,23 +2,22 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state.utils
+package com.tinder.scarlet.v2.v3.utils
 
 import com.tinder.StateMachine
-import com.tinder.scarlet.RequestFactory
-import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleDestroyed
-import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleStarted
-import com.tinder.scarlet.state.utils.Worker.Event.OnLifecycleStopped
-import com.tinder.scarlet.state.utils.Worker.Event.OnShouldStart
-import com.tinder.scarlet.state.utils.Worker.Event.OnWorkFailed
-import com.tinder.scarlet.state.utils.Worker.Event.OnWorkStarted
-import com.tinder.scarlet.state.utils.Worker.Event.OnWorkStopped
-import com.tinder.scarlet.state.utils.Worker.State.Destroyed
-import com.tinder.scarlet.state.utils.Worker.State.Started
-import com.tinder.scarlet.state.utils.Worker.State.Starting
-import com.tinder.scarlet.state.utils.Worker.State.Stopped
-import com.tinder.scarlet.state.utils.Worker.State.Stopping
-import com.tinder.scarlet.state.utils.Worker.State.WillStart
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnLifecycleDestroyed
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnLifecycleStarted
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnLifecycleStopped
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnShouldStart
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnWorkFailed
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnWorkStarted
+import com.tinder.scarlet.v2.v3.utils.Worker.Event.OnWorkStopped
+import com.tinder.scarlet.v2.v3.utils.Worker.State.Destroyed
+import com.tinder.scarlet.v2.v3.utils.Worker.State.Started
+import com.tinder.scarlet.v2.v3.utils.Worker.State.Starting
+import com.tinder.scarlet.v2.v3.utils.Worker.State.Stopped
+import com.tinder.scarlet.v2.v3.utils.Worker.State.Stopping
+import com.tinder.scarlet.v2.v3.utils.Worker.State.WillStart
 
 internal class Worker<CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any>(
     private val startRequestFactory: RequestFactory<START_REQUEST>,

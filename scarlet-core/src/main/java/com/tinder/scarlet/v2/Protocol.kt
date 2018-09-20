@@ -7,37 +7,6 @@ package com.tinder.scarlet.v2
 import com.tinder.scarlet.Message
 import java.lang.reflect.Type
 
-
-interface Scarlet : ServiceFactory.Factory {
-
-    data class Configuration(
-        val protocol: Protocol,
-        val lifecycle: Lifecycle,
-        val backoffStrategy: BackoffStrategy
-    )
-
-    interface Factory {
-        fun create(configuration: Configuration): Scarlet
-    }
-}
-
-interface ServiceFactory {
-
-    fun <T> create(): T
-
-    data class Configuration(
-        val topic: Topic,
-        val lifecycle: Lifecycle,
-        val backoffStrategy: BackoffStrategy,
-        val streamAdapters: List<Any> = emptyList(),
-        val messageAdapters: List<Any> = emptyList()
-    )
-
-    interface Factory {
-        fun create(configuration: ServiceFactory.Configuration): ServiceFactory
-    }
-}
-
 // plugin
 interface Protocol {
     fun createChannelFactory(): Channel.Factory
@@ -121,63 +90,4 @@ interface Protocol {
             fun create(type: Type, annotations: Array<Annotation>): EventAdapter<*>
         }
     }
-}
-
-interface Channel : MessageQueue.Factory {
-    val topic: Topic
-        get() = Topic.Default
-
-    fun open(openRequest: Protocol.OpenRequest)
-
-    fun close(closeRequest: Protocol.CloseRequest)
-
-    fun forceClose()
-
-    interface Listener {
-        fun onOpened(channel: Channel, response: Protocol.OpenResponse = Protocol.OpenResponse.Empty)
-        fun onClosing(channel: Channel)
-        fun onClosed(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
-        fun onFailed(channel: Channel, throwable: Throwable?)
-    }
-
-    interface Factory {
-        fun create(topic: Topic, listener: Listener): Channel?
-    }
-}
-
-interface MessageQueue {
-
-    fun send(message: Message, messageMetaData: Protocol.MessageMetaData)
-
-    interface Listener {
-        fun onMessageReceived(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
-        fun onMessageDelivered(channel: Channel, message: Message, metadata: Protocol.MessageMetaData? = null)
-    }
-
-    interface Factory {
-        fun createMessageQueue(listener: Listener): MessageQueue? = null
-    }
-}
-
-interface Topic {
-    val id: String
-
-    object Default : Topic {
-        override val id = ""
-    }
-}
-
-
-// plugin
-interface Lifecycle {
-
-    // Event
-
-    // onStart()
-
-    // onStop()
-}
-
-// plugin
-interface BackoffStrategy {
 }

@@ -27,7 +27,6 @@ import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.retry.BackoffStrategy
 import com.tinder.StateMachine.Matcher.Companion.any
 import com.tinder.StateMachine.Transition.Valid
-import com.tinder.scarlet.SideEffect
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable

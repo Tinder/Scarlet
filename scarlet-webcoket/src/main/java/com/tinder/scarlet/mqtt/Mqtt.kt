@@ -170,30 +170,3 @@ class MqttMessageChannel(
         }
     }
 }
-
-class MqttChannelFactory(
-    private val mqttClientFactory: Mqtt.MqttClientFactory,
-    private val mqttConnectOptionsFactory: Mqtt.MqttConnectOptionsFactory,
-    private val qos: Int
-) : Channel.Factory, Protocol.OpenRequest.Factory {
-
-    private var mainChannel: MqttMainChannel? = null
-
-    override fun create(topic: Topic, listener: Channel.Listener): Channel {
-        if (topic == Topic.Default) {
-            mainChannel = MqttMainChannel(mqttClientFactory, listener)
-            return mainChannel!!
-        }
-        return MqttMessageChannel(topic, listener)
-    }
-
-    override fun create(channel: Channel): Protocol.OpenRequest {
-        if (channel.topic == Topic.Default) {
-            return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
-        }
-        return Mqtt.TopicOpenRequest(
-            requireNotNull(mainChannel?.client),
-            qos
-        )
-    }
-}

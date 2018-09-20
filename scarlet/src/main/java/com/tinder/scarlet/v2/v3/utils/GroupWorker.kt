@@ -2,10 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state.utils
-
-import com.tinder.scarlet.RequestFactory
-import com.tinder.scarlet.StaticRequestFactory
+package com.tinder.scarlet.v2.v3.utils
 
 internal class GroupWorker<WORKER_ID : Any, CONTEXT : Any, START_REQUEST : Any, START_RESPONSE : Any, STOP_REQUEST : Any, STOP_RESPONSE : Any> {
     private val workerFactory =

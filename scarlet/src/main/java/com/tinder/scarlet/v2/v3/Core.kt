@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.state
+package com.tinder.scarlet.v2.v3
 
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Protocol
