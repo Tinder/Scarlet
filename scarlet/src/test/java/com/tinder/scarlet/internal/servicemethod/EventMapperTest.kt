@@ -327,7 +327,7 @@ internal class EventMapperTest {
 
         private val ON_STATE_CHANGE_TO_CONNECTING = Event.OnStateChange(mock<State.Connecting>())
         private val ON_STATE_CHANGE_TO_CONNECTED = Event.OnStateChange(mock<State.Connected>())
-        private val ON_STATE_CHANGE_TO_WAITING_TO_RETRY = Event.OnStateChange(mock<State.WillOpe>())
+        private val ON_STATE_CHANGE_TO_WAITING_TO_RETRY = Event.OnStateChange(mock<State.WaitingToRetry>())
         private val ON_STATE_CHANGE_TO_DISCONNECTING = Event.OnStateChange(mock<State.Disconnecting>())
         private val ON_STATE_CHANGE_TO_DISCONNECTED = Event.OnStateChange(mock<State.Disconnected>())
         private val ON_STATE_CHANGE_TO_DESTROYED = Event.OnStateChange(mock<State.Destroyed>())

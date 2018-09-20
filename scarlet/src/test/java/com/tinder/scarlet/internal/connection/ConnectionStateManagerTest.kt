@@ -97,11 +97,11 @@ internal class ConnectionStateManagerTest {
             any<Event.OnLifecycle.StateChange<*>>().withLifecycleState<Lifecycle.State.Started>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
             any<Event.OnWebSocket.Terminate>(),
-            any<Event.OnStateChange<*>>().withState<State.WillOpe>(),
+            any<Event.OnStateChange<*>>().withState<State.WaitingToRetry>(),
             any<Event.OnRetry>(),
             any<Event.OnStateChange<*>>().withState<State.Connecting>(),
             any<Event.OnWebSocket.Terminate>(),
-            any<Event.OnStateChange<*>>().withState<State.WillOpe>()
+            any<Event.OnStateChange<*>>().withState<State.WaitingToRetry>()
         )
     }
 
