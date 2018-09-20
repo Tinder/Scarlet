@@ -8,7 +8,6 @@ import com.tinder.StateMachine
 import com.tinder.StateMachine.Matcher.Companion.any
 import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.Lifecycle
-import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.ProtocolEvent
 import com.tinder.scarlet.v2.SideEffect
 import com.tinder.scarlet.v2.State
@@ -102,13 +101,13 @@ class StateMachineFactory {
 
     private companion object {
         private val lifecycleStarted =
-            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Started }
+            any<Event, Event.OnLifecycleStateChange>().where { lifecycleState == Lifecycle.State.Started }
 
         private val lifecycleStopped =
-            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Stopped }
+            any<Event, Event.OnLifecycleStateChange>().where { lifecycleState == Lifecycle.State.Stopped }
 
         private val lifecycleDestroyed =
-            any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Completed }
+            any<Event, Event.OnLifecycleStateChange>().where { lifecycleState == Lifecycle.State.Completed }
 
         private val protocolOpened =
             any<Event, Event.OnProtocolEvent>().where { event is ProtocolEvent.OnOpened }

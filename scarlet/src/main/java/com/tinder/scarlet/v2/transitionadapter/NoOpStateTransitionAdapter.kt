@@ -62,7 +62,7 @@ class ProtocolEventStateTransitionAdapter : StateTransition.Adapter<Any> {
 class LifecycleStateTransitionAdapter {
     override fun adapt(stateTransition: StateTransition): Any? {
         val event = stateTransition.event as? Event.OnLifecycleStateChange ?: return null
-        return event.state
+        return event.lifecycleState
     }
 
     class Factory : StateTransition.Adapter.Factory {
