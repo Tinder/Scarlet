@@ -31,7 +31,7 @@ class OkHttpEventSource(
         }
     }
 
-    override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
+    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
         return EventSourceEvent.Adapter.Factory()
     }
 

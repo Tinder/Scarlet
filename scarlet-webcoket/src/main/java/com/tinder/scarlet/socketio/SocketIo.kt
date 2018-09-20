@@ -48,7 +48,7 @@ class SocketIo(
         }
     }
 
-    override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
+    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
         return object : ProtocolEvent.Adapter.Factory {}
     }
 

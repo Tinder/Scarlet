@@ -39,7 +39,7 @@ class OkHttpWebSocket(
         }
     }
 
-    override fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory {
+    override fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory {
         return WebSocketEvent.Adapter.Factory()
     }
 

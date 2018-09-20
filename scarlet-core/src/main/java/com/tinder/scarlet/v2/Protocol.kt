@@ -23,7 +23,7 @@ interface Protocol {
         return object : Protocol.MessageMetaData.Factory {}
     }
 
-    fun createEventAdapterFactory(channel: Channel): ProtocolEvent.Adapter.Factory
+    fun createEventAdapterFactory(): ProtocolEvent.Adapter.Factory
 
     interface OpenRequest {
         interface Factory {

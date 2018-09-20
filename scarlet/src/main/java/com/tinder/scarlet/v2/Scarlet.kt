@@ -72,13 +72,18 @@ class Scarlet internal constructor(
                 Schedulers.io()
             )
 
+            val messageAdapterResolver = configuration.createMessageAdapterResolver()
+
             val stubInterfaceFactory = StubInterface.Factory(
                 RuntimePlatform.get(),
                 coordinator,
                 StubMethod.Factory(
                     configuration.createStreamAdapterResolver(),
-                    configuration.createMessageAdapterResolver(),
-                    createStateTransitionAdapterResolver()
+                    messageAdapterResolver,
+                    createStateTransitionAdapterResolver(
+                        messageAdapterResolver,
+                        configuration.protocol.createEventAdapterFactory()
+                    )
                 )
             )
 
@@ -93,17 +98,22 @@ class Scarlet internal constructor(
             return MessageAdapterResolver(messageAdapterFactories + BuiltInMessageAdapterFactory())
         }
 
-        private fun createStateTransitionAdapterResolver(): StateTransitionAdapterResolver {
+        private fun createStateTransitionAdapterResolver(
+            messageAdapterResolver: MessageAdapterResolver,
+            protocolEventAdapterFactory: ProtocolEvent.Adapter.Factory
+        ): StateTransitionAdapterResolver {
+            val deserializedValueStateTransitionAdapterFactory =
+                DeserializedValueStateTransitionAdapter.Factory(messageAdapterResolver)
             return StateTransitionAdapterResolver(
                 listOf(
                     NoOpStateTransitionAdapter.Factory(),
                     EventStateTransitionAdapter.Factory(),
                     StateStateTransitionAdapter.Factory(),
                     ProtocolEventStateTransitionAdapter.Factory(),
-                    ProtocolSpecificEventStateTransitionAdapter.Factory(),
+                    ProtocolSpecificEventStateTransitionAdapter.Factory(protocolEventAdapterFactory),
                     LifecycleStateTransitionAdapter.Factory(),
-                    DeserializationStateTransitionAdapter.Factory(),
-                    DeserializedValueStateTransitionAdapter.Factory()
+                    DeserializationStateTransitionAdapter.Factory(deserializedValueStateTransitionAdapterFactory),
+                    deserializedValueStateTransitionAdapterFactory
                 )
             )
         }
