@@ -25,7 +25,7 @@ class Scarlet internal constructor(
 
     data class Configuration(
         val protocol: Protocol,
-        val topic: Topic = Topic.Default,
+        val topic: Topic = Topic.Main,
         val lifecycle: Lifecycle,
         val backoffStrategy: BackoffStrategy,
         val streamAdapters: List<Any> = emptyList(),

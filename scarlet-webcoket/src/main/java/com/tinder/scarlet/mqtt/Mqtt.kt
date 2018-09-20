@@ -19,34 +19,34 @@ class Mqtt(
     private val mqttClientFactory: MqttClientFactory,
     private val mqttConnectOptionsFactory: MqttConnectOptionsFactory,
     private val qos: Int
-) : Protocol, Channel.Factory, Protocol.OpenRequest.Factory {
+) : Protocol {
 
     private var mainChannel: MqttMainChannel? = null
 
-    override fun create(topic: Topic, listener: Channel.Listener): Channel {
-        if (topic == Topic.Default) {
-            mainChannel = MqttMainChannel(mqttClientFactory, listener)
-            return mainChannel!!
-        }
-        return MqttMessageChannel(topic, listener)
-    }
-
-    override fun create(channel: Channel): Protocol.OpenRequest {
-        if (channel.topic == Topic.Default) {
-            return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
-        }
-        return Mqtt.TopicOpenRequest(
-            requireNotNull(mainChannel?.client),
-            qos
-        )
-    }
-
     override fun createChannelFactory(): Channel.Factory {
-        return this
+        return object : Channel.Factory {
+            override fun create(topic: Topic, listener: Channel.Listener): Channel {
+                if (topic == Topic.Main) {
+                    mainChannel = MqttMainChannel(mqttClientFactory, listener)
+                    return mainChannel!!
+                }
+                return MqttMessageChannel(topic, listener)
+            }
+        }
     }
 
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return this
+        return object : Protocol.OpenRequest.Factory {
+            override fun create(channel: Channel): Protocol.OpenRequest {
+                if (channel.topic == Topic.Main) {
+                    return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
+                }
+                return Mqtt.TopicOpenRequest(
+                    requireNotNull(mainChannel?.client),
+                    qos
+                )
+            }
+        }
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {

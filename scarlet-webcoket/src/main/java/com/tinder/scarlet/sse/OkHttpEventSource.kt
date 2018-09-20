@@ -20,10 +20,8 @@ class OkHttpEventSource(
     private val okHttpClient: OkHttpClient,
     private val requestFactory: RequestFactory
 ) : Protocol {
-    private val factory = OkHttpEventSourceChannel.Factory(okHttpClient)
-
     override fun createChannelFactory(): Channel.Factory {
-        return factory
+        return OkHttpEventSourceChannel.Factory(okHttpClient)
     }
 
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
@@ -51,7 +49,7 @@ class OkHttpEventSourceChannel(
     private val okHttpClient: OkHttpClient,
     private val listener: Channel.Listener
 ) : Channel {
-    override val topic: Topic = Topic.Default
+    override val topic: Topic = Topic.Main
     private var eventSource: EventSource? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
@@ -108,7 +106,7 @@ class OkHttpEventSourceChannel(
     ) : Channel.Factory, MessageQueue.Factory {
 
         override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic != Topic.Default) {
+            if (topic != Topic.Main) {
                 return null
             }
             return OkHttpEventSourceChannel(

@@ -6,7 +6,7 @@ package com.tinder.scarlet.v2
 
 interface Channel : MessageQueue.Factory {
     val topic: Topic
-        get() = Topic.Default
+        get() = Topic.Main
 
     fun open(openRequest: Protocol.OpenRequest)
 

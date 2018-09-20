@@ -22,10 +22,8 @@ class OkHttpWebSocket(
     private val requestFactory: RequestFactory
 ) : Protocol {
 
-    private val factory = OkHttpWebSocketChannel.Factory(okHttpClient)
-
     override fun createChannelFactory(): Channel.Factory {
-        return factory
+        return OkHttpWebSocketChannel.Factory(okHttpClient)
     }
 
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
@@ -62,7 +60,7 @@ class OkHttpWebSocketChannel(
     private val okHttpClient: OkHttpClient,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
-    override val topic: Topic = Topic.Default
+    override val topic: Topic = Topic.Main
     private var webSocket: WebSocket? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
@@ -138,7 +136,7 @@ class OkHttpWebSocketChannel(
     ) : Channel.Factory {
 
         override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic != Topic.Default) {
+            if (topic != Topic.Main) {
                 return null
             }
             return OkHttpWebSocketChannel(

@@ -14,33 +14,33 @@ import javax.security.auth.login.LoginException
 
 class StompProtocol(
     private val openRequestFactory: StompProtocol.RequestFactory
-) : Protocol, Channel.Factory, Protocol.OpenRequest.Factory {
+) : Protocol {
     private var mainChannel: StompMainChannel? = null
 
-    override fun create(topic: Topic, listener: Channel.Listener): Channel {
-        if (topic == Topic.Default) {
-            mainChannel = StompMainChannel(listener)
-            return mainChannel!!
-        }
-        return StompMessageChannel(topic, listener)
-    }
-
-    override fun create(channel: Channel): Protocol.OpenRequest {
-        if (channel.topic == Topic.Default) {
-            return openRequestFactory.createClientOpenRequest()
-        }
-        return StompProtocol.DestinationOpenRequest(
-            requireNotNull(mainChannel?.client),
-            openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
-        )
-    }
-
     override fun createChannelFactory(): Channel.Factory {
-        return this
+        return object : Channel.Factory {
+            override fun create(topic: Topic, listener: Channel.Listener): Channel {
+                if (topic == Topic.Main) {
+                    mainChannel = StompMainChannel(listener)
+                    return mainChannel!!
+                }
+                return StompMessageChannel(topic, listener)
+            }
+        }
     }
 
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return this
+        return object : Protocol.OpenRequest.Factory {
+            override fun create(channel: Channel): Protocol.OpenRequest {
+                if (channel.topic == Topic.Main) {
+                    return openRequestFactory.createClientOpenRequest()
+                }
+                return StompProtocol.DestinationOpenRequest(
+                    requireNotNull(mainChannel?.client),
+                    openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
+                )
+            }
+        }
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {

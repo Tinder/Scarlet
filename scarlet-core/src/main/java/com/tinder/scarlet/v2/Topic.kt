@@ -7,7 +7,7 @@ package com.tinder.scarlet.v2
 interface Topic {
     val id: String
 
-    object Default : Topic {
+    object Main : Topic {
         override val id = ""
     }
 }

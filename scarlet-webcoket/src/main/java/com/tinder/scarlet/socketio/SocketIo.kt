@@ -16,34 +16,34 @@ import org.json.JSONObject
 class SocketIo(
     private val url: String,
     private val options: IO.Options
-) : Protocol, Channel.Factory, Protocol.OpenRequest.Factory {
+) : Protocol {
 
     private var mainChannel: SocketIoMainChannel? = null
 
-    override fun create(topic: Topic, listener: Channel.Listener): Channel {
-        if (topic == Topic.Default) {
-            mainChannel = SocketIoMainChannel(
-                options,
-                listener
-            )
-            return mainChannel!!
-        }
-        return SocketIoMessageChannel(topic, listener)
-    }
-
-    override fun create(channel: Channel): Protocol.OpenRequest {
-        if (channel.topic == Topic.Default) {
-            return SocketIo.MainChannelOpenRequest(url)
-        }
-        return SocketIo.MessageChannelOpenRequest(requireNotNull(mainChannel?.socket))
-    }
-
     override fun createChannelFactory(): Channel.Factory {
-        return this
+        return object : Channel.Factory {
+            override fun create(topic: Topic, listener: Channel.Listener): Channel {
+                if (topic == Topic.Main) {
+                    mainChannel = SocketIoMainChannel(
+                        options,
+                        listener
+                    )
+                    return mainChannel!!
+                }
+                return SocketIoMessageChannel(topic, listener)
+            }
+        }
     }
 
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return this
+        return object : Protocol.OpenRequest.Factory {
+            override fun create(channel: Channel): Protocol.OpenRequest {
+                if (channel.topic == Topic.Main) {
+                    return SocketIo.MainChannelOpenRequest(url)
+                }
+                return SocketIo.MessageChannelOpenRequest(requireNotNull(mainChannel?.socket))
+            }
+        }
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
