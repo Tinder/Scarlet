@@ -6,5 +6,5 @@ package com.tinder.scarlet.v2
 
 interface ProtocolSpecificEvent {
 
-    object Empty: ProtocolSpecificEvent
+    object Empty : ProtocolSpecificEvent
 }

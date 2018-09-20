@@ -32,8 +32,7 @@ internal class TimerEventSource(
         subscriber?.dispose()
     }
 
-    private inner class RetryTimerSubscriber(
-    ) : DisposableSubscriber<Long>() {
+    private inner class RetryTimerSubscriber : DisposableSubscriber<Long>() {
         override fun onNext(t: Long) {
             eventSourceCallback?.onEvent(Event.OnShouldConnect)
         }
@@ -44,5 +43,3 @@ internal class TimerEventSource(
         override fun onError(throwable: Throwable) = throw throwable
     }
 }
-
-

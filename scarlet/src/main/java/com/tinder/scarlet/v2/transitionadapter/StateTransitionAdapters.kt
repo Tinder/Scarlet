@@ -185,6 +185,4 @@ internal class DeserializedValueStateTransitionAdapter(
             return DeserializedValueStateTransitionAdapter(messageAdapter)
         }
     }
-
 }
-

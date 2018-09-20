@@ -9,6 +9,4 @@ data class StateTransition(
     val event: Event,
     val toState: State,
     val sideEffect: SideEffect?
-) {
-
-}
+)

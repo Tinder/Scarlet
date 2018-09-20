@@ -4,7 +4,6 @@
 
 package com.tinder.scarlet.websocket
 
-
 /**
  * Used to initiate a shutdown of a WebSocket.
  *

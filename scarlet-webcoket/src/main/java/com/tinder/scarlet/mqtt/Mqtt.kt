@@ -102,7 +102,6 @@ class MqttMainChannel(
         try {
             client?.disconnect()
             listener.onClosed(this)
-
         } catch (e: Throwable) {
             listener.onFailed(this, e)
         }

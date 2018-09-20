@@ -7,7 +7,6 @@ package com.tinder.scarlet.v2.service
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Matcher.Companion.any
 import com.tinder.scarlet.v2.Event
-import com.tinder.scarlet.v2.Lifecycle
 import com.tinder.scarlet.v2.LifecycleState
 import com.tinder.scarlet.v2.ProtocolEvent
 import com.tinder.scarlet.v2.SideEffect

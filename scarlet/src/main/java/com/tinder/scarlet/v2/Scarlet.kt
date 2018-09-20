@@ -119,4 +119,3 @@ class Scarlet internal constructor(
         }
     }
 }
-

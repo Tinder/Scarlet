@@ -15,5 +15,4 @@ interface Lifecycle : Publisher<LifecycleState> {
      * Returns a lifecycle that starts only when all source Lifecycles are start.
      */
     fun combineWith(vararg others: Lifecycle): Lifecycle
-
 }

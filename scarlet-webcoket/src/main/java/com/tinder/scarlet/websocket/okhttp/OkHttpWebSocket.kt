@@ -59,4 +59,3 @@ class OkHttpWebSocket(
         fun createCloseRequest(): CloseRequest
     }
 }
-

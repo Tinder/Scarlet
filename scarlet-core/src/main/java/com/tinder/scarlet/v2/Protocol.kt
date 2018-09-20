@@ -6,9 +6,7 @@ package com.tinder.scarlet.v2
 
 import com.tinder.scarlet.Message
 
-// plugin
 interface Protocol {
-    // TODO to val?
     fun createChannelFactory(): Channel.Factory
 
     fun createOpenRequestFactory(channel: Channel): OpenRequest.Factory {
@@ -56,7 +54,4 @@ interface Protocol {
 
         object Empty : MessageMetaData
     }
-
-
 }
-

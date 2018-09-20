@@ -6,8 +6,6 @@ package com.tinder.scarlet.websocket.oksse
 
 import com.here.oksse.ServerSentEvent
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.KotlinJsonAdapterFactory
-import com.squareup.moshi.Moshi
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.oksse.model.ServerSentMessage

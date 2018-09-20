@@ -6,5 +6,4 @@ package com.tinder.scarlet.mqtt
 
 import com.tinder.scarlet.v2.ProtocolSpecificEvent
 
-class MqttEvent: ProtocolSpecificEvent {
-}
+class MqttEvent : ProtocolSpecificEvent

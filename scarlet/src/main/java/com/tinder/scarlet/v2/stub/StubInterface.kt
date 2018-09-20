@@ -12,9 +12,9 @@ import java.lang.reflect.Proxy
 internal class StubInterface(
     private val stubMethods: Map<Method, StubMethod>,
     private val callback: Callback
-)  {
+) {
 
-    fun invoke(method: Method, args: Array<Any>) : Any {
+    fun invoke(method: Method, args: Array<Any>): Any {
         val stubMethod = checkNotNull(stubMethods[method]) { "Stub method not found" }
         return when (stubMethod) {
             is StubMethod.Send -> callback.send(stubMethod, args[0])
@@ -75,4 +75,3 @@ internal class StubInterface(
         }
     }
 }
-

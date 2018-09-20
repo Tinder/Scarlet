@@ -6,5 +6,4 @@ package com.tinder.scarlet.socketio
 
 import com.tinder.scarlet.v2.ProtocolSpecificEvent
 
-class SocketIoEvent: ProtocolSpecificEvent {
-}
+class SocketIoEvent : ProtocolSpecificEvent

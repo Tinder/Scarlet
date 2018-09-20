@@ -32,5 +32,4 @@ sealed class ProtocolEvent {
     ) : ProtocolEvent()
 
     data class OnFailed(val throwable: Throwable?) : ProtocolEvent()
-
 }
