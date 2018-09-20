@@ -5,6 +5,7 @@
 package com.tinder.scarlet.v2.service
 
 import com.tinder.scarlet.retry.BackoffStrategy
+import com.tinder.scarlet.v2.Event
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.subscribers.DisposableSubscriber

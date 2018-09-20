@@ -4,6 +4,8 @@
 
 package com.tinder.scarlet.v2.service
 
+import com.tinder.scarlet.v2.Event
+
 
 internal interface EventCallback {
 

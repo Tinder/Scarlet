@@ -6,6 +6,7 @@ package com.tinder.scarlet.v2.service
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
+import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.Topic

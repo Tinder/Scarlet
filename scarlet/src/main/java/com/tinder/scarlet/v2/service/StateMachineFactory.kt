@@ -6,42 +6,11 @@ package com.tinder.scarlet.v2.service
 
 import com.tinder.StateMachine
 import com.tinder.StateMachine.Matcher.Companion.any
+import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.Lifecycle
 import com.tinder.scarlet.v2.Protocol
-
-sealed class State {
-    data class WillConnect internal constructor(
-        val retryCount: Int
-    ) : State()
-
-    data class Connecting internal constructor(
-        val retryCount: Int
-    ) : State()
-
-    object Connected : State()
-
-    object Disconnecting : State()
-
-    object Disconnected : State()
-
-    object Destroyed : State()
-}
-
-sealed class Event {
-    data class OnLifecycleStateChange internal constructor(val state: Lifecycle.State) : Event()
-
-    data class OnProtocolEvent internal constructor(val event: Protocol.Event) : Event()
-
-    object OnShouldConnect : Event()
-}
-
-sealed class SideEffect {
-    data class ScheduleRetry(val retryCount: Int) : SideEffect()
-    object CancelRetry : SideEffect()
-    object OpenProtocol : SideEffect()
-    object CloseProtocol : SideEffect()
-    object ForceCloseProtocol : SideEffect()
-}
+import com.tinder.scarlet.v2.SideEffect
+import com.tinder.scarlet.v2.State
 
 class StateMachineFactory {
 

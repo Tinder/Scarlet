@@ -4,6 +4,7 @@
 
 package com.tinder.scarlet.v2.service
 
+import com.tinder.scarlet.v2.Event
 import com.tinder.scarlet.v2.Lifecycle
 import io.reactivex.subscribers.DisposableSubscriber
 import java.util.concurrent.atomic.AtomicInteger

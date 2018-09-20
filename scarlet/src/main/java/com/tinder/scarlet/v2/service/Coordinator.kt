@@ -5,6 +5,9 @@
 package com.tinder.scarlet.v2.service
 
 import com.tinder.StateMachine
+import com.tinder.scarlet.v2.Event
+import com.tinder.scarlet.v2.SideEffect
+import com.tinder.scarlet.v2.State
 import com.tinder.scarlet.v2.stub.StubInterface
 import com.tinder.scarlet.v2.stub.StubMethod
 import io.reactivex.Scheduler
