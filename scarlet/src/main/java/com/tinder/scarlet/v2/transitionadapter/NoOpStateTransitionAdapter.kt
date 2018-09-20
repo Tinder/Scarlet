@@ -44,7 +44,7 @@ class EventStateTransitionAdapter : StateTransition.Adapter<Any> {
 class ProtocolEventStateTransitionAdapter : StateTransition.Adapter<Any> {
     override fun adapt(stateTransition: StateTransition): Any? {
         val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
-        return event.event
+        return event.protocolEvent
     }
 
     class Factory : StateTransition.Adapter.Factory {

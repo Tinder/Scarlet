@@ -110,12 +110,12 @@ class StateMachineFactory {
             any<Event, Event.OnLifecycleStateChange>().where { lifecycleState == Lifecycle.State.Completed }
 
         private val protocolOpened =
-            any<Event, Event.OnProtocolEvent>().where { event is ProtocolEvent.OnOpened }
+            any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnOpened }
 
         private val protocolClosed =
-            any<Event, Event.OnProtocolEvent>().where { event is ProtocolEvent.OnClosed }
+            any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnClosed }
 
         private val protocolFailed =
-            any<Event, Event.OnProtocolEvent>().where { event is ProtocolEvent.OnFailed }
+            any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnFailed }
     }
 }
