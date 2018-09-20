@@ -6,7 +6,6 @@ package com.tinder.scarlet.socketio
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
-import com.tinder.scarlet.v2.DefaultTopic
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.Topic
@@ -15,125 +14,128 @@ import io.socket.client.Socket
 import org.json.JSONObject
 
 class SocketIo(
-    val options: IO.Options
-) : Protocol {
+    private val url: String,
+    private val options: IO.Options
+) : Protocol, Channel.Factory, Protocol.OpenRequest.Factory {
+
+    private var mainChannel: SocketIoMainChannel? = null
+
+    override fun create(topic: Topic, listener: Channel.Listener): Channel {
+        if (topic == Topic.Default) {
+            mainChannel = SocketIoMainChannel(
+                options,
+                listener
+            )
+            return mainChannel!!
+        }
+        return SocketIoMessageChannel(topic, listener)
+    }
+
+    override fun create(channel: Channel): Protocol.OpenRequest {
+        if (channel.topic == Topic.Default) {
+            return SocketIo.MainChannelOpenRequest(url)
+        }
+        return SocketIo.MessageChannelOpenRequest(requireNotNull(mainChannel?.socket))
+    }
+
     override fun createChannelFactory(): Channel.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return this
     }
 
-    override fun createMessageQueueFactory(): MessageQueue.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun createChannelOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun createChannelCloseRequestFactory(channel: Channel): Protocol.CloseRequest.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun createMessageMetaDataFactory(channel: Channel): Protocol.MessageMetaData.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
+        return this
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    data class OpenRequest(val url: String) : Protocol.OpenRequest
+    data class MainChannelOpenRequest(val url: String) : Protocol.OpenRequest
 
-    object Empty : Protocol.OpenResponse, Protocol.CloseRequest, Protocol.CloseResponse
-
+    data class MessageChannelOpenRequest(val socket: Socket) : Protocol.OpenRequest
 }
 
-class SocketIoChannel(
+class SocketIoMainChannel(
     private val options: IO.Options,
     private val listener: Channel.Listener
 ) : Channel {
-    override val topic: Topic = DefaultTopic
-    private var socket: Socket? = null
+    var socket: Socket? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as SocketIo.OpenRequest
+        val openRequest = openRequest as SocketIo.MainChannelOpenRequest
         val socket = IO.socket(openRequest.url, options)
         socket
             .on(Socket.EVENT_CONNECT) {
-                listener.onOpened(this, SocketIo.Empty)
+                listener.onOpened(this)
             }
             .on(Socket.EVENT_DISCONNECT) {
-                listener.onClosed(this, SocketIo.Empty)
+                listener.onClosed(this)
             }
             .on(Socket.EVENT_ERROR) {
-                listener.onCanceled(this, null)
+                listener.onFailed(this, null)
             }
-
         socket.open()
         this.socket = socket
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
         socket?.disconnect()
+        socket = null
     }
 
     override fun forceClose() {
         socket?.disconnect()
+        socket = null
     }
 
-    fun addMessageQueue(topic: Topic, messageQueueListener: MessageQueue.Listener): MessageQueue {
-        return InnerMessageQueue(topic, messageQueueListener)
+    override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue? {
+        return null
+    }
+}
+
+class SocketIoMessageChannel(
+    override val topic: Topic,
+    private val listener: Channel.Listener
+) : Channel, MessageQueue {
+
+    private var socket: Socket? = null
+    private var messageQueueListener: MessageQueue.Listener? = null
+
+    override fun open(openRequest: Protocol.OpenRequest) {
+        val openRequest = openRequest as SocketIo.MessageChannelOpenRequest
+        socket = openRequest.socket
+        socket?.on(topic.id) {
+            val jsonObject = it[0] as JSONObject
+            messageQueueListener?.onMessageReceived(this, Message.Text(jsonObject.toString()))
+        }
+        listener.onOpened(this)
     }
 
-    inner class InnerMessageQueue(
-        override val topic: Topic,
-        private var messageQueueListener: MessageQueue.Listener
-    ) : Channel, MessageQueue {
-
-        override fun open(openRequest: Protocol.OpenRequest) {
-            socket?.on(topic.id) {
-                val jsonObject = it[0] as JSONObject
-                messageQueueListener.onMessageReceived(this, Message.Text(jsonObject.toString()))
-            }
-        }
-
-        override fun close(closeRequest: Protocol.CloseRequest) {
-            socket?.off(topic.id)
-        }
-
-        override fun forceClose() {
-            socket?.off(topic.id)
-        }
-
-        override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
-            when (message) {
-                is Message.Text -> socket?.send(topic.id, message.value)
-                is Message.Bytes -> {
-                    socket?.send(topic.id, message.value)
-                }
-            }
-        }
+    override fun close(closeRequest: Protocol.CloseRequest) {
+        socket?.off(topic.id)
+        socket = null
+        listener.onClosed(this)
     }
 
-    class Factory(
-        private val options: IO.Options
-    ) : Channel.Factory, MessageQueue.Factory {
+    override fun forceClose() {
+        socket?.off(topic.id)
+        socket = null
+        listener.onClosed(this)
+    }
 
-        override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic == DefaultTopic) {
-                return SocketIoChannel(
-                    options,
-                    listener
-                )
-            }
-            // sub channel
-            return SocketIoChannel,
-        }
+    override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {
+        require(messageQueueListener == null)
+        messageQueueListener = listener
+        return this
+    }
 
-        override fun create(channel: Channel, listener: MessageQueue.Listener): MessageQueue? {
-            if (channel !is SocketIoChannel) {
-                return null
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+        when (message) {
+            is Message.Text -> socket?.send(topic.id, message.value)
+            is Message.Bytes -> {
+                socket?.send(topic.id, message.value)
             }
-            return channel.addMessageQueue(channel.topic, listener)
         }
     }
 }
+

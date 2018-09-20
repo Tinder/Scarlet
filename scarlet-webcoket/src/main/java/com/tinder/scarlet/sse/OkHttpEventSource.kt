@@ -2,11 +2,10 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.websocket.okhttp
+package com.tinder.scarlet.sse
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.v2.Channel
-import com.tinder.scarlet.v2.DefaultTopic
 import com.tinder.scarlet.v2.MessageQueue
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.Topic
@@ -27,38 +26,21 @@ class OkHttpEventSource(
         return factory
     }
 
-    override fun createMessageQueueFactory(): MessageQueue.Factory {
-        return factory
-    }
-
-    override fun createChannelOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
+    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel) = requestFactory.createOpenRequest()
         }
-    }
-
-    override fun createChannelCloseRequestFactory(channel: Channel): Protocol.CloseRequest.Factory {
-        return object : Protocol.CloseRequest.Factory {
-            override fun create(channel: Channel) = Empty
-        }
-    }
-
-    override fun createMessageMetaDataFactory(channel: Channel): Protocol.MessageMetaData.Factory {
-        return object : Protocol.MessageMetaData.Factory {}
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-
     data class OpenRequest(val okHttpRequest: Request) : Protocol.OpenRequest
 
     data class OpenResponse(val eventSource: EventSource, val okHttpResponse: Response) : Protocol.OpenResponse
 
-    object Empty : Protocol.CloseRequest, Protocol.CloseResponse
-
-    data class MessageMetaData(val id: String?, val type: String?) : Protocol.MessageMetaData
+    data class IncomingMessageMetaData(val id: String?, val type: String?) : Protocol.MessageMetaData
 
     interface RequestFactory {
         fun createOpenRequest(): OpenRequest
@@ -69,7 +51,7 @@ class OkHttpEventSourceChannel(
     private val okHttpClient: OkHttpClient,
     private val listener: Channel.Listener
 ) : Channel {
-    override val topic: Topic = DefaultTopic
+    override val topic: Topic = Topic.Default
     private var eventSource: EventSource? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
@@ -87,9 +69,9 @@ class OkHttpEventSourceChannel(
         eventSource?.cancel()
     }
 
-    fun addMessageQueue(messageQueueListener: MessageQueue.Listener): MessageQueue {
+    override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {
         require(this.messageQueueListener == null)
-        this.messageQueueListener = messageQueueListener
+        this.messageQueueListener = listener
         return InnerMessageQueue()
     }
 
@@ -100,24 +82,24 @@ class OkHttpEventSourceChannel(
 
     inner class InnerEventSourceListener : EventSourceListener() {
         override fun onOpen(eventSource: EventSource, response: Response) =
-            listener.onOpened(this@OkHttpEventSourceChannel, OkHttpEventSource.OpenResponse(eventSource, response))
+            listener.onOpened(this@OkHttpEventSourceChannel,
+                OkHttpEventSource.OpenResponse(eventSource, response)
+            )
 
         override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
             messageQueueListener?.onMessageReceived(
                 this@OkHttpEventSourceChannel,
                 Message.Text(data),
-                OkHttpEventSource.MessageMetaData(id, type)
+                OkHttpEventSource.IncomingMessageMetaData(id, type)
             )
         }
 
         override fun onClosed(eventSource: EventSource?) {
-            listener.onClosed(
-                this@OkHttpEventSourceChannel, OkHttpEventSource.Empty
-            )
+            listener.onClosed(this@OkHttpEventSourceChannel)
         }
 
         override fun onFailure(eventSource: EventSource?, t: Throwable?, response: Response?) {
-            listener.onCanceled(this@OkHttpEventSourceChannel, t)
+            listener.onFailed(this@OkHttpEventSourceChannel, t)
         }
     }
 
@@ -126,20 +108,13 @@ class OkHttpEventSourceChannel(
     ) : Channel.Factory, MessageQueue.Factory {
 
         override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic != DefaultTopic) {
+            if (topic != Topic.Default) {
                 return null
             }
             return OkHttpEventSourceChannel(
                 okHttpClient,
                 listener
             )
-        }
-
-        override fun create(channel: Channel, listener: MessageQueue.Listener): MessageQueue? {
-            if (channel !is OkHttpEventSourceChannel) {
-                return null
-            }
-            return channel.addMessageQueue(listener)
         }
     }
 }

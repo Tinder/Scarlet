@@ -42,35 +42,48 @@ interface ServiceFactory {
 interface Protocol {
     fun createChannelFactory(): Channel.Factory
 
-    fun createMessageQueueFactory(): MessageQueue.Factory
+    fun createOpenRequestFactory(channel: Channel): OpenRequest.Factory {
+        return object : Protocol.OpenRequest.Factory {}
+    }
 
-    fun createChannelOpenRequestFactory(channel: Channel): OpenRequest.Factory
+    fun createCloseRequestFactory(channel: Channel): CloseRequest.Factory {
+        return object : Protocol.CloseRequest.Factory {}
+    }
 
-    fun createChannelCloseRequestFactory(channel: Channel): CloseRequest.Factory
+    fun createOutgoingMessageMetaDataFactory(channel: Channel): MessageMetaData.Factory {
+        return object : Protocol.MessageMetaData.Factory {}
+    }
 
-    fun createMessageMetaDataFactory(channel: Channel): MessageMetaData.Factory
 
     fun createEventAdapterFactory(channel: Channel): EventAdapter.Factory
 
     interface OpenRequest {
         interface Factory {
-            fun create(channel: Channel): OpenRequest
+            fun create(channel: Channel): OpenRequest = Empty
         }
+
+        object Empty : OpenRequest
     }
 
-    interface OpenResponse
+    interface OpenResponse {
+        object Empty : OpenResponse
+    }
 
     interface CloseRequest {
         interface Factory {
-            fun create(channel: Channel): CloseRequest
+            fun create(channel: Channel): CloseRequest = Empty
         }
+
+        object Empty : CloseRequest
     }
 
-    interface CloseResponse
+    interface CloseResponse {
+        object Empty : CloseResponse
+    }
 
     interface MessageMetaData {
         interface Factory {
-            fun create(channel: Channel): MessageMetaData? = null
+            fun create(channel: Channel, message: Message): MessageMetaData? = null
         }
     }
 
@@ -107,8 +120,9 @@ interface Protocol {
     }
 }
 
-interface Channel {
+interface Channel : MessageQueue.Factory {
     val topic: Topic
+        get() = Topic.Default
 
     fun open(openRequest: Protocol.OpenRequest)
 
@@ -117,14 +131,14 @@ interface Channel {
     fun forceClose()
 
     interface Listener {
-        fun onOpened(channel: Channel, response: Protocol.OpenResponse)
+        fun onOpened(channel: Channel, response: Protocol.OpenResponse = Protocol.OpenResponse.Empty)
         fun onClosing(channel: Channel)
-        fun onClosed(channel: Channel, response: Protocol.CloseResponse)
-        fun onCanceled(channel: Channel, throwable: Throwable?)
+        fun onClosed(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
+        fun onFailed(channel: Channel, throwable: Throwable?)
     }
 
     interface Factory {
-        fun create(topic: Topic, listener: Listener): Channel? = null
+        fun create(topic: Topic, listener: Listener): Channel?
     }
 }
 
@@ -138,17 +152,18 @@ interface MessageQueue {
     }
 
     interface Factory {
-        fun create(channel: Channel, listener: Listener): MessageQueue? = null
+        fun createMessageQueue(listener: Listener): MessageQueue? = null
     }
 }
 
 interface Topic {
     val id: String
+
+    object Default : Topic {
+        override val id = ""
+    }
 }
 
-object DefaultTopic : Topic {
-    override val id = ""
-}
 
 // plugin
 interface Lifecycle {

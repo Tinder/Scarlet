@@ -50,6 +50,7 @@ ext {
     timber = 'com.jakewharton.timber:timber:4.6.0'
     okSse = 'com.github.heremaps:oksse:0.9.0'
     socketIo = 'io.socket:socket.io-client:1.0.0'
+    pahoMqtt = 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
 
     junit = 'junit:junit:4.12'
     mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
