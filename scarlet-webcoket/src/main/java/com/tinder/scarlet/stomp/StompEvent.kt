@@ -2,36 +2,38 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.websocket
+package com.tinder.scarlet.stomp
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.v2.Protocol
+import com.tinder.scarlet.websocket.OkHttpWebSocket
+import com.tinder.scarlet.websocket.ShutdownReason
 import okhttp3.Response
 import okhttp3.WebSocket
 import java.lang.reflect.Type
 
-sealed class WebSocketEvent {
+sealed class StompEvent {
     /**
      * Invoked when a WebSocket has been accepted by the remote peer and may begin transmitting messages.
      *
      * @property webSocket The `WebSocket` instance used for this connection.
      */
-    data class OnConnectionOpened(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) : WebSocketEvent()
+    data class OnConnectionOpened(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) : StompEvent()
 
     /**
      * Invoked when a [text message][Message.Text] or [binary message][Message.Bytes] has been received.
      *
      * @property message The raw message.
      */
-    data class OnMessageReceived(val message: Message) : WebSocketEvent()
+    data class OnMessageReceived(val message: Message) : StompEvent()
 
     /**
      * Invoked when the peer has indicated that no more incoming messages will be transmitted.
      *
      * @property shutdownReason Reason to shutdown from the peer.
      */
-    data class OnConnectionClosing(val shutdownReason: ShutdownReason) : WebSocketEvent()
+    data class OnConnectionClosing(val shutdownReason: ShutdownReason) : StompEvent()
 
     /**
      * Invoked when both peers have indicated that no more messages will be transmitted and the connection has been
@@ -39,7 +41,7 @@ sealed class WebSocketEvent {
      *
      * @property shutdownReason Reason to shutdown from the peer.
      */
-    data class OnConnectionClosed(val shutdownReason: ShutdownReason) : WebSocketEvent()
+    data class OnConnectionClosed(val shutdownReason: ShutdownReason) : StompEvent()
 
     /**
      * Invoked when a web socket has been closed due to an error reading from or writing to the network. Both outgoing
@@ -47,28 +49,28 @@ sealed class WebSocketEvent {
      *
      * @property throwable The error causing the failure.
      */
-    data class OnConnectionFailed(val throwable: Throwable) : WebSocketEvent()
+    data class OnConnectionFailed(val throwable: Throwable) : StompEvent()
 
-    class Adapter : Protocol.EventAdapter<WebSocketEvent> {
-        override fun fromEvent(event: Protocol.Event): WebSocketEvent {
+    class Adapter : Protocol.EventAdapter<StompEvent> {
+        override fun fromEvent(event: Protocol.Event): StompEvent {
             return when (event) {
                 is Protocol.Event.OnOpened -> {
                     val response = event.response as OkHttpWebSocket.OpenResponse
-                    WebSocketEvent.OnConnectionOpened(response.okHttpWebSocket, response.okHttpResponse)
+                    StompEvent.OnConnectionOpened(response.okHttpWebSocket, response.okHttpResponse)
                 }
                 is Protocol.Event.OnMessageReceived -> {
-                    WebSocketEvent.OnMessageReceived(event.message)
+                    StompEvent.OnMessageReceived(event.message)
                 }
                 is Protocol.Event.OnClosing -> {
                     val response = event.request as OkHttpWebSocket.CloseRequest
-                    WebSocketEvent.OnConnectionClosing(response.shutdownReason)
+                    StompEvent.OnConnectionClosing(response.shutdownReason)
                 }
                 is Protocol.Event.OnClosed -> {
                     val response = event.response as OkHttpWebSocket.CloseResponse
-                    WebSocketEvent.OnConnectionClosed(response.shutdownReason)
+                    StompEvent.OnConnectionClosed(response.shutdownReason)
                 }
                 is Protocol.Event.OnFailed -> {
-                    WebSocketEvent.OnConnectionFailed(event.throwable ?: Throwable())
+                    StompEvent.OnConnectionFailed(event.throwable ?: Throwable())
                 }
                 else -> throw IllegalArgumentException()
             }
@@ -77,8 +79,8 @@ sealed class WebSocketEvent {
         class Factory : Protocol.EventAdapter.Factory {
             override fun create(type: Type, annotations: Array<Annotation>): Protocol.EventAdapter<*> {
                 val receivingClazz = type.getRawType()
-                require(WebSocketEvent::class.java.isAssignableFrom(receivingClazz)) {
-                    "Only subclasses of WebSocketEvent are supported"
+                require(StompEvent::class.java.isAssignableFrom(receivingClazz)) {
+                    "Only subclasses of StompEvent are supported"
                 }
                 return Adapter()
             }

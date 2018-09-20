@@ -50,10 +50,9 @@ interface Protocol {
         return object : Protocol.CloseRequest.Factory {}
     }
 
-    fun createOutgoingMessageMetaDataFactory(channel: Channel): MessageMetaData.Factory {
+    fun createSendingMessageMetaDataFactory(channel: Channel): MessageMetaData.Factory {
         return object : Protocol.MessageMetaData.Factory {}
     }
-
 
     fun createEventAdapterFactory(channel: Channel): EventAdapter.Factory
 
@@ -100,6 +99,10 @@ interface Protocol {
             val channel: Channel, val message: Message, val messageMetaData: MessageMetaData
         ) : Event()
 
+        data class OnMessageDelivered(
+            val channel: Channel, val message: Message, val messageMetaData: MessageMetaData
+        ) : Event()
+
         data class OnClosing(
             val channel: Channel, val request: CloseRequest
         ) : Event()
@@ -108,7 +111,7 @@ interface Protocol {
             val channel: Channel, val request: CloseRequest, val response: CloseResponse
         ) : Event()
 
-        data class OnCanceled(val channel: Channel, val throwable: Throwable?) : Event()
+        data class OnFailed(val channel: Channel, val throwable: Throwable?) : Event()
     }
 
     interface EventAdapter<T> {
@@ -173,7 +176,6 @@ interface Lifecycle {
     // onStart()
 
     // onStop()
-
 }
 
 // plugin

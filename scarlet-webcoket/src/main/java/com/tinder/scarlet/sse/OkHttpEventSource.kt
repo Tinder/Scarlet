@@ -33,14 +33,14 @@ class OkHttpEventSource(
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return EventSourceEvent.Adapter.Factory()
     }
 
     data class OpenRequest(val okHttpRequest: Request) : Protocol.OpenRequest
 
     data class OpenResponse(val eventSource: EventSource, val okHttpResponse: Response) : Protocol.OpenResponse
 
-    data class IncomingMessageMetaData(val id: String?, val type: String?) : Protocol.MessageMetaData
+    data class ReceivedMessageMetaData(val id: String?, val type: String?) : Protocol.MessageMetaData
 
     interface RequestFactory {
         fun createOpenRequest(): OpenRequest
@@ -90,7 +90,7 @@ class OkHttpEventSourceChannel(
             messageQueueListener?.onMessageReceived(
                 this@OkHttpEventSourceChannel,
                 Message.Text(data),
-                OkHttpEventSource.IncomingMessageMetaData(id, type)
+                OkHttpEventSource.ReceivedMessageMetaData(id, type)
             )
         }
 

@@ -41,7 +41,7 @@ class OkHttpWebSocket(
     }
 
     override fun createEventAdapterFactory(channel: Channel): Protocol.EventAdapter.Factory {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return WebSocketEvent.Adapter.Factory()
     }
 
     data class OpenRequest(val okHttpRequest: Request) : Protocol.OpenRequest
