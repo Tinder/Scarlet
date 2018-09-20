@@ -24,6 +24,9 @@ class StateMachineFactory {
                         SideEffect.ScheduleRetry(0)
                     )
                 }
+                on(lifecycleStopped) {
+                    dontTransition()
+                }
                 on(lifecycleDestroyed) {
                     transitionTo(State.Destroyed)
                 }
@@ -34,6 +37,9 @@ class StateMachineFactory {
                         State.Connecting(retryCount = retryCount + 1),
                         SideEffect.OpenProtocol
                     )
+                }
+                on(lifecycleStarted) {
+                    dontTransition()
                 }
                 on(lifecycleStopped) {
                     transitionTo(
@@ -60,6 +66,9 @@ class StateMachineFactory {
                 }
             }
             state<State.Connected> {
+                on(lifecycleStarted) {
+                    dontTransition()
+                }
                 on(lifecycleStopped) {
                     transitionTo(
                         State.Disconnecting,
@@ -90,7 +99,6 @@ class StateMachineFactory {
         }
     }
 
-
     private companion object {
         private val lifecycleStarted =
             any<Event, Event.OnLifecycleStateChange>().where { state == Lifecycle.State.Started }
@@ -109,6 +117,5 @@ class StateMachineFactory {
 
         private val protocolFailed =
             any<Event, Event.OnProtocolEvent>().where { event is Protocol.Event.OnFailed }
-
     }
 }

@@ -63,6 +63,15 @@ internal class Coordinator(
         publishSubject.onNext(transition)
 
         when (transition.toState) {
+            is State.WillConnect -> {
+                lifecycleEventSource.requestNext()
+            }
+            is State.Connected -> {
+                lifecycleEventSource.requestNext()
+            }
+            is State.Disconnected -> {
+                lifecycleEventSource.requestNext()
+            }
             is State.Destroyed -> {
                 session.stop()
                 publishSubject.onComplete()

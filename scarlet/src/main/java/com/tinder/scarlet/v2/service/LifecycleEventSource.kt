@@ -13,17 +13,19 @@ internal class LifecycleEventSource(
     private val lifecycle: Lifecycle
 ) {
 
+    private val lifecycleStateSubscriber = LifecycleStateSubscriber()
     private lateinit var eventCallback: EventCallback
-    private lateinit var lifecycleStateSubscriber: LifecycleStateSubscriber
 
     fun start(eventCallback: EventCallback) {
         this.eventCallback = eventCallback
-        lifecycleStateSubscriber = LifecycleStateSubscriber()
         lifecycle.subscribe(lifecycleStateSubscriber)
     }
 
-    private inner class LifecycleStateSubscriber(
-    ) : DisposableSubscriber<Lifecycle.State>() {
+    fun requestNext() {
+        lifecycleStateSubscriber.requestNext()
+    }
+
+    private inner class LifecycleStateSubscriber : DisposableSubscriber<Lifecycle.State>() {
         private val pendingRequestCount = AtomicInteger()
 
         override fun onStart() = request(1)
