@@ -104,10 +104,7 @@ internal class ProtocolSpecificEventStateTransitionAdapter(
     ) : StateTransitionAdapter.Factory {
         override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
-            require(!ProtocolSpecificEvent::class.java.isAssignableFrom(clazz)) {
-                "Subclasses of ProtocolEvent is not supported"
-            }
-            require(clazz == ProtocolSpecificEvent::class.java)
+            require(ProtocolSpecificEvent::class.java.isAssignableFrom(clazz))
             val protocolEventAdapter = protocolEventAdatperFactory.create(type, annotations)
             return ProtocolSpecificEventStateTransitionAdapter(protocolEventAdapter)
         }

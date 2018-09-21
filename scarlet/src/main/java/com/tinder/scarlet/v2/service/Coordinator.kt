@@ -32,11 +32,13 @@ internal class Coordinator(
         session.start(this)
     }
 
+    @Synchronized
     override fun send(stubMethod: StubMethod.Send, data: Any): Any {
         val message = stubMethod.messageAdapter.toMessage(data)
         return session.send(message)
     }
 
+    @Synchronized
     override fun receive(stubMethod: StubMethod.Receive): Any {
         val stream = Flowable.defer<StateTransition> { publishProcessor }
             .observeOn(scheduler)
@@ -45,6 +47,7 @@ internal class Coordinator(
         return stubMethod.streamAdapter.adapt(stream)
     }
 
+    @Synchronized
     override fun onEvent(event: Event) {
         val transition = stateMachine.transition(event) as? StateMachine.Transition.Valid ?: return
         val sideEffect = transition.sideEffect ?: return

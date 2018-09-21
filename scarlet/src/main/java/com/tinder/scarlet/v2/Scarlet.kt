@@ -73,6 +73,7 @@ class Scarlet internal constructor(
                 ),
                 DEFAULT_SCHEDULER
             )
+            coordinator.start()
 
             val messageAdapterResolver = configuration.createMessageAdapterResolver()
 
