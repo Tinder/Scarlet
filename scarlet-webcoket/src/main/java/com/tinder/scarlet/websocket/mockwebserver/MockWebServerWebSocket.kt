@@ -7,7 +7,6 @@ package com.tinder.scarlet.websocket.mockwebserver
 import com.tinder.scarlet.v2.Channel
 import com.tinder.scarlet.v2.Protocol
 import com.tinder.scarlet.v2.ProtocolEventAdapter
-import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocketChannel
@@ -18,7 +17,8 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
 class MockWebServerWebSocket(
-    private val mockWebServer: MockWebServer
+    private val mockWebServer: MockWebServer,
+    private val requestFactory: RequestFactory
 ) : Protocol {
     override fun createChannelFactory(): Channel.Factory {
         return OkHttpWebSocketChannel.Factory(
@@ -41,12 +41,16 @@ class MockWebServerWebSocket(
     override fun createCloseRequestFactory(channel: Channel): Protocol.CloseRequest.Factory {
         return object : Protocol.CloseRequest.Factory {
             override fun create(channel: Channel): Protocol.CloseRequest {
-                return OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL)
+                return requestFactory.createCloseRequest()
             }
         }
     }
 
     override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
         return WebSocketEvent.Adapter.Factory()
+    }
+
+    interface RequestFactory {
+        fun createCloseRequest(): OkHttpWebSocket.CloseRequest
     }
 }

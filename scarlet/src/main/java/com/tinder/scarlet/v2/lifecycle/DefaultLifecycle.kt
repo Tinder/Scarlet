@@ -6,12 +6,7 @@ package com.tinder.scarlet.v2.lifecycle
 
 import com.tinder.scarlet.v2.Lifecycle
 import com.tinder.scarlet.v2.LifecycleState
+import io.reactivex.Flowable
 
 internal class DefaultLifecycle(
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry()
-) : Lifecycle by lifecycleRegistry {
-
-    init {
-        lifecycleRegistry.onNext(LifecycleState.Started)
-    }
-}
+) : Lifecycle by FlowableLifecycle(Flowable.just(LifecycleState.Started))

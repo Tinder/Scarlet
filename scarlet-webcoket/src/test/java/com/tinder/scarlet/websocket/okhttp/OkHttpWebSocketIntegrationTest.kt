@@ -3,13 +3,25 @@
  */
 package com.tinder.scarlet.websocket.okhttp
 
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.ShutdownReason
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.WebSocket
+import com.tinder.scarlet.testutils.TestStreamObserver
+import com.tinder.scarlet.testutils.ValueAssert
+import com.tinder.scarlet.testutils.any
+import com.tinder.scarlet.testutils.test
+import com.tinder.scarlet.v2.LifecycleState
+import com.tinder.scarlet.v2.Scarlet
+import com.tinder.scarlet.v2.lifecycle.LifecycleRegistry
+import com.tinder.scarlet.websocket.ShutdownReason
+import com.tinder.scarlet.websocket.WebSocketEvent
+import com.tinder.scarlet.websocket.mockwebserver.MockWebServerWebSocket
+import com.tinder.scarlet.ws.Receive
+import com.tinder.scarlet.ws.Send
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.TimeUnit
@@ -22,11 +34,11 @@ internal class OkHttpWebSocketIntegrationTest {
 
     private val serverLifecycleRegistry = LifecycleRegistry()
     private lateinit var server: Service
-    private lateinit var serverWebSocketEventObserver: TestStreamObserver<WebSocket.Event>
+    private lateinit var serverWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
 
     private val clientLifecycleRegistry = LifecycleRegistry()
     private lateinit var client: Service
-    private lateinit var clientWebSocketEventObserver: TestStreamObserver<WebSocket.Event>
+    private lateinit var clientWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
 
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
@@ -49,11 +61,12 @@ internal class OkHttpWebSocketIntegrationTest {
         Assertions.assertThat(isSendTextSuccessful).isTrue()
         Assertions.assertThat(isSendBytesSuccessful).isTrue()
         serverWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnMessageReceived>().containingText(textMessage1),
-            any<WebSocket.Event.OnMessageReceived>().containingText(textMessage2),
-            any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage1),
-            any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage2)
+            any<WebSocketEvent.OnConnectionOpened>(),
+//            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingText("asdf"),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
         serverStringObserver.awaitValues(
             any<String> { Assertions.assertThat(this).isEqualTo(textMessage1) },
@@ -89,16 +102,15 @@ internal class OkHttpWebSocketIntegrationTest {
     fun close_givenConnectionIsEstablished_shouldCloseServer() {
         // Given
         givenConnectionIsEstablished()
-        val clientCloseReason = ShutdownReason(1001, "client away")
 
         // When
-        clientLifecycleRegistry.onNext(Lifecycle.State.Stopped.WithReason(clientCloseReason))
+        clientLifecycleRegistry.onNext(LifecycleState.Stopped)
 
         // Then
         serverWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnConnectionClosing>().withClosingReason(clientCloseReason),
-            any<WebSocket.Event.OnConnectionClosed>().withClosedReason(clientCloseReason)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionClosing>().withClosingReason(CLIENT_SHUTDOWN_REASON),
+            any<WebSocketEvent.OnConnectionClosed>().withClosedReason(CLIENT_SHUTDOWN_REASON)
         )
     }
 
@@ -106,16 +118,16 @@ internal class OkHttpWebSocketIntegrationTest {
     fun cancel_givenConnectionIsEstablished_shouldFailTheConnection() {
         // When
         givenConnectionIsEstablished()
-        clientLifecycleRegistry.onNext(Lifecycle.State.Stopped.AndAborted)
+        clientLifecycleRegistry.onNext(LifecycleState.Stopped)
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnConnectionFailed>()
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionFailed>()
         )
         serverWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnConnectionFailed>()
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionFailed>()
         )
     }
 
@@ -123,16 +135,15 @@ internal class OkHttpWebSocketIntegrationTest {
     fun givenConnectionIsEstablished_andServerCloses_shouldClose() {
         // Given
         givenConnectionIsEstablished()
-        val serverCloseReason = ShutdownReason(1002, "mockWebServer shutdown")
 
         // When
-        serverLifecycleRegistry.onNext(Lifecycle.State.Stopped.WithReason(serverCloseReason))
+        serverLifecycleRegistry.onNext(LifecycleState.Stopped)
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnConnectionClosing>().withClosingReason(serverCloseReason),
-            any<WebSocket.Event.OnConnectionClosed>().withClosedReason(serverCloseReason)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionClosing>().withClosingReason(SERVER_SHUTDOWN_REASON),
+            any<WebSocketEvent.OnConnectionClosed>().withClosedReason(SERVER_SHUTDOWN_REASON)
         )
     }
 
@@ -151,9 +162,9 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>(),
-            any<WebSocket.Event.OnMessageReceived>().containingText(textMessage),
-            any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage)
         )
         Assertions.assertThat(testTextStreamObserver.values).containsExactly(textMessage)
         Assertions.assertThat(testBytesStreamObserver.values).containsExactly(bytesMessage)
@@ -161,8 +172,8 @@ internal class OkHttpWebSocketIntegrationTest {
 
     private fun givenConnectionIsEstablished() {
         createClientAndServer()
-        serverLifecycleRegistry.onNext(Lifecycle.State.Started)
-        clientLifecycleRegistry.onNext(Lifecycle.State.Started)
+        serverLifecycleRegistry.onNext(LifecycleState.Started)
+        clientLifecycleRegistry.onNext(LifecycleState.Started)
         blockUntilConnectionIsEstablish()
     }
 
@@ -173,16 +184,45 @@ internal class OkHttpWebSocketIntegrationTest {
         clientWebSocketEventObserver = client.observeWebSocketEvent().test()
     }
 
-    private fun createServer(): Service = Scarlet.Builder()
-        .webSocketFactory(mockWebServer.newWebSocketFactory())
-        .lifecycle(serverLifecycleRegistry)
-        .build()
-        .create()
+    private fun createServer(): Service {
+        return Scarlet.Factory()
+            .create(
+                Scarlet.Configuration(
+                    protocol = MockWebServerWebSocket(
+                        mockWebServer,
+                        object : MockWebServerWebSocket.RequestFactory {
+                            override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                                return OkHttpWebSocket.CloseRequest(SERVER_SHUTDOWN_REASON)
+                            }
+                        }
+                    ),
+                    lifecycle = serverLifecycleRegistry
+                )
+            )
+            .create()
+    }
 
-    private fun createClient(): Service = Scarlet.Builder()
-        .webSocketFactory(createOkHttpClient().newWebSocketFactory(serverUrlString))
-        .lifecycle(clientLifecycleRegistry)
-        .build().create()
+    private fun createClient(): Service {
+        return Scarlet.Factory()
+            .create(
+                Scarlet.Configuration(
+                    protocol = OkHttpWebSocket(
+                        createOkHttpClient(),
+                        object : OkHttpWebSocket.RequestFactory {
+                            override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
+                                return OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build())
+                            }
+
+                            override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                                return OkHttpWebSocket.CloseRequest(CLIENT_SHUTDOWN_REASON)
+                            }
+                        }
+                    ),
+                    lifecycle = clientLifecycleRegistry
+                )
+            )
+            .create()
+    }
 
     private fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .writeTimeout(500, TimeUnit.MILLISECONDS)
@@ -191,16 +231,16 @@ internal class OkHttpWebSocketIntegrationTest {
 
     private fun blockUntilConnectionIsEstablish() {
         clientWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>()
+            any<WebSocketEvent.OnConnectionOpened>()
         )
         serverWebSocketEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>()
+            any<WebSocketEvent.OnConnectionOpened>()
         )
     }
 
     private interface Service {
         @Receive
-        fun observeWebSocketEvent(): Stream<WebSocket.Event>
+        fun observeWebSocketEvent(): Stream<WebSocketEvent>
 
         @Receive
         fun observeText(): Stream<String>
@@ -219,5 +259,37 @@ internal class OkHttpWebSocketIntegrationTest {
 
         @Send
         fun sendBytesAndConfirm(message: ByteArray): Boolean
+    }
+
+    private companion object {
+//        inline fun <reified T : WebSocketEvent> ValueAssert<WebSocketEvent>.withProtocolEvent() = assert {
+//            assertThat(event).isInstanceOf(T::class.java)
+//        }
+
+        private val CLIENT_SHUTDOWN_REASON = ShutdownReason(1001, "client away")
+        private val SERVER_SHUTDOWN_REASON = ShutdownReason(1002, "mockWebServer shutdown")
+
+        fun ValueAssert<WebSocketEvent.OnMessageReceived>.containingText(expectedText: String) = assert {
+            assertThat(message).isInstanceOf(Message.Text::class.java)
+            val (text) = message as Message.Text
+            assertThat(text).isEqualTo(expectedText)
+        }
+
+        fun ValueAssert<WebSocketEvent.OnMessageReceived>.containingBytes(expectedBytes: ByteArray) = assert {
+            assertThat(message).isInstanceOf(Message.Bytes::class.java)
+            val (bytes) = message as Message.Bytes
+            assertThat(bytes).isEqualTo(expectedBytes)
+        }
+
+        fun ValueAssert<WebSocketEvent.OnConnectionClosing>.withClosingReason(
+            expectedShutdownReason: ShutdownReason
+        ) = assert {
+            assertThat(shutdownReason).isEqualTo(expectedShutdownReason)
+        }
+
+        fun ValueAssert<WebSocketEvent.OnConnectionClosed>.withClosedReason(expectedShutdownReason: ShutdownReason) =
+            assert {
+                assertThat(shutdownReason).isEqualTo(expectedShutdownReason)
+            }
     }
 }

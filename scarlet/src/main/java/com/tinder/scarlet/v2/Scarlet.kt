@@ -11,7 +11,9 @@ import com.tinder.scarlet.internal.servicemethod.StreamAdapterResolver
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
 import com.tinder.scarlet.retry.BackoffStrategy
+import com.tinder.scarlet.retry.ExponentialBackoffStrategy
 import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
+import com.tinder.scarlet.v2.lifecycle.DefaultLifecycle
 import com.tinder.scarlet.v2.service.Coordinator
 import com.tinder.scarlet.v2.service.LifecycleEventSource
 import com.tinder.scarlet.v2.service.Session
@@ -44,8 +46,8 @@ class Scarlet internal constructor(
     data class Configuration(
         val protocol: Protocol,
         val topic: Topic = Topic.Main,
-        val lifecycle: Lifecycle,
-        val backoffStrategy: BackoffStrategy,
+        val lifecycle: Lifecycle = DEFAULT_LIFECYCLE,
+        val backoffStrategy: BackoffStrategy = DEFAULT_BACKOFF_STRATEGY,
         val streamAdapterFactories: List<StreamAdapter.Factory> = emptyList(),
         val messageAdapterFactories: List<MessageAdapter.Factory> = emptyList()
     )
@@ -66,10 +68,10 @@ class Scarlet internal constructor(
                     configuration.lifecycle
                 ),
                 TimerEventSource(
-                    Schedulers.io(),
+                    DEFAULT_SCHEDULER,
                     configuration.backoffStrategy
                 ),
-                Schedulers.io()
+                DEFAULT_SCHEDULER
             )
 
             val messageAdapterResolver = configuration.createMessageAdapterResolver()
@@ -117,5 +119,14 @@ class Scarlet internal constructor(
                 )
             )
         }
+    }
+
+    private companion object {
+        private val DEFAULT_LIFECYCLE = DefaultLifecycle()
+        private val RETRY_BASE_DURATION = 1000L
+        private val RETRY_MAX_DURATION = 10000L
+        private val DEFAULT_BACKOFF_STRATEGY =
+            ExponentialBackoffStrategy(RETRY_BASE_DURATION, RETRY_MAX_DURATION)
+        private val DEFAULT_SCHEDULER = Schedulers.computation() // TODO same thread option for debugging
     }
 }
