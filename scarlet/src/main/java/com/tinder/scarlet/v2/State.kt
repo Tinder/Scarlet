@@ -15,7 +15,7 @@ sealed class State {
 
     object Connected : State()
 
-    object Disconnecting : State()
+    data class Disconnecting(val forceClosed: Boolean) : State()
 
     object Disconnected : State()
 

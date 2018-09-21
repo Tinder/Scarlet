@@ -50,8 +50,7 @@ internal class Coordinator(
     @Synchronized
     override fun onEvent(event: Event) {
         val transition = stateMachine.transition(event) as? StateMachine.Transition.Valid ?: return
-        val sideEffect = transition.sideEffect ?: return
-        with(sideEffect) {
+        with(transition.sideEffect) {
             when (this) {
                 is SideEffect.OpenProtocol -> {
                     session.openSession()

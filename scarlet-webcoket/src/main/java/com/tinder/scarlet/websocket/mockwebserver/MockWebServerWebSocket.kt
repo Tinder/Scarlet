@@ -33,7 +33,7 @@ class MockWebServerWebSocket(
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
-                return OkHttpWebSocket.OpenRequest(Request.Builder().url("localhost.com").build())
+                return OkHttpWebSocket.OpenRequest(Request.Builder().url("http://localhost.com").build())
             }
         }
     }

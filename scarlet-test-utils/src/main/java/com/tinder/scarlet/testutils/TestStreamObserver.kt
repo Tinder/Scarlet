@@ -27,7 +27,7 @@ class TestStreamObserver<out T : Any>(stream: Stream<T>) {
 
     fun awaitCount(exactly: Int) {
         testSubscriber.awaitCount(exactly)
-        assertThat(values).hasSize(exactly)
+        assertThat(values).describedAs("Expected: $values, Actual: ${testSubscriber.values()}").hasSize(exactly)
     }
 
     fun awaitValues(vararg valueAsserts: ValueAssert<Any>) {

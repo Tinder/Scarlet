@@ -20,7 +20,6 @@ import com.tinder.scarlet.ws.Send
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockWebServer
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -53,28 +52,28 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // When
         client.sendText(textMessage1)
-        val isSendTextSuccessful = client.sendTextAndConfirm(textMessage2)
+        val isSendTextEnqueued = client.sendTextAndConfirm(textMessage2)
         client.sendBytes(bytesMessage1)
-        val isSendBytesSuccessful = client.sendBytesAndConfirm(bytesMessage2)
+        val isSendBytesEnqueued = client.sendBytesAndConfirm(bytesMessage2)
 
         // Then
-        Assertions.assertThat(isSendTextSuccessful).isTrue()
-        Assertions.assertThat(isSendBytesSuccessful).isTrue()
+        assertThat(isSendTextEnqueued).isTrue()
+        assertThat(isSendBytesEnqueued).isTrue()
         serverWebSocketEventObserver.awaitValues(
             any<WebSocketEvent.OnConnectionOpened>(),
-//            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
-            any<WebSocketEvent.OnMessageReceived>().containingText("asdf"),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
+//            any<WebSocketEvent.OnMessageReceived>().containingText("asdf"),
             any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
             any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
             any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
         serverStringObserver.awaitValues(
-            any<String> { Assertions.assertThat(this).isEqualTo(textMessage1) },
-            any<String> { Assertions.assertThat(this).isEqualTo(textMessage2) }
+            any<String> { assertThat(this).isEqualTo(textMessage1) },
+            any<String> { assertThat(this).isEqualTo(textMessage2) }
         )
         serverBytesObserver.awaitValues(
-            any<ByteArray> { Assertions.assertThat(this).isEqualTo(bytesMessage1) },
-            any<ByteArray> { Assertions.assertThat(this).isEqualTo(bytesMessage2) }
+            any<ByteArray> { assertThat(this).isEqualTo(bytesMessage1) },
+            any<ByteArray> { assertThat(this).isEqualTo(bytesMessage2) }
         )
     }
 
@@ -92,8 +91,8 @@ internal class OkHttpWebSocketIntegrationTest {
         val isSendBytesSuccessful = client.sendBytesAndConfirm(bytesMessage)
 
         // Then
-        Assertions.assertThat(isSendTextSuccessful).isFalse()
-        Assertions.assertThat(isSendBytesSuccessful).isFalse()
+        assertThat(isSendTextSuccessful).isFalse()
+        assertThat(isSendBytesSuccessful).isFalse()
         serverStringObserver.awaitValues()
         serverBytesObserver.awaitValues()
     }
@@ -118,7 +117,7 @@ internal class OkHttpWebSocketIntegrationTest {
     fun cancel_givenConnectionIsEstablished_shouldFailTheConnection() {
         // When
         givenConnectionIsEstablished()
-        clientLifecycleRegistry.onNext(LifecycleState.Stopped)
+        clientLifecycleRegistry.onNext(LifecycleState.Completed)
 
         // Then
         clientWebSocketEventObserver.awaitValues(
@@ -166,8 +165,8 @@ internal class OkHttpWebSocketIntegrationTest {
             any<WebSocketEvent.OnMessageReceived>().containingText(textMessage),
             any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage)
         )
-        Assertions.assertThat(testTextStreamObserver.values).containsExactly(textMessage)
-        Assertions.assertThat(testBytesStreamObserver.values).containsExactly(bytesMessage)
+        assertThat(testTextStreamObserver.values).containsExactly(textMessage)
+        assertThat(testBytesStreamObserver.values).containsExactly(bytesMessage)
     }
 
     private fun givenConnectionIsEstablished() {

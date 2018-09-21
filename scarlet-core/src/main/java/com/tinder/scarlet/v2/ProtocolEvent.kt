@@ -9,7 +9,6 @@ import com.tinder.scarlet.Message
 sealed class ProtocolEvent {
 
     data class OnOpened(
-        val messageQueue: MessageQueue?,
         val response: Protocol.OpenResponse
     ) : ProtocolEvent()
 

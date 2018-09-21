@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 
 interface MessageQueue {
 
-    fun send(message: Message, messageMetaData: Protocol.MessageMetaData)
+    fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean
 
     interface Listener {
         fun onMessageReceived(

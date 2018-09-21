@@ -151,10 +151,12 @@ class StompMessageChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        val client = client ?: return false
         when (message) {
-            is Message.Text -> client?.send(topic.id, message.value)
+            is Message.Text -> client.send(topic.id, message.value)
             is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
         }
+        return true
     }
 }

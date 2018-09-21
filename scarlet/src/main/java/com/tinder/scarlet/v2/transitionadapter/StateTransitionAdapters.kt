@@ -171,7 +171,11 @@ internal class DeserializedValueStateTransitionAdapter(
     override fun adapt(stateTransition: StateTransition): Any? {
         val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
         val protocolEvent = event.protocolEvent as? ProtocolEvent.OnMessageReceived ?: return null
-        return messageAdapter.fromMessage(protocolEvent.message)
+        return try {
+            messageAdapter.fromMessage(protocolEvent.message)
+        } catch (throwable: Throwable) {
+            null
+        }
     }
 
     class Factory(

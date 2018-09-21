@@ -20,6 +20,10 @@ internal class TimerEventSource(
     private var eventSourceCallback: EventCallback? = null
 
     fun start(retryCount: Int, eventSourceCallback: EventCallback) {
+        if (retryCount == 0) {
+            eventSourceCallback.onEvent(Event.OnShouldConnect)
+            return
+        }
         this.eventSourceCallback = eventSourceCallback
         val backoffDuration = backoffStrategy.backoffDurationMillisAt(retryCount)
         subscriber = RetryTimerSubscriber()

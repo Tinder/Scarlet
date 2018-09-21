@@ -46,15 +46,17 @@ class OkHttpWebSocketChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        val webSocket = webSocket ?: return false
         when (message) {
-            is Message.Text -> webSocket?.send(message.value)
+            is Message.Text -> webSocket.send(message.value)
             is Message.Bytes -> {
                 val bytes = message.value
                 val byteString = ByteString.of(bytes, 0, bytes.size)
-                webSocket?.send(byteString)
+                webSocket.send(byteString)
             }
         }
+        return true
     }
 
     inner class InnerWebSocketListener : WebSocketListener() {
@@ -104,10 +106,12 @@ class OkHttpWebSocketChannel(
                     )
                 )
             )
+            this@OkHttpWebSocketChannel.webSocket = null
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             listener.onFailed(this@OkHttpWebSocketChannel, t)
+            this@OkHttpWebSocketChannel.webSocket = null
         }
     }
 

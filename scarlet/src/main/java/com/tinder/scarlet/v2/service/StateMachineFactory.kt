@@ -71,14 +71,23 @@ class StateMachineFactory {
                 }
                 on(lifecycleStopped) {
                     transitionTo(
-                        State.Disconnecting,
+                        State.Disconnecting(forceClosed = false),
                         SideEffect.CloseProtocol
                     )
                 }
                 on(lifecycleDestroyed) {
                     transitionTo(
-                        State.Destroyed,
+                        State.Disconnecting(forceClosed = true),
                         SideEffect.ForceCloseProtocol
+                    )
+                }
+                on(protocolMessageReceived) {
+                    dontTransition()
+                }
+                on(protocolClosing) {
+                    transitionTo(
+                        State.Disconnecting(forceClosed = false),
+                        SideEffect.CloseProtocol
                     )
                 }
                 on(protocolFailed) {
@@ -89,8 +98,22 @@ class StateMachineFactory {
                 }
             }
             state<State.Disconnecting> {
+                on(protocolClosing) {
+                    dontTransition()
+                }
                 on(protocolClosed) {
-                    transitionTo(State.Disconnected)
+                    if (forceClosed) {
+                        transitionTo(State.Disconnected)
+                    } else {
+                        transitionTo(State.Destroyed)
+                    }
+                }
+                on(protocolFailed) {
+                    if (forceClosed) {
+                        transitionTo(State.Disconnected)
+                    } else {
+                        transitionTo(State.Destroyed)
+                    }
                 }
             }
             state<State.Destroyed> {
@@ -111,6 +134,12 @@ class StateMachineFactory {
 
         private val protocolOpened =
             any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnOpened }
+
+        private val protocolMessageReceived =
+            any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnMessageReceived }
+
+        private val protocolClosing =
+            any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnClosing }
 
         private val protocolClosed =
             any<Event, Event.OnProtocolEvent>().where { protocolEvent is ProtocolEvent.OnClosed }

@@ -74,7 +74,8 @@ class OkHttpEventSourceChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        return false
     }
 
     inner class InnerEventSourceListener : EventSourceListener() {

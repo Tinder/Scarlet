@@ -164,10 +164,12 @@ class MqttMessageChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        val client = client ?: return false
         when (message) {
             is Message.Text -> throw IllegalArgumentException("String are not supported")
-            is Message.Bytes -> client?.publish(topic.id, MqttMessage(message.value)) // TODO qos
+            is Message.Bytes -> client.publish(topic.id, MqttMessage(message.value)) // TODO qos
         }
+        return true
     }
 }

@@ -34,8 +34,7 @@ internal class Session(
     }
 
     fun stop() {
-        val session = channelCache ?: return
-        session.channel.forceClose()
+        channelCache = null
     }
 
     fun openSession() {
@@ -44,11 +43,11 @@ internal class Session(
         session.channel.open(openRequest)
     }
 
-    fun send(message: Message) {
-        val session = channelCache ?: return
-        val messageQueue = session.messageQueue ?: return
+    fun send(message: Message): Boolean {
+        val session = channelCache ?: return false
+        val messageQueue = session.messageQueue ?: return false
         val metaData = session.sendingMessageMetaDataFactory.create(session.channel, message)
-        messageQueue.send(message, metaData)
+        return messageQueue.send(message, metaData)
     }
 
     fun closeSession() {
@@ -67,7 +66,6 @@ internal class Session(
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnOpened(
-                        null,
                         response
                     )
                 )

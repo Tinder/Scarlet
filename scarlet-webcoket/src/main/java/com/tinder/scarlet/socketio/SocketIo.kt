@@ -131,12 +131,14 @@ class SocketIoMessageChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData) {
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        val socket = socket ?: return false
         when (message) {
-            is Message.Text -> socket?.send(topic.id, message.value)
+            is Message.Text -> socket.send(topic.id, message.value)
             is Message.Bytes -> {
-                socket?.send(topic.id, message.value)
+                socket.send(topic.id, message.value)
             }
         }
+        return true
     }
 }
