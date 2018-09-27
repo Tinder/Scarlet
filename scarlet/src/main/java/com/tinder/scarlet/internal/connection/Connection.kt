@@ -177,6 +177,7 @@ internal class Connection(
         private fun scheduleRetry(duration: Long): Disposable {
             val retryTimerScheduler = RetryTimerSubscriber(this)
             Flowable.timer(duration, TimeUnit.MILLISECONDS, scheduler)
+                .onBackpressureBuffer()
                 .subscribe(retryTimerScheduler)
             return retryTimerScheduler
         }
