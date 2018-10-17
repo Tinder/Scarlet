@@ -54,8 +54,8 @@ internal class JacksonMessageAdapterTest {
         // Then
         assertThat(isSuccessful).isTrue()
         serverEventObserver.awaitValues(
-                any<Event.OnConnectionOpened<*>>(),
-                any<Event.OnMessageReceived>().containingText(expectedString)
+            any<Event.OnConnectionOpened<*>>(),
+            any<Event.OnMessageReceived>().containingText(expectedString)
         )
         serverAnImplementationObserver.awaitCount(1)
         assertThat(serverAnImplementationObserver.values).containsExactly(data)
@@ -75,8 +75,8 @@ internal class JacksonMessageAdapterTest {
         // Then
         assertThat(isSuccessful).isTrue()
         serverEventObserver.awaitValues(
-                any<Event.OnConnectionOpened<*>>(),
-                any<Event.OnMessageReceived>().containingText(expectedString)
+            any<Event.OnConnectionOpened<*>>(),
+            any<Event.OnMessageReceived>().containingText(expectedString)
         )
         serverAnImplementationObserver.awaitCount(1)
         assertThat(serverAnImplementationObserver.values).containsExactly(data)
@@ -98,42 +98,41 @@ internal class JacksonMessageAdapterTest {
     }
 
     private fun createJackson(): ObjectMapper = ObjectMapper()
-            .registerModule(KotlinModule())
+        .registerModule(KotlinModule())
 
     private fun createServer(factory: JacksonMessageAdapter.Factory): Service {
         val webSocketFactory = mockWebServer.newWebSocketFactory()
         val scarlet = Scarlet.Builder()
-                .webSocketFactory(webSocketFactory)
-                .addMessageAdapterFactory(factory)
-                .lifecycle(serverLifecycleRegistry)
-                .build()
+            .webSocketFactory(webSocketFactory)
+            .addMessageAdapterFactory(factory)
+            .lifecycle(serverLifecycleRegistry)
+            .build()
         return scarlet.create()
     }
 
     private fun createClient(factory: JacksonMessageAdapter.Factory): Service {
         val okHttpClient = OkHttpClient.Builder()
-                .writeTimeout(500, TimeUnit.MILLISECONDS)
-                .readTimeout(500, TimeUnit.MILLISECONDS)
-                .build()
+            .writeTimeout(500, TimeUnit.MILLISECONDS)
+            .readTimeout(500, TimeUnit.MILLISECONDS)
+            .build()
         val webSocketFactory = okHttpClient.newWebSocketFactory(serverUrlString)
         val scarlet = Scarlet.Builder()
-                .webSocketFactory(webSocketFactory)
-                .addMessageAdapterFactory(TextMessageAdapter.Factory())
-                .addMessageAdapterFactory(factory)
-                .lifecycle(clientLifecycleRegistry)
-                .build()
+            .webSocketFactory(webSocketFactory)
+            .addMessageAdapterFactory(TextMessageAdapter.Factory())
+            .addMessageAdapterFactory(factory)
+            .lifecycle(clientLifecycleRegistry)
+            .build()
         return scarlet.create()
     }
 
     private fun blockUntilConnectionIsEstablish() {
         serverEventObserver.awaitValues(
-                any<OnConnectionOpened<*>>()
+            any<OnConnectionOpened<*>>()
         )
         clientEventObserver.awaitValues(
-                any<OnConnectionOpened<*>>()
+            any<OnConnectionOpened<*>>()
         )
     }
-
 
     companion object {
 
@@ -157,7 +156,6 @@ internal class JacksonMessageAdapterTest {
             }
         }
 
-
         internal interface Service {
             @Receive
             fun observeEvents(): Stream<Event>
@@ -175,5 +173,4 @@ internal class JacksonMessageAdapterTest {
             fun sendAnInterface(impl: AnInterface): Boolean
         }
     }
-
 }

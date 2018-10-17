@@ -7,8 +7,8 @@ import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type
 
 class JacksonMessageAdapter<T> private constructor(
-        private val objectMapper: ObjectMapper,
-        private val klass: Class<T>
+    private val objectMapper: ObjectMapper,
+    private val klass: Class<T>
 ) : MessageAdapter<T> {
 
     override fun fromMessage(message: Message): T {
@@ -23,16 +23,14 @@ class JacksonMessageAdapter<T> private constructor(
         return Message.Text(body)
     }
 
-
     class Factory constructor(
-            private val objectMapper: ObjectMapper = DEFAULT_OBJECT_MAPPER
+        private val objectMapper: ObjectMapper = DEFAULT_OBJECT_MAPPER
     ) : MessageAdapter.Factory {
         override fun create(type: Type, annotations: Array<Annotation>): MessageAdapter<*> =
-                JacksonMessageAdapter(objectMapper, type.getRawType())
+            JacksonMessageAdapter(objectMapper, type.getRawType())
 
         companion object {
             private val DEFAULT_OBJECT_MAPPER = ObjectMapper()
         }
     }
-
 }
