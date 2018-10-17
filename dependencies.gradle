@@ -30,6 +30,7 @@ ext {
     gson = 'com.google.code.gson:gson:2.8.2'
     protobuf = 'com.google.protobuf:protobuf-java:3.4.0'
     jacksonDatabind = 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
+    jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
     jsonPatch = 'com.github.fge:json-patch:1.9'
 
     dagger = 'com.google.dagger:dagger:2.12'
