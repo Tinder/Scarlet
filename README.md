@@ -103,7 +103,7 @@ implementation 'com.github.tinder.scarlet:scarlet:$latestVersion'
 - [x] `moshi`
 - [x] `gson`
 - [x] `protobuf`
-- [ ] `jackson`
+- [x] `jackson`
 - [ ] `simple-xml`
 
 `StreamAdapter.Factory`

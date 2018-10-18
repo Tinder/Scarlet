@@ -161,9 +161,6 @@ internal class JacksonMessageAdapterTest {
             fun observeEvents(): Stream<Event>
 
             @Send
-            fun sendString(message: String): Boolean
-
-            @Send
             fun sendAnImplementation(impl: AnImplementation): Boolean
 
             @Receive
