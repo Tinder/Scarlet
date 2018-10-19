@@ -20,6 +20,8 @@
 
 ./gradlew scarlet-message-adapter-gson:build scarlet-message-adapter-gson:publishToMavenLocal
 
+./gradlew scarlet-message-adapter-gson:build scarlet-message-adapter-jackson:publishToMavenLocal
+
 ./gradlew scarlet-stream-adapter-builtin:build scarlet-stream-adapter-builtin:publishToMavenLocal
 
 ./gradlew scarlet-stream-adapter-rxjava2:build scarlet-stream-adapter-rxjava2:publishToMavenLocal
