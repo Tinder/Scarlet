@@ -114,7 +114,7 @@ internal class ScarletTest {
         val equalsSelf = exampleService.equals(exampleService)
 
         // Then
-        assert(equalsSelf) { "equals must be reflexive" }
+        assertThat(equalsSelf).describedAs("equals must be reflexive").isTrue()
     }
 
     @Test
@@ -129,7 +129,7 @@ internal class ScarletTest {
         val equalsOther = exampleService.equals(otherExampleService)
 
         // Then
-        assert(!equalsOther) { "should not equal other instance" }
+        assertThat(equalsOther).describedAs("should not equal other instance").isFalse()
     }
 
     @Suppress("UNUSED")
