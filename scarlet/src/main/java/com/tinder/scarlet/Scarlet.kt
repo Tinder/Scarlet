@@ -20,6 +20,7 @@ import com.tinder.scarlet.retry.ExponentialBackoffStrategy
 import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
 import io.reactivex.schedulers.Schedulers
 import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 /**
@@ -117,12 +118,30 @@ class Scarlet internal constructor(
     private fun createInvocationHandler(serviceInterface: Class<*>, serviceInstance: Service): InvocationHandler =
         InvocationHandler { proxy, method, nullableArgs ->
             val args = nullableArgs ?: arrayOf()
-            if (runtimePlatform.isDefaultMethod(method)) {
-                runtimePlatform.invokeDefaultMethod(method, serviceInterface, proxy, args)
-            } else {
-                serviceInstance.execute(method, args)
+            when {
+                runtimePlatform.isDefaultMethod(method) -> runtimePlatform.invokeDefaultMethod(method, serviceInterface, proxy, args)
+                isJavaObjectMethod(method) -> handleJavaObjectMethod(method, serviceInstance, serviceInterface, proxy, args)
+                else -> serviceInstance.execute(method, args)
             }
         }
+
+    private fun isJavaObjectMethod(method: Method) = method.declaringClass == Object::class.java
+
+    private fun handleJavaObjectMethod(method: Method, serviceInstance: Service, serviceInterface: Class<*>, proxy: Any, args: Array<out Any>): Any {
+        return when {
+            isEquals(method) -> proxy === args[0]
+            isToString(method) -> "Scarlet service implementation for ${serviceInterface.name}"
+            isHashCode(method) -> serviceInstance.hashCode()
+            else -> throw IllegalStateException("Cannot execute $method")
+        }
+    }
+
+    private fun isHashCode(method: Method) = method.name == "hashCode" && method.parameterTypes.isEmpty()
+
+    private fun isToString(method: Method) = method.name == "toString" && method.parameterTypes.isEmpty()
+
+    private fun isEquals(method: Method) =
+        method.name == "equals" && arrayOf(Object::class.java).contentEquals(method.parameterTypes)
 
     /**
      * Build a new [Scarlet] instance.
