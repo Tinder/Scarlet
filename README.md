@@ -20,7 +20,7 @@ Declare a WebSocket client using an interface:
 ~~~ kotlin
 interface GdaxService {
 	@Receive
-	fun observeOnConnectionOpenedEvent(): Flowable<WebSocket.Event.OnConnectionOpen<*>>
+	fun observeWebSocketEvent(): Flowable<WebSocket.Event>
 	@Send
 	fun sendSubscribe(subscribe: Subscribe)
 	@Receive
@@ -49,7 +49,8 @@ val BITCOIN_TICKER_SUBSCRIBE_MESSAGE = Subscribe(
     channels = listOf("ticker")
 )
 
-gdaxService.observeOnConnectionOpenedEvent()
+gdaxService.observeWebSocketEvent()
+    .filter { it is WebSocket.Event.OnConnectionOpened<*> }
     .subscribe({
         gdaxService.sendSubscribe(BITCOIN_TICKER_SUBSCRIBE_MESSAGE)
     })
