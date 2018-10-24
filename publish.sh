@@ -9,8 +9,6 @@
 
 ./gradlew scarlet-core-internal:build scarlet-core-internal:artifactoryPublish
 
-./gradlew state-machine:build state-machine:artifactoryPublish
-
 ./gradlew scarlet:build scarlet:artifactoryPublish
 
 ./gradlew scarlet-test-utils:build scarlet-test-utils:artifactoryPublish
