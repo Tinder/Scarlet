@@ -26,7 +26,10 @@ internal class NoOpStateTransitionAdapter : StateTransitionAdapter<Any> {
     }
 
     class Factory : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(clazz == StateTransition::class.java)
             return NoOpStateTransitionAdapter()
@@ -40,7 +43,10 @@ internal class EventStateTransitionAdapter : StateTransitionAdapter<Any> {
     }
 
     class Factory : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(!Event::class.java.isAssignableFrom(clazz)) {
                 "Subclasses of Event is not supported"
@@ -57,7 +63,10 @@ internal class StateStateTransitionAdapter : StateTransitionAdapter<Any> {
     }
 
     class Factory : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(!State::class.java.isAssignableFrom(clazz)) {
                 "Subclasses of State is not supported"
@@ -75,7 +84,10 @@ internal class ProtocolEventStateTransitionAdapter : StateTransitionAdapter<Any>
     }
 
     class Factory : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(!ProtocolEvent::class.java.isAssignableFrom(clazz)) {
                 "Subclasses of ProtocolEvent is not supported"
@@ -102,7 +114,10 @@ internal class ProtocolSpecificEventStateTransitionAdapter(
     class Factory(
         private val protocolEventAdatperFactory: ProtocolEventAdapter.Factory
     ) : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(ProtocolSpecificEvent::class.java.isAssignableFrom(clazz))
             val protocolEventAdapter = protocolEventAdatperFactory.create(type, annotations)
@@ -118,7 +133,10 @@ internal class LifecycleStateTransitionAdapter : StateTransitionAdapter<Any> {
     }
 
     class Factory : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(!LifecycleState::class.java.isAssignableFrom(clazz)) {
                 "Subclasses of LifecycleState is not supported"
@@ -130,11 +148,13 @@ internal class LifecycleStateTransitionAdapter : StateTransitionAdapter<Any> {
 }
 
 internal class DeserializationStateTransitionAdapter(
-    private val deserializedValueStateTransitionAdapter: DeserializedValueStateTransitionAdapter
+    private val messageAdapter: MessageAdapter<Any>
 ) : StateTransitionAdapter<Any> {
     override fun adapt(stateTransition: StateTransition): Any? {
+        val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
+        val protocolEvent = event.protocolEvent as? ProtocolEvent.OnMessageReceived ?: return null
         return try {
-            val deserializedValue = deserializedValueStateTransitionAdapter.adapt(stateTransition)
+            val deserializedValue = messageAdapter.fromMessage(protocolEvent.message)
             Deserialization.Success(deserializedValue)
         } catch (throwable: Throwable) {
             Deserialization.Error<Any>(throwable)
@@ -142,21 +162,20 @@ internal class DeserializationStateTransitionAdapter(
     }
 
     class Factory(
-        private val deserializedValueStateTransitionAdapterFactory: DeserializedValueStateTransitionAdapter.Factory
+        private val messageAdapterResolver: MessageAdapterResolver
     ) : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
             require(!Deserialization::class.java.isAssignableFrom(clazz)) {
                 "Subclasses of Deserialization is not supported"
             }
             require(clazz == Deserialization::class.java)
             val messageType = (type as ParameterizedType).getFirstTypeArgument()
-            val deserializedValueStateTransitionAdapter =
-                deserializedValueStateTransitionAdapterFactory.create(
-                    messageType,
-                    annotations
-                ) as DeserializedValueStateTransitionAdapter
-            return DeserializationStateTransitionAdapter(deserializedValueStateTransitionAdapter)
+            val messageAdapter = messageAdapterResolver.resolve(messageType, annotations)
+            return DeserializationStateTransitionAdapter(messageAdapter)
         }
     }
 
@@ -181,7 +200,10 @@ internal class DeserializedValueStateTransitionAdapter(
     class Factory(
         private val messageAdapterResolver: MessageAdapterResolver
     ) : StateTransitionAdapter.Factory {
-        override fun create(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
+        override fun create(
+            type: Type,
+            annotations: Array<Annotation>
+        ): StateTransitionAdapter<Any> {
             val messageAdapter = messageAdapterResolver.resolve(type, annotations)
             return DeserializedValueStateTransitionAdapter(messageAdapter)
         }

@@ -107,8 +107,6 @@ class Scarlet internal constructor(
             messageAdapterResolver: MessageAdapterResolver,
             protocolEventAdapterFactory: ProtocolEventAdapter.Factory
         ): StateTransitionAdapterResolver {
-            val deserializedValueStateTransitionAdapterFactory =
-                DeserializedValueStateTransitionAdapter.Factory(messageAdapterResolver)
             return StateTransitionAdapterResolver(
                 listOf(
                     NoOpStateTransitionAdapter.Factory(),
@@ -117,10 +115,8 @@ class Scarlet internal constructor(
                     ProtocolEventStateTransitionAdapter.Factory(),
                     ProtocolSpecificEventStateTransitionAdapter.Factory(protocolEventAdapterFactory),
                     LifecycleStateTransitionAdapter.Factory(),
-                    DeserializationStateTransitionAdapter.Factory(
-                        deserializedValueStateTransitionAdapterFactory
-                    ),
-                    deserializedValueStateTransitionAdapterFactory
+                    DeserializationStateTransitionAdapter.Factory(messageAdapterResolver),
+                    DeserializedValueStateTransitionAdapter.Factory(messageAdapterResolver)
                 )
             )
         }

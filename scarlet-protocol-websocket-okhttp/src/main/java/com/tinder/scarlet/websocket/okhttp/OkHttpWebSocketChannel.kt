@@ -25,7 +25,7 @@ class OkHttpWebSocketChannel(
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val webSocketOpenRequest = openRequest as OkHttpWebSocket.OpenRequest
-        webSocketFactory.createWebSocket(openRequest.okHttpRequest, InnerWebSocketListener())
+        webSocketFactory.createWebSocket(webSocketOpenRequest.okHttpRequest, InnerWebSocketListener())
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
@@ -48,7 +48,7 @@ class OkHttpWebSocketChannel(
 
     override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
         val webSocket = webSocket ?: return false
-        when (message) {
+        return when (message) {
             is Message.Text -> webSocket.send(message.value)
             is Message.Bytes -> {
                 val bytes = message.value
@@ -56,7 +56,6 @@ class OkHttpWebSocketChannel(
                 webSocket.send(byteString)
             }
         }
-        return true
     }
 
     inner class InnerWebSocketListener : WebSocketListener() {

@@ -22,16 +22,20 @@ import org.junit.Test
 class ReceiveChannelTest {
 
     @get:Rule
-    private val connection = OkHttpWebSocketConnection.create<Service>(
-        OkHttpWebSocketConnection.Configuration(
+    internal val connection = OkHttpWebSocketConnection.create<Service>(
+        observeWebSocketEvent = { observeEvents() },
+        serverConfiguration = OkHttpWebSocketConnection.Configuration(
+            streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
+        ),
+        clientConfiguration = OkHttpWebSocketConnection.Configuration(
             streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
         )
-    ) { observeEvents() }
+    )
 
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
         // Given
-        connection.givenConnectionIsEstablished()
+        connection.establishConnection()
         val textMessage1 = "Hello"
         val textMessage2 = "Hi"
         val bytesMessage1 = "Yo".toByteArray()
@@ -66,7 +70,7 @@ class ReceiveChannelTest {
         }
     }
 
-    private interface Service {
+    internal interface Service {
         @Receive
         fun observeEvents(): Stream<WebSocketEvent>
 

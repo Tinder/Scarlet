@@ -22,91 +22,59 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
 
 class OkHttpWebSocketConnection<SERVICE : Any>(
-    private val configuration: Configuration,
     private val clazz: Class<SERVICE>,
-    private val observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>
+    private val observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>,
+    private val serverConfiguration: Configuration,
+    private val clientConfiguration: Configuration
 ) : TestRule {
 
-    lateinit var client: SERVICE
-    lateinit var server: SERVICE
-    lateinit var clientWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
-    lateinit var serverWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
+    val client: SERVICE
+        get() = clientAndServer.client
+    val server: SERVICE
+        get() = clientAndServer.server
+    val clientWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
+        get() = clientAndServer.clientWebSocketEventObserver
+    val serverWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
+        get() = clientAndServer.serverWebSocketEventObserver
 
     private val serverUrlString by lazy { mockWebServer.url("/").toString() }
     private val serverLifecycleRegistry = LifecycleRegistry()
     private val clientLifecycleRegistry = LifecycleRegistry()
 
     private val mockWebServer = MockWebServer()
+    private val clientAndServer = ClientAndServer()
 
     override fun apply(base: Statement, description: Description): Statement {
         return RuleChain.outerRule(mockWebServer)
-            .around(object : ExternalResource() {
-                override fun after() {
-                    serverLifecycleRegistry.onNext(LifecycleState.Completed)
-                    clientLifecycleRegistry.onNext(LifecycleState.Completed)
-                }
-            })
+            .around(clientAndServer)
             .apply(base, description)
     }
 
-    fun givenConnectionIsEstablished() {
-        createClientAndServer()
+    fun establishConnection() {
         serverLifecycleRegistry.onNext(LifecycleState.Started)
         clientLifecycleRegistry.onNext(LifecycleState.Started)
         blockUntilConnectionIsEstablish()
     }
 
-    private fun createClientAndServer() {
-        server = createServer()
-        serverWebSocketEventObserver = server.observeWebSocketEvent().test()
-        client = createClient()
-        clientWebSocketEventObserver = client.observeWebSocketEvent().test()
+    fun clientClosure() {
+        clientLifecycleRegistry.onNext(LifecycleState.Stopped)
     }
 
-    private fun createServer(): SERVICE {
-        val protocol = MockWebServerWebSocket(
-            mockWebServer,
-            MockWebServerWebSocket.SimpleRequestFactory {
-                OkHttpWebSocket.CloseRequest(configuration.serverShutdownReason)
-            }
-        )
-        return Scarlet.Factory()
-            .create(
-                Scarlet.Configuration(
-                    protocol = protocol,
-                    lifecycle = serverLifecycleRegistry,
-                    messageAdapterFactories = configuration.messageAdapterFactories,
-                    streamAdapterFactories = configuration.streamAdapterFactories,
-                    debug = true
-                )
-            )
-            .create(clazz)
+    fun clientTerminate() {
+        clientLifecycleRegistry.onNext(LifecycleState.Completed)
     }
 
-    private fun createClient(): SERVICE {
-        val protocol = OkHttpWebSocket(
-            createOkHttpClient(),
-            OkHttpWebSocket.SimpleRequestFactory(
-                { OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build()) },
-                { OkHttpWebSocket.CloseRequest(configuration.clientShutdownReason) })
-        )
-        val configuration = Scarlet.Configuration(
-            protocol = protocol,
-            lifecycle = clientLifecycleRegistry,
-            messageAdapterFactories = configuration.messageAdapterFactories,
-            streamAdapterFactories = configuration.streamAdapterFactories,
-            debug = true
-        )
-        val scarlet = Scarlet.Factory().create(configuration)
-        return scarlet.create(clazz)
+    fun serverClosure() {
+        serverLifecycleRegistry.onNext(LifecycleState.Stopped)
     }
 
-    private fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .writeTimeout(500, TimeUnit.MILLISECONDS)
-        .readTimeout(500, TimeUnit.MILLISECONDS)
-        .build()
+    fun serverTerminate() {
+        clientLifecycleRegistry.onNext(LifecycleState.Completed)
+    }
 
     private fun blockUntilConnectionIsEstablish() {
         clientWebSocketEventObserver.awaitValues(
@@ -117,22 +85,114 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
         )
     }
 
+    private inner class ClientAndServer : ExternalResource() {
+        lateinit var client: SERVICE
+        lateinit var server: SERVICE
+        lateinit var clientWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
+        lateinit var serverWebSocketEventObserver: TestStreamObserver<WebSocketEvent>
+
+        override fun before() {
+            createClientAndServer()
+        }
+
+        override fun after() {
+            clientLifecycleRegistry.onNext(LifecycleState.Completed)
+        }
+
+        private fun createClientAndServer() {
+            server = createServer()
+            serverWebSocketEventObserver = server.observeWebSocketEvent().test()
+            client = createClient()
+            clientWebSocketEventObserver = client.observeWebSocketEvent().test()
+            server.observeWebSocketEvent().start(object : Stream.Observer<WebSocketEvent> {
+                override fun onNext(data: WebSocketEvent) {
+                    LOGGER.info("server webSocket event: $data")
+                }
+
+                override fun onError(throwable: Throwable) {
+                    LOGGER.log(Level.WARNING, "server webSocket error", throwable)
+                }
+
+                override fun onComplete() {
+                    LOGGER.info("server webSocket completed")
+                }
+            })
+            client.observeWebSocketEvent().start(object : Stream.Observer<WebSocketEvent> {
+                override fun onNext(data: WebSocketEvent) {
+                    LOGGER.info("client webSocket event: $data")
+                }
+
+                override fun onError(throwable: Throwable) {
+                    LOGGER.log(Level.WARNING, "client webSocket error", throwable)
+                }
+
+                override fun onComplete() {
+                    LOGGER.info("client webSocket completed")
+                }
+            })
+        }
+
+        private fun createServer(): SERVICE {
+            val protocol = MockWebServerWebSocket(
+                mockWebServer,
+                MockWebServerWebSocket.SimpleRequestFactory {
+                    OkHttpWebSocket.CloseRequest(serverConfiguration.shutdownReason)
+                }
+            )
+            val configuration = Scarlet.Configuration(
+                protocol = protocol,
+                lifecycle = serverLifecycleRegistry,
+                messageAdapterFactories = serverConfiguration.messageAdapterFactories,
+                streamAdapterFactories = serverConfiguration.streamAdapterFactories,
+                debug = true
+            )
+            return Scarlet.Factory().create(configuration)
+                .create(clazz)
+        }
+
+        private fun createClient(): SERVICE {
+            val protocol = OkHttpWebSocket(
+                createOkHttpClient(),
+                OkHttpWebSocket.SimpleRequestFactory(
+                    { OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build()) },
+                    { OkHttpWebSocket.CloseRequest(clientConfiguration.shutdownReason) })
+            )
+            val configuration = Scarlet.Configuration(
+                protocol = protocol,
+                lifecycle = clientLifecycleRegistry,
+                messageAdapterFactories = clientConfiguration.messageAdapterFactories,
+                streamAdapterFactories = clientConfiguration.streamAdapterFactories,
+                debug = true
+            )
+            val scarlet = Scarlet.Factory().create(configuration)
+            return scarlet.create(clazz)
+        }
+
+        private fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+            .writeTimeout(500, TimeUnit.MILLISECONDS)
+            .readTimeout(500, TimeUnit.MILLISECONDS)
+            .build()
+    }
+
     data class Configuration(
-        val serverShutdownReason: ShutdownReason = ShutdownReason.GRACEFUL,
-        val clientShutdownReason: ShutdownReason = ShutdownReason.GRACEFUL,
+        val shutdownReason: ShutdownReason = ShutdownReason.GRACEFUL,
         val messageAdapterFactories: List<MessageAdapter.Factory> = emptyList(),
         val streamAdapterFactories: List<StreamAdapter.Factory> = emptyList()
     )
 
     companion object {
+        private val LOGGER = Logger.getLogger(OkHttpWebSocketConnection::class.java.name)
+
         inline fun <reified SERVICE : Any> create(
-            configuration: Configuration,
-            noinline observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>
+            noinline observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>,
+            serverConfiguration: Configuration = Configuration(),
+            clientConfiguration: Configuration = Configuration()
         ): OkHttpWebSocketConnection<SERVICE> {
             return OkHttpWebSocketConnection(
-                configuration,
                 SERVICE::class.java,
-                observeWebSocketEvent
+                observeWebSocketEvent,
+                serverConfiguration,
+                clientConfiguration
             )
         }
     }

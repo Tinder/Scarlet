@@ -10,8 +10,6 @@ dependencies {
     implementation rootProject.ext.okio
     implementation rootProject.ext.kotlinStdlib
 
-    testImplementation project(':scarlet')
-    testImplementation project(':scarlet-websocket-mockwebserver')
     testImplementation project(':scarlet-test-utils')
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
