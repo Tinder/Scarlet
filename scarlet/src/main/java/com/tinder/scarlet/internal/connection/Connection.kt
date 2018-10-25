@@ -4,6 +4,7 @@
 
 package com.tinder.scarlet.internal.connection
 
+import com.tinder.StateMachine
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.Event.OnLifecycle
 import com.tinder.scarlet.Event.OnRetry
@@ -11,6 +12,7 @@ import com.tinder.scarlet.Event.OnWebSocket
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Session
+import com.tinder.scarlet.SideEffect
 import com.tinder.scarlet.State
 import com.tinder.scarlet.State.Connected
 import com.tinder.scarlet.State.Connecting
@@ -24,8 +26,8 @@ import com.tinder.scarlet.internal.connection.subscriber.RetryTimerSubscriber
 import com.tinder.scarlet.internal.connection.subscriber.WebSocketEventSubscriber
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.retry.BackoffStrategy
-import com.tinder.statemachine.StateMachine
-import com.tinder.statemachine.StateMachine.Matcher.Companion.any
+import com.tinder.StateMachine.Matcher.Companion.any
+import com.tinder.StateMachine.Transition.Valid
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -59,55 +61,59 @@ internal class Connection(
 
         private val lifecycleStateSubscriber = LifecycleStateSubscriber(this)
         private val eventProcessor = PublishProcessor.create<Event>()
-        private val stateMachine = StateMachine.create<State, Event> {
+        private val stateMachine = StateMachine.create<State, Event, SideEffect> {
             state<Disconnected> {
                 onEnter {
                     requestNextLifecycleState()
                 }
-                on(lifecycleStart()) transitionTo {
+                on(lifecycleStart()) {
                     val webSocketSession = open()
-                    Connecting(session = webSocketSession, retryCount = 0)
+                    transitionTo(Connecting(session = webSocketSession, retryCount = 0))
                 }
-                on(lifecycleStop()) run {
+                on(lifecycleStop()) {
                     // No-op
                     requestNextLifecycleState()
+                    dontTransition()
                 }
-                on<OnLifecycle.Terminate>() transitionTo {
-                    Destroyed
+                on<OnLifecycle.Terminate>() {
+                    transitionTo(Destroyed)
                 }
             }
             state<WaitingToRetry> {
                 onEnter {
                     requestNextLifecycleState()
                 }
-                on<OnRetry>() transitionTo {
+                on<OnRetry> {
                     val webSocketSession = open()
-                    Connecting(session = webSocketSession, retryCount = retryCount + 1)
+                    transitionTo(Connecting(session = webSocketSession, retryCount = retryCount + 1))
                 }
-                on(lifecycleStart()) run {
+                on(lifecycleStart()) {
                     // No-op
                     requestNextLifecycleState()
+                    dontTransition()
                 }
-                on(lifecycleStop()) transitionTo {
+                on(lifecycleStop()) {
                     cancelRetry()
-                    Disconnected
+                    transitionTo(Disconnected)
                 }
-                on<OnLifecycle.Terminate>() transitionTo {
+                on<OnLifecycle.Terminate>() {
                     cancelRetry()
-                    Destroyed
+                    transitionTo(Destroyed)
                 }
             }
             state<Connecting> {
-                on(webSocketOpen()) transitionTo {
-                    Connected(session = session)
+                on(webSocketOpen()) {
+                    transitionTo(Connected(session = session))
                 }
-                on<OnWebSocket.Terminate>() transitionTo {
+                on<OnWebSocket.Terminate>() {
                     val backoffDuration = backoffStrategy.backoffDurationMillisAt(retryCount)
                     val timerDisposable = scheduleRetry(backoffDuration)
-                    WaitingToRetry(
-                        timerDisposable = timerDisposable,
-                        retryCount = retryCount,
-                        retryInMillis = backoffDuration
+                    transitionTo(
+                        WaitingToRetry(
+                            timerDisposable = timerDisposable,
+                            retryCount = retryCount,
+                            retryInMillis = backoffDuration
+                        )
                     )
                 }
             }
@@ -115,31 +121,34 @@ internal class Connection(
                 onEnter {
                     requestNextLifecycleState()
                 }
-                on(lifecycleStart()) run {
+                on(lifecycleStart()) {
                     // No-op
                     requestNextLifecycleState()
+                    dontTransition()
                 }
-                on(lifecycleStop()) transitionTo {
+                on(lifecycleStop()) {
                     initiateShutdown(it.state)
-                    Disconnecting
+                    transitionTo(Disconnecting)
                 }
-                on<OnLifecycle.Terminate>() transitionTo {
+                on<OnLifecycle.Terminate> {
                     session.webSocket.cancel()
-                    Destroyed
+                    transitionTo(Destroyed)
                 }
-                on<OnWebSocket.Terminate>() transitionTo {
+                on<OnWebSocket.Terminate>() {
                     val backoffDuration = backoffStrategy.backoffDurationMillisAt(0)
                     val timerDisposable = scheduleRetry(backoffDuration)
-                    WaitingToRetry(
-                        timerDisposable = timerDisposable,
-                        retryCount = 0,
-                        retryInMillis = backoffDuration
+                    transitionTo(
+                        WaitingToRetry(
+                            timerDisposable = timerDisposable,
+                            retryCount = 0,
+                            retryInMillis = backoffDuration
+                        )
                     )
                 }
             }
             state<Disconnecting> {
-                on<OnWebSocket.Terminate>() transitionTo {
-                    Disconnected
+                on<OnWebSocket.Terminate> {
+                    transitionTo(Disconnected)
                 }
             }
             state<Destroyed> {
@@ -147,9 +156,13 @@ internal class Connection(
                     lifecycleStateSubscriber.dispose()
                 }
             }
-            defaultState(Disconnected)
-            onStateChange { state ->
-                eventProcessor.onNext(Event.OnStateChange(state))
+            initialState(Disconnected)
+            onTransition { transition ->
+                transition.let {
+                    if (it is Valid && it.fromState != it.toState) {
+                        eventProcessor.onNext(Event.OnStateChange(state))
+                    }
+                }
             }
         }
 
@@ -219,4 +232,5 @@ internal class Connection(
         private fun createSharedLifecycle() = LifecycleRegistry()
             .apply { lifecycle.subscribe(this) }
     }
+
 }

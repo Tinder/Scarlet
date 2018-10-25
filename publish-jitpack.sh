@@ -6,8 +6,6 @@
 
 ./gradlew scarlet-core-internal:build scarlet-core-internal:publishToMavenLocal
 
-./gradlew state-machine:build state-machine:publishToMavenLocal
-
 ./gradlew scarlet:build scarlet:publishToMavenLocal
 
 ./gradlew scarlet-test-utils:build scarlet-test-utils:publishToMavenLocal
