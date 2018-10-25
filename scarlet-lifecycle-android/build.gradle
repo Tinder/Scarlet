@@ -27,7 +27,7 @@ dependencies {
     implementation project(':scarlet')
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxKotlin
-    implementation rootProject.ext.supportAppCompat
+    implementation rootProject.ext.appCompat
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation rootProject.ext.junit
