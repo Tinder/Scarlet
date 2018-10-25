@@ -5,14 +5,9 @@ ext {
     compileSdkVersion = 28
     buildToolsVersion = '28.0.3'
 
-    supportVersion = '28.0.0'
-
-    supportAnnotations = "com.android.support:support-annotations:$supportVersion"
-    supportAppCompat = "com.android.support:appcompat-v7:$supportVersion"
-    supportDesign = "com.android.support:design:$supportVersion"
-
-    constraintLayout = 'com.android.support.constraint:constraint-layout:1.0.2'
-    multiDex = 'com.android.support:multidex:1.0.2'
+    appCompat = 'androidx.appcompat:appcompat:1.0.0'
+    material = 'com.google.android.material:material:1.0.0'
+    multiDex = 'androidx.multidex:multidex:2.0.0'
 
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.2'
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'

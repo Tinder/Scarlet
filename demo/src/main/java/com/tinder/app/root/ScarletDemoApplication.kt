@@ -5,7 +5,7 @@
 package com.tinder.app.root
 
 import android.app.Application
-import android.support.multidex.MultiDex
+import androidx.multidex.MultiDex
 import com.facebook.stetho.Stetho
 import com.tinder.app.echo.inject.DaggerEchoBotComponent
 import com.tinder.app.echo.inject.EchoBotComponent

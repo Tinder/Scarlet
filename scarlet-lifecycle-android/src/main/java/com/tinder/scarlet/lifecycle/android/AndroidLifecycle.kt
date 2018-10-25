@@ -5,7 +5,7 @@
 package com.tinder.scarlet.lifecycle.android
 
 import android.app.Application
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
