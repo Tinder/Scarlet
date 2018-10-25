@@ -35,7 +35,7 @@ class ReceiveChannelTest {
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val textMessage1 = "Hello"
         val textMessage2 = "Hi"
         val bytesMessage1 = "Yo".toByteArray()

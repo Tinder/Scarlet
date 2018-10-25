@@ -13,7 +13,6 @@ import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.testutils.v2.OkHttpWebSocketConnection
@@ -54,7 +53,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendAnInterface_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = AnImplementation("value")
         val expectedSerializedData = """{"name":"value"}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
@@ -76,7 +75,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendAnImplementation_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = AnImplementation("value")
         val expectedSerializedData = """{"name":"value"}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
@@ -98,7 +97,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendAnnotatedString_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = "value"
         val expectedSerializedData = """"qualified!""""
         val expectedDeserializedSerializedData = "it worked!"
@@ -122,7 +121,7 @@ internal class MoshiMessageAdapterTest {
     fun sendRawString_givenJsonIsMalformed_andFactoryIsLenient_shouldBeReceivedByTheServer() {
         // Given
 //        Factory.Config(lenient = true)
-        connection.establishConnection()
+        connection.open()
         val malformedJson = """{"name":value}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
@@ -142,7 +141,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendRawString_givenJsonIsMalformed_andFactoryIsNotLenient_shouldNotBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val malformedJson = """{"name":value}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
@@ -161,7 +160,7 @@ internal class MoshiMessageAdapterTest {
     fun sendRawString_givenJsonHasNullValues_andFactorySerializesNull_shouldBeReceivedByTheServer() {
         // Given
 //        givenConnectionIsEstablished(Factory.Config(lenient = true, serializeNull = true))
-        connection.establishConnection()
+        connection.open()
         val jsonWithNullValues = "{}"
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
@@ -187,7 +186,7 @@ internal class MoshiMessageAdapterTest {
 //            failOnUnknown = true
 //        )
 
-        connection.establishConnection()
+        connection.open()
         val jsonWithUnknownKeys = """{"taco":"delicious"}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
@@ -205,7 +204,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendRawBytes_givenUtf8EncodedJsonWithUtf8Bom_shouldSkipUtf8Bom() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val jsonWithUtf8Bom = Buffer()
             .write(ByteString.decodeHex("EFBBBF"))
             .writeUtf8("""{"name":"value"}""")
@@ -229,7 +228,7 @@ internal class MoshiMessageAdapterTest {
     @Test
     fun sendRawBytes_givenUtf16EncodedJsonWithUtf16Bom_shouldNotSkipUtf16Bom() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val jsonWithUtf16Bom = Buffer()
             .write(ByteString.decodeHex("FEFF"))
             .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))

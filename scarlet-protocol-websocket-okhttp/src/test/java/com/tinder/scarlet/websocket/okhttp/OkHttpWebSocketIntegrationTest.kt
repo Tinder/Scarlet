@@ -35,7 +35,7 @@ internal class OkHttpWebSocketIntegrationTest {
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val textMessage1 = "Hello"
         val textMessage2 = "Hi"
         val bytesMessage1 = "Yo".toByteArray()
@@ -91,7 +91,7 @@ internal class OkHttpWebSocketIntegrationTest {
     @Test
     fun close_givenConnectionIsEstablished_shouldCloseServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
 
         // When
         connection.clientClosure()
@@ -107,7 +107,7 @@ internal class OkHttpWebSocketIntegrationTest {
     @Test
     fun cancel_givenConnectionIsEstablished_shouldFailTheConnection() {
         // When
-        connection.establishConnection()
+        connection.open()
         connection.clientTerminate()
 
         // Then
@@ -124,7 +124,7 @@ internal class OkHttpWebSocketIntegrationTest {
     @Test
     fun givenConnectionIsEstablished_andServerCloses_shouldClose() {
         // Given
-        connection.establishConnection()
+        connection.open()
 
         // When
         connection.serverClosure()
@@ -140,7 +140,7 @@ internal class OkHttpWebSocketIntegrationTest {
     @Test
     fun givenConnectionIsEstablished_andServerSendsMessages_shouldReceiveMessages() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val textMessage = "Hello"
         val bytesMessage = "Hi".toByteArray()
         val testTextStreamObserver = connection.client.observeText().test()

@@ -54,7 +54,7 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
             .apply(base, description)
     }
 
-    fun establishConnection() {
+    fun open() {
         serverLifecycleRegistry.onNext(LifecycleState.Started)
         clientLifecycleRegistry.onNext(LifecycleState.Started)
         blockUntilConnectionIsEstablish()

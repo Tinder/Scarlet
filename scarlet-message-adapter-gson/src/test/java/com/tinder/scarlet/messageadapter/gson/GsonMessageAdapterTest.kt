@@ -49,7 +49,7 @@ internal class GsonMessageAdapterTest {
     @Test
     fun sendAnInterface_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = AnImplementation("value")
         val expectedString = """{"name":"value"}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
@@ -69,7 +69,7 @@ internal class GsonMessageAdapterTest {
     @Test
     fun sendAnImplementation_shouldBeReceivedByTheServer() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = AnImplementation("value")
         val expectedString = """{"name":"value"}"""
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
@@ -89,7 +89,7 @@ internal class GsonMessageAdapterTest {
     @Test
     fun serializeUsesConfiguration() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = AnImplementation(null)
         val expectedString = "{}"
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
@@ -109,7 +109,7 @@ internal class GsonMessageAdapterTest {
     @Test
     fun deserializeUsesConfiguration() {
         // Given
-        connection.establishConnection()
+        connection.open()
         val data = "{/* a comment! */}"
         val expectedString = "{/* a comment! */}"
         val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
