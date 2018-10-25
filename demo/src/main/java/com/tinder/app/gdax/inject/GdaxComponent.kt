@@ -10,16 +10,18 @@ import com.squareup.moshi.Moshi
 import com.tinder.app.gdax.api.GdaxService
 import com.tinder.app.gdax.api.MoshiAdapters
 import com.tinder.app.gdax.view.GdaxFragment
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.Scarlet
-import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
+import com.tinder.scarlet.v2.Lifecycle
+import com.tinder.scarlet.v2.Scarlet
+import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
-import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
+import com.tinder.scarlet.websocket.ShutdownReason
+import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
 @GdaxScope
@@ -60,12 +62,25 @@ interface GdaxComponent {
                 .add(MoshiAdapters())
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val scarlet = Scarlet.Builder()
-                .webSocketFactory(client.newWebSocketFactory("wss://ws-feed.gdax.com"))
-                .lifecycle(lifecycle)
-                .addMessageAdapterFactory(MoshiMessageAdapter.Factory(moshi))
-                .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
-                .build()
+            val protocol = OkHttpWebSocket(
+                client,
+                object : OkHttpWebSocket.RequestFactory {
+                    override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
+                        return OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://ws-feed.gdax.com").build())
+                    }
+
+                    override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                        return OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL)
+                    }
+                }
+            )
+            val configuration = Scarlet.Configuration(
+                protocol = protocol,
+                lifecycle = lifecycle,
+                messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
+                streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
+            )
+            val scarlet = Scarlet.Factory().create(configuration)
             return scarlet.create()
         }
     }

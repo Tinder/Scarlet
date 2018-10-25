@@ -9,15 +9,18 @@ import com.tinder.app.echo.api.BitmapMessageAdapter
 import com.tinder.app.echo.api.EchoService
 import com.tinder.app.echo.domain.LoggedInLifecycle
 import com.tinder.app.echo.view.EchoBotFragment
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.Scarlet
-import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
+import com.tinder.scarlet.v2.Lifecycle
+import com.tinder.scarlet.v2.Scarlet
+import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
+import com.tinder.scarlet.websocket.ShutdownReason
+import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
 @EchoBotScope
@@ -54,12 +57,25 @@ interface EchoBotComponent {
         @Provides
         @EchoBotScope
         fun provideEchoService(client: OkHttpClient, lifecycle: Lifecycle): EchoService {
-            val scarlet = Scarlet.Builder()
-                .webSocketFactory(client.newWebSocketFactory("ws://demos.kaazing.com/echo"))
-                .lifecycle(lifecycle)
-                .addMessageAdapterFactory(BitmapMessageAdapter.Factory())
-                .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
-                .build()
+            val protocol = OkHttpWebSocket(
+                client,
+                object : OkHttpWebSocket.RequestFactory {
+                    override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
+                        return OkHttpWebSocket.OpenRequest(Request.Builder().url("ws://demos.kaazing.com/echo").build())
+                    }
+
+                    override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                        return OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL)
+                    }
+                }
+            )
+            val configuration = Scarlet.Configuration(
+                protocol = protocol,
+                lifecycle = lifecycle,
+                messageAdapterFactories = listOf(BitmapMessageAdapter.Factory()),
+                streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
+            )
+            val scarlet = Scarlet.Factory().create(configuration)
             return scarlet.create()
         }
     }

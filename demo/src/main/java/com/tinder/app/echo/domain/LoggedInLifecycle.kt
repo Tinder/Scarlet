@@ -5,8 +5,9 @@
 package com.tinder.app.echo.domain
 
 import com.tinder.app.echo.inject.EchoBotScope
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import com.tinder.scarlet.v2.Lifecycle
+import com.tinder.scarlet.v2.LifecycleState
+import com.tinder.scarlet.v2.lifecycle.LifecycleRegistry
 import javax.inject.Inject
 
 @EchoBotScope
@@ -21,8 +22,8 @@ class LoggedInLifecycle constructor(
         authStatusRepository.observeAuthStatus()
             .map {
                 when (it) {
-                    AuthStatus.LOGGED_IN -> Lifecycle.State.Started
-                    AuthStatus.LOGGED_OUT -> Lifecycle.State.Stopped.WithReason()
+                    AuthStatus.LOGGED_IN -> LifecycleState.Started
+                    AuthStatus.LOGGED_OUT -> LifecycleState.Stopped
                 }
             }
             .subscribe(lifecycleRegistry)

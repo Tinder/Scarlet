@@ -7,10 +7,10 @@ package com.tinder.app.echo.domain
 import android.graphics.Bitmap
 import com.tinder.app.echo.api.EchoService
 import com.tinder.app.echo.inject.EchoBotScope
-import com.tinder.scarlet.Event
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.State
-import com.tinder.scarlet.WebSocket
+import com.tinder.scarlet.v2.Event
+import com.tinder.scarlet.v2.LifecycleState
+import com.tinder.scarlet.v2.State
+import com.tinder.scarlet.websocket.WebSocketEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import io.reactivex.schedulers.Schedulers
@@ -29,35 +29,47 @@ class ChatMessageRepository @Inject constructor(
     private val messagesProcessor = BehaviorProcessor.create<List<ChatMessage>>()
 
     init {
-        echoService.observeEvent()
+        echoService.observeStateTransition()
+            .observeOn(Schedulers.io())
+            .subscribe({ stateTransition ->
+                val event = stateTransition.event
+                val description = when (event) {
+                    is Event.OnLifecycleStateChange -> when (event.lifecycleState) {
+                        LifecycleState.Started -> "\uD83C\uDF1D On Lifecycle Start"
+                        LifecycleState.Stopped -> "\uD83C\uDF1A On Lifecycle Stop"
+                        LifecycleState.Completed -> "\uD83D\uDCA5 On Lifecycle Terminate"
+                    }
+                    is Event.OnProtocolEvent -> {
+                        when (stateTransition.toState) {
+                            is State.WillConnect -> "\uD83D\uDCA4 WaitingToRetry"
+                            is State.Connecting -> "⏳ Connecting"
+                            is State.Connected -> "\uD83D\uDEEB Connected"
+                            is State.Disconnecting -> "⏳ Disconnecting"
+                            State.Disconnected -> "\uD83D\uDEEC Disconnected"
+                            State.Destroyed -> "\uD83D\uDCA5 Destroyed"
+                        }
+                    }
+                    Event.OnShouldConnect -> "⏰ On Retry"
+                }
+                val chatMessage =
+                    ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
+                addChatMessage(chatMessage)
+            }, { e ->
+                Timber.e(e)
+            })
+
+        echoService.observeWebSocketEvent()
             .observeOn(Schedulers.io())
             .subscribe({ event ->
                 val description = when (event) {
-                    is Event.OnLifecycle.StateChange<*> -> when (event.state) {
-                        Lifecycle.State.Started -> "\uD83C\uDF1D On Lifecycle Start"
-                        is Lifecycle.State.Stopped -> "\uD83C\uDF1A On Lifecycle Stop"
-                        Lifecycle.State.Destroyed -> "\uD83D\uDCA5 On Lifecycle Terminate"
-                    }
-                    Event.OnLifecycle.Terminate -> "\uD83D\uDCA5 On Lifecycle Terminate"
-                    is Event.OnWebSocket.Event<*> -> when (event.event) {
-                        is WebSocket.Event.OnConnectionOpened<*> -> "\uD83D\uDEF0️ On WebSocket Connection Opened"
-                        is WebSocket.Event.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket Message Received"
-                        is WebSocket.Event.OnConnectionClosing -> "\uD83D\uDEF0️ On WebSocket Connection Closing"
-                        is WebSocket.Event.OnConnectionClosed -> "\uD83D\uDEF0️ On WebSocket Connection Closed"
-                        is WebSocket.Event.OnConnectionFailed -> "\uD83D\uDEF0️ On WebSocket Connection Failed"
-                    }
-                    Event.OnWebSocket.Terminate -> "\uD83D\uDEF0️ On WebSocket Terminate"
-                    is Event.OnStateChange<*> -> when (event.state) {
-                        is State.WaitingToRetry -> "\uD83D\uDCA4 WaitingToRetry"
-                        is State.Connecting -> "⏳ Connecting"
-                        is State.Connected -> "\uD83D\uDEEB Connected"
-                        State.Disconnecting -> "⏳ Disconnecting"
-                        State.Disconnected -> "\uD83D\uDEEC Disconnected"
-                        State.Destroyed -> "\uD83D\uDCA5 Destroyed"
-                    }
-                    Event.OnRetry -> "⏰ On Retry"
+                    is WebSocketEvent.OnConnectionOpened -> "\uD83D\uDEF0️ On WebSocket Connection Opened"
+                    is WebSocketEvent.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket Message Received"
+                    is WebSocketEvent.OnConnectionClosing -> "\uD83D\uDEF0️ On WebSocket Connection Closing"
+                    is WebSocketEvent.OnConnectionClosed -> "\uD83D\uDEF0️ On WebSocket Connection Closed"
+                    is WebSocketEvent.OnConnectionFailed -> "\uD83D\uDEF0️ On WebSocket Connection Failed"
                 }
-                val chatMessage = ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
+                val chatMessage =
+                    ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
                 addChatMessage(chatMessage)
             }, { e ->
                 Timber.e(e)

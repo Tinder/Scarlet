@@ -5,18 +5,18 @@
 package com.tinder.app.echo.api
 
 import android.graphics.Bitmap
-import com.tinder.scarlet.Event
-import com.tinder.scarlet.State
+import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import io.reactivex.Flowable
 
 interface EchoService {
     @Receive
-    fun observeState(): Flowable<State>
+    fun observeStateTransition(): Flowable<StateTransition>
 
     @Receive
-    fun observeEvent(): Flowable<Event>
+    fun observeWebSocketEvent(): Flowable<WebSocketEvent>
 
     @Receive
     fun observeText(): Flowable<String>

@@ -9,6 +9,7 @@ import com.tinder.app.gdax.api.model.ProductId
 import com.tinder.app.gdax.api.model.Subscribe
 import com.tinder.app.gdax.inject.GdaxScope
 import com.tinder.scarlet.WebSocket
+import com.tinder.scarlet.websocket.WebSocketEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import org.joda.time.format.ISODateTimeFormat
@@ -26,7 +27,7 @@ class TransactionRepository @Inject constructor(
 
     init {
         gdaxService.observeWebSocketEvent()
-            .filter { it is WebSocket.Event.OnConnectionOpened<*> }
+            .filter { it is WebSocketEvent.OnConnectionOpened }
             .subscribe({
                 val subscribe = Subscribe(
                     type = Subscribe.Type.SUBSCRIBE,

@@ -3,12 +3,14 @@
  */
 package com.tinder.scarlet.websocket.okhttp
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.TestStreamObserver
-import com.tinder.scarlet.testutils.ValueAssert
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
+import com.tinder.scarlet.testutils.v2.containingBytes
+import com.tinder.scarlet.testutils.v2.containingText
+import com.tinder.scarlet.testutils.v2.withClosedReason
+import com.tinder.scarlet.testutils.v2.withClosingReason
 import com.tinder.scarlet.v2.LifecycleState
 import com.tinder.scarlet.v2.Scarlet
 import com.tinder.scarlet.v2.lifecycle.LifecycleRegistry
@@ -60,19 +62,19 @@ internal class OkHttpWebSocketIntegrationTest {
         assertThat(isSendTextEnqueued).isTrue()
         assertThat(isSendBytesEnqueued).isTrue()
         serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
         serverStringObserver.awaitValues(
-                any<String> { assertThat(this).isEqualTo(textMessage1) },
-                any<String> { assertThat(this).isEqualTo(textMessage2) }
+            any<String> { assertThat(this).isEqualTo(textMessage1) },
+            any<String> { assertThat(this).isEqualTo(textMessage2) }
         )
         serverBytesObserver.awaitValues(
-                any<ByteArray> { assertThat(this).isEqualTo(bytesMessage1) },
-                any<ByteArray> { assertThat(this).isEqualTo(bytesMessage2) }
+            any<ByteArray> { assertThat(this).isEqualTo(bytesMessage1) },
+            any<ByteArray> { assertThat(this).isEqualTo(bytesMessage2) }
         )
     }
 
@@ -106,9 +108,9 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // Then
         serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnConnectionClosing>().withClosingReason(CLIENT_SHUTDOWN_REASON),
-                any<WebSocketEvent.OnConnectionClosed>().withClosedReason(CLIENT_SHUTDOWN_REASON)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionClosing>().withClosingReason(CLIENT_SHUTDOWN_REASON),
+            any<WebSocketEvent.OnConnectionClosed>().withClosedReason(CLIENT_SHUTDOWN_REASON)
         )
     }
 
@@ -120,12 +122,12 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnConnectionFailed>()
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionFailed>()
         )
         serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnConnectionFailed>()
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionFailed>()
         )
     }
 
@@ -139,9 +141,9 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnConnectionClosing>().withClosingReason(SERVER_SHUTDOWN_REASON),
-                any<WebSocketEvent.OnConnectionClosed>().withClosedReason(SERVER_SHUTDOWN_REASON)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnConnectionClosing>().withClosingReason(SERVER_SHUTDOWN_REASON),
+            any<WebSocketEvent.OnConnectionClosed>().withClosedReason(SERVER_SHUTDOWN_REASON)
         )
     }
 
@@ -160,9 +162,9 @@ internal class OkHttpWebSocketIntegrationTest {
 
         // Then
         clientWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage)
         )
         assertThat(testTextStreamObserver.values).containsExactly(textMessage)
         assertThat(testBytesStreamObserver.values).containsExactly(bytesMessage)
@@ -184,55 +186,55 @@ internal class OkHttpWebSocketIntegrationTest {
 
     private fun createServer(): Service {
         return Scarlet.Factory()
-                .create(
-                        Scarlet.Configuration(
-                                protocol = MockWebServerWebSocket(
-                                        mockWebServer,
-                                        object : MockWebServerWebSocket.RequestFactory {
-                                            override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
-                                                return OkHttpWebSocket.CloseRequest(SERVER_SHUTDOWN_REASON)
-                                            }
-                                        }
-                                ),
-                                lifecycle = serverLifecycleRegistry
-                        )
+            .create(
+                Scarlet.Configuration(
+                    protocol = MockWebServerWebSocket(
+                        mockWebServer,
+                        object : MockWebServerWebSocket.RequestFactory {
+                            override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                                return OkHttpWebSocket.CloseRequest(SERVER_SHUTDOWN_REASON)
+                            }
+                        }
+                    ),
+                    lifecycle = serverLifecycleRegistry
                 )
-                .create()
+            )
+            .create()
     }
 
     private fun createClient(): Service {
         val factory = Scarlet.Factory()
         val protocol = OkHttpWebSocket(
-                createOkHttpClient(),
-                object : OkHttpWebSocket.RequestFactory {
-                    override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
-                        return OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build())
-                    }
-
-                    override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
-                        return OkHttpWebSocket.CloseRequest(CLIENT_SHUTDOWN_REASON)
-                    }
+            createOkHttpClient(),
+            object : OkHttpWebSocket.RequestFactory {
+                override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
+                    return OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build())
                 }
+
+                override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+                    return OkHttpWebSocket.CloseRequest(CLIENT_SHUTDOWN_REASON)
+                }
+            }
         )
         val configuration = Scarlet.Configuration(
-                protocol = protocol,
-                lifecycle = clientLifecycleRegistry
+            protocol = protocol,
+            lifecycle = clientLifecycleRegistry
         )
         val scarlet = factory.create(configuration)
         return scarlet.create()
     }
 
     private fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-            .writeTimeout(500, TimeUnit.MILLISECONDS)
-            .readTimeout(500, TimeUnit.MILLISECONDS)
-            .build()
+        .writeTimeout(500, TimeUnit.MILLISECONDS)
+        .readTimeout(500, TimeUnit.MILLISECONDS)
+        .build()
 
     private fun blockUntilConnectionIsEstablish() {
         clientWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>()
+            any<WebSocketEvent.OnConnectionOpened>()
         )
         serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>()
+            any<WebSocketEvent.OnConnectionOpened>()
         )
     }
 
@@ -264,27 +266,5 @@ internal class OkHttpWebSocketIntegrationTest {
         private val CLIENT_SHUTDOWN_REASON = ShutdownReason(1001, "client away")
         private val SERVER_SHUTDOWN_REASON = ShutdownReason(1002, "mockWebServer shutdown")
 
-        fun ValueAssert<WebSocketEvent.OnMessageReceived>.containingText(expectedText: String) = assert {
-            assertThat(message).isInstanceOf(Message.Text::class.java)
-            val (text) = message as Message.Text
-            assertThat(text).isEqualTo(expectedText)
-        }
-
-        fun ValueAssert<WebSocketEvent.OnMessageReceived>.containingBytes(expectedBytes: ByteArray) = assert {
-            assertThat(message).isInstanceOf(Message.Bytes::class.java)
-            val (bytes) = message as Message.Bytes
-            assertThat(bytes).isEqualTo(expectedBytes)
-        }
-
-        fun ValueAssert<WebSocketEvent.OnConnectionClosing>.withClosingReason(
-                expectedShutdownReason: ShutdownReason
-        ) = assert {
-            assertThat(shutdownReason).isEqualTo(expectedShutdownReason)
-        }
-
-        fun ValueAssert<WebSocketEvent.OnConnectionClosed>.withClosedReason(expectedShutdownReason: ShutdownReason) =
-                assert {
-                    assertThat(shutdownReason).isEqualTo(expectedShutdownReason)
-                }
     }
 }
