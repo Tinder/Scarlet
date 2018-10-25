@@ -10,13 +10,13 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
-import androidx.core.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.github.bassaer.chatmessageview.model.ChatUser
 import com.github.bassaer.chatmessageview.model.Message
 import com.github.bassaer.chatmessageview.view.ChatView

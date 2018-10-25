@@ -5,13 +5,13 @@
 package com.tinder.app.root.view
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import androidx.core.app.Fragment
-import androidx.core.app.FragmentManager
-import androidx.core.app.FragmentStatePagerAdapter
-import androidx.core.view.ViewPager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import com.tinder.R
 import com.tinder.app.echo.view.EchoBotFragment
 import com.tinder.app.gdax.view.GdaxFragment
