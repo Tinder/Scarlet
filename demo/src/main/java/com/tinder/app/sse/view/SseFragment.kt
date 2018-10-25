@@ -5,10 +5,10 @@
 package com.tinder.app.sse.view
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.tinder.R
 import com.tinder.app.sse.domain.MarketSnapshot
 import com.tinder.app.sse.inject.SseComponent
