@@ -10,9 +10,9 @@ import com.squareup.moshi.Moshi
 import com.tinder.app.gdax.api.GdaxService
 import com.tinder.app.gdax.api.MoshiAdapters
 import com.tinder.app.gdax.view.GdaxFragment
-import com.tinder.scarlet.v2.Lifecycle
-import com.tinder.scarlet.v2.Scarlet
-import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
+import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.ShutdownReason

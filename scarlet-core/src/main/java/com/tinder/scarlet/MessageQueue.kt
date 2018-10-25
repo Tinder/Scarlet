@@ -2,9 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.v2
-
-import com.tinder.scarlet.Message
+package com.tinder.scarlet
 
 interface MessageQueue {
 

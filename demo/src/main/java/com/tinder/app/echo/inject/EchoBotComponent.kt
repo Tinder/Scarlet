@@ -9,9 +9,9 @@ import com.tinder.app.echo.api.BitmapMessageAdapter
 import com.tinder.app.echo.api.EchoService
 import com.tinder.app.echo.domain.LoggedInLifecycle
 import com.tinder.app.echo.view.EchoBotFragment
-import com.tinder.scarlet.v2.Lifecycle
-import com.tinder.scarlet.v2.Scarlet
-import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
+import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket

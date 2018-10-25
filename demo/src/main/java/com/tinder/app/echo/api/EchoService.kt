@@ -5,7 +5,7 @@
 package com.tinder.app.echo.api
 
 import android.graphics.Bitmap
-import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send

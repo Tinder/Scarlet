@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.v2
+package com.tinder.scarlet
 
 /**
  * Used to trigger the start and stop of WebSocket connections.

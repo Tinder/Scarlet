@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.ShutdownReason
+import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
 internal class LifecycleOwnerResumedLifecycle(
@@ -22,12 +22,14 @@ internal class LifecycleOwnerResumedLifecycle(
 
     private inner class ALifecycleObserver : LifecycleObserver {
         @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_PAUSE)
-        fun onPause() = lifecycleRegistry.onNext(
-            Lifecycle.State.Stopped.WithReason(ShutdownReason(1000, "Paused"))
-        )
+        fun onPause() {
+            lifecycleRegistry.onNext(LifecycleState.Stopped)
+        }
 
         @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_RESUME)
-        fun onResume() = lifecycleRegistry.onNext(Lifecycle.State.Started)
+        fun onResume() {
+            lifecycleRegistry.onNext(LifecycleState.Started)
+        }
 
         @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {

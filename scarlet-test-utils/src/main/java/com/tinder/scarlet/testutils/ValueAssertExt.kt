@@ -2,15 +2,14 @@
  * © 2018 Match Group, LLC.
  */
 
-@file:JvmName("TestUtils")
+@file:JvmName("ValueAssertUtils")
 
-package com.tinder.scarlet.testutils.v2
+package com.tinder.scarlet.testutils
 
 import com.tinder.scarlet.Message
-import com.tinder.scarlet.testutils.ValueAssert
-import com.tinder.scarlet.v2.Event
-import com.tinder.scarlet.v2.LifecycleState
-import com.tinder.scarlet.v2.ProtocolEvent
+import com.tinder.scarlet.Event
+import com.tinder.scarlet.LifecycleState
+import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
 import org.assertj.core.api.Assertions.assertThat

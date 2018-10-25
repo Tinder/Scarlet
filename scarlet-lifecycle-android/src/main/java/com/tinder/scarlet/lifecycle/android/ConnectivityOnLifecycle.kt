@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
 internal class ConnectivityOnLifecycle(
@@ -39,10 +40,10 @@ internal class ConnectivityOnLifecycle(
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting
     }
 
-    private fun toLifecycleState(isConnected: Boolean): Lifecycle.State = if (isConnected) {
-        Lifecycle.State.Started
+    private fun toLifecycleState(isConnected: Boolean): LifecycleState = if (isConnected) {
+        LifecycleState.Started
     } else {
-        Lifecycle.State.Stopped.AndAborted
+        LifecycleState.Stopped
     }
 
     private inner class ConnectivityChangeBroadcastReceiver : BroadcastReceiver() {

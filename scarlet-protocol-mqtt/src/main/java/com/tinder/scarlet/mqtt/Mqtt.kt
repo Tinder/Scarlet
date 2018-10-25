@@ -5,11 +5,11 @@
 package com.tinder.scarlet.mqtt
 
 import com.tinder.scarlet.Message
-import com.tinder.scarlet.v2.Channel
-import com.tinder.scarlet.v2.MessageQueue
-import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEventAdapter
-import com.tinder.scarlet.v2.Topic
+import com.tinder.scarlet.Channel
+import com.tinder.scarlet.MessageQueue
+import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.ProtocolEventAdapter
+import com.tinder.scarlet.Topic
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttClient

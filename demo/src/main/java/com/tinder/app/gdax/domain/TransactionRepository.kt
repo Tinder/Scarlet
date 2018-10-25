@@ -8,7 +8,6 @@ import com.tinder.app.gdax.api.GdaxService
 import com.tinder.app.gdax.api.model.ProductId
 import com.tinder.app.gdax.api.model.Subscribe
 import com.tinder.app.gdax.inject.GdaxScope
-import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.WebSocketEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor

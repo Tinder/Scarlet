@@ -6,9 +6,9 @@ package com.tinder.scarlet.streamadapter.rxjava
 
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.v2.OkHttpWebSocketConnection
-import com.tinder.scarlet.testutils.v2.containingBytes
-import com.tinder.scarlet.testutils.v2.containingText
+import com.tinder.scarlet.testutils.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.containingBytes
+import com.tinder.scarlet.testutils.containingText
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send

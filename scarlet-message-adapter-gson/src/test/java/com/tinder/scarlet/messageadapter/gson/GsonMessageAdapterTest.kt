@@ -15,9 +15,9 @@ import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.v2.OkHttpWebSocketConnection
-import com.tinder.scarlet.testutils.v2.containingText
-import com.tinder.scarlet.v2.StateTransition
+import com.tinder.scarlet.testutils.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send

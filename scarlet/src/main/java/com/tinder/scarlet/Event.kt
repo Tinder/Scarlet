@@ -5,19 +5,9 @@
 package com.tinder.scarlet
 
 sealed class Event {
-    sealed class OnLifecycle : Event() {
-        data class StateChange<out T : Lifecycle.State> internal constructor(val state: T) : OnLifecycle()
+    data class OnLifecycleStateChange internal constructor(val lifecycleState: LifecycleState) : Event()
 
-        object Terminate : OnLifecycle()
-    }
+    data class OnProtocolEvent internal constructor(val protocolEvent: ProtocolEvent) : Event()
 
-    sealed class OnWebSocket : Event() {
-        data class Event<out T : WebSocket.Event> internal constructor(val event: T) : OnWebSocket()
-
-        object Terminate : OnWebSocket()
-    }
-
-    data class OnStateChange<out T : State> internal constructor(val state: T) : Event()
-
-    object OnRetry : Event()
+    object OnShouldConnect : Event()
 }

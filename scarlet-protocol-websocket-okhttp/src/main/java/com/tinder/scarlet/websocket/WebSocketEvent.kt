@@ -6,9 +6,9 @@ package com.tinder.scarlet.websocket
 
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.utils.getRawType
-import com.tinder.scarlet.v2.ProtocolEvent
-import com.tinder.scarlet.v2.ProtocolEventAdapter
-import com.tinder.scarlet.v2.ProtocolSpecificEvent
+import com.tinder.scarlet.ProtocolEvent
+import com.tinder.scarlet.ProtocolEventAdapter
+import com.tinder.scarlet.ProtocolSpecificEvent
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import okhttp3.Response
 import okhttp3.WebSocket

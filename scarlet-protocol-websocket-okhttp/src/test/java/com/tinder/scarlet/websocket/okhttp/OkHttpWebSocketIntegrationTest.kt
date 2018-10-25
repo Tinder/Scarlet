@@ -6,11 +6,11 @@ package com.tinder.scarlet.websocket.okhttp
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.v2.OkHttpWebSocketConnection
-import com.tinder.scarlet.testutils.v2.containingBytes
-import com.tinder.scarlet.testutils.v2.containingText
-import com.tinder.scarlet.testutils.v2.withClosedReason
-import com.tinder.scarlet.testutils.v2.withClosingReason
+import com.tinder.scarlet.testutils.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.containingBytes
+import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.testutils.withClosedReason
+import com.tinder.scarlet.testutils.withClosingReason
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive

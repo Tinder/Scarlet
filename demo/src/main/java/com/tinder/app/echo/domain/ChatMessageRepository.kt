@@ -7,9 +7,9 @@ package com.tinder.app.echo.domain
 import android.graphics.Bitmap
 import com.tinder.app.echo.api.EchoService
 import com.tinder.app.echo.inject.EchoBotScope
-import com.tinder.scarlet.v2.Event
-import com.tinder.scarlet.v2.LifecycleState
-import com.tinder.scarlet.v2.State
+import com.tinder.scarlet.Event
+import com.tinder.scarlet.LifecycleState
+import com.tinder.scarlet.State
 import com.tinder.scarlet.websocket.WebSocketEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor

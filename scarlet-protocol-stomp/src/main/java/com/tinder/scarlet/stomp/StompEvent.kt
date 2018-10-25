@@ -4,6 +4,6 @@
 
 package com.tinder.scarlet.stomp
 
-import com.tinder.scarlet.v2.ProtocolSpecificEvent
+import com.tinder.scarlet.ProtocolSpecificEvent
 
 sealed class StompEvent : ProtocolSpecificEvent

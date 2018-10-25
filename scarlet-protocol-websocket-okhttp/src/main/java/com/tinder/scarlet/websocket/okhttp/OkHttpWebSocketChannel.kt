@@ -5,10 +5,10 @@
 package com.tinder.scarlet.websocket.okhttp
 
 import com.tinder.scarlet.Message
-import com.tinder.scarlet.v2.Channel
-import com.tinder.scarlet.v2.MessageQueue
-import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.Topic
+import com.tinder.scarlet.Channel
+import com.tinder.scarlet.MessageQueue
+import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.Topic
 import com.tinder.scarlet.websocket.ShutdownReason
 import okhttp3.Response
 import okhttp3.WebSocket

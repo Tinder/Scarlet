@@ -12,14 +12,12 @@ import com.tinder.app.sse.api.SseStockPriceRepository
 import com.tinder.app.sse.api.StockMarketService
 import com.tinder.app.sse.domain.StockPriceRepository
 import com.tinder.app.sse.view.SseFragment
-import com.tinder.scarlet.v2.Lifecycle
-import com.tinder.scarlet.v2.Scarlet
-import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
+import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.sse.OkHttpEventSource
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
-import com.tinder.scarlet.websocket.ShutdownReason
-import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import dagger.Binds
 import dagger.Component
 import dagger.Module

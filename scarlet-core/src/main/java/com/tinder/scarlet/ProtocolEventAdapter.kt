@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.v2
+package com.tinder.scarlet
 
 import java.lang.reflect.Type
 

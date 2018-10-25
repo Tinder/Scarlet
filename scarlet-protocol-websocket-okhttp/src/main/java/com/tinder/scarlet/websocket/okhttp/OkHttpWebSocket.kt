@@ -4,9 +4,9 @@
 
 package com.tinder.scarlet.websocket.okhttp
 
-import com.tinder.scarlet.v2.Channel
-import com.tinder.scarlet.v2.Protocol
-import com.tinder.scarlet.v2.ProtocolEventAdapter
+import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.ProtocolEventAdapter
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
 import okhttp3.OkHttpClient
