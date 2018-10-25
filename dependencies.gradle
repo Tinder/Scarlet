@@ -8,6 +8,7 @@ ext {
     appCompat = 'androidx.appcompat:appcompat:1.0.0'
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
 
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.2'
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'

@@ -39,6 +39,7 @@ dependencies {
     implementation rootProject.ext.appCompat
     implementation rootProject.ext.material
     implementation rootProject.ext.multiDex
+    implementation rootProject.ext.constraintLayout
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxAndroid
     implementation rootProject.ext.rxKotlin
