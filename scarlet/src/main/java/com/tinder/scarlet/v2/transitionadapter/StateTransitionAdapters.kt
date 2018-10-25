@@ -169,9 +169,6 @@ internal class DeserializationStateTransitionAdapter(
             annotations: Array<Annotation>
         ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
-            require(!Deserialization::class.java.isAssignableFrom(clazz)) {
-                "Subclasses of Deserialization is not supported"
-            }
             require(clazz == Deserialization::class.java)
             val messageType = (type as ParameterizedType).getFirstTypeArgument()
             val messageAdapter = messageAdapterResolver.resolve(messageType, annotations)

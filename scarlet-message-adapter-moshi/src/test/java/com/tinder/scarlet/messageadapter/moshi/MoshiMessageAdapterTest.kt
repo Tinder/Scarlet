@@ -26,332 +26,395 @@ import okio.ByteString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.junit.experimental.runners.Enclosed
+import org.junit.runner.RunWith
 import java.lang.reflect.Type
 import java.nio.charset.Charset
 
+@RunWith(Enclosed::class)
 internal class MoshiMessageAdapterTest {
 
-    private val moshi = createMoshi()
-    private var config = MoshiMessageAdapter.Factory.Config()
-    private val factory = MoshiMessageAdapter.Factory(moshi, config)
-
-    @get:Rule
-    internal val connection = OkHttpWebSocketConnection.create<Service>(
-        observeWebSocketEvent = { observeEvents() },
-        serverConfiguration = OkHttpWebSocketConnection.Configuration(
-            messageAdapterFactories = listOf(
-                factory
-            )
-        ),
-        clientConfiguration = OkHttpWebSocketConnection.Configuration(
-            messageAdapterFactories = listOf(
-                factory
+    class WithDefaultConfig {
+        @get:Rule
+        internal val connection = OkHttpWebSocketConnection.create<Service>(
+            observeWebSocketEvent = { observeEvents() },
+            serverConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory()
+                )
+            ),
+            clientConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory()
+                )
             )
         )
-    )
 
-    @Test
-    fun sendAnInterface_shouldBeReceivedByTheServer() {
-        // Given
-        connection.open()
-        val data = AnImplementation("value")
-        val expectedSerializedData = """{"name":"value"}"""
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
+        @Test
+        fun sendAnInterface_shouldBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val data = AnImplementation("value")
+            val expectedSerializedData = """{"name":"value"}"""
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
-        // When
-        val isSuccessful = connection.client.sendAnInterface(data)
+            // When
+            val isSuccessful = connection.client.sendAnInterface(data)
 
-        // Then
-        assertThat(isSuccessful).isTrue()
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
-        )
-        serverAnImplementationObserver.awaitValues(
-            any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
-        )
-    }
-
-    @Test
-    fun sendAnImplementation_shouldBeReceivedByTheServer() {
-        // Given
-        connection.open()
-        val data = AnImplementation("value")
-        val expectedSerializedData = """{"name":"value"}"""
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        val isSuccessful = connection.client.sendAnImplementation(data)
-
-        // Then
-        assertThat(isSuccessful).isTrue()
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
-        )
-        serverAnImplementationObserver.awaitValues(
-            any<AnImplementation> { assertThat(this).isEqualTo(data) }
-        )
-    }
-
-    @Test
-    fun sendAnnotatedString_shouldBeReceivedByTheServer() {
-        // Given
-        connection.open()
-        val data = "value"
-        val expectedSerializedData = """"qualified!""""
-        val expectedDeserializedSerializedData = "it worked!"
-        val serverAnnotatedStringObserver = connection.server.observeAnnotatedString().test()
-
-        // When
-        val isSuccessful = connection.client.sendAnnotatedString(data)
-
-        // Then
-        assertThat(isSuccessful).isTrue()
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
-        )
-        serverAnnotatedStringObserver.awaitValues(
-            any<String> { assertThat(this).isEqualTo(expectedDeserializedSerializedData) }
-        )
-    }
-
-    @Test
-    fun sendRawString_givenJsonIsMalformed_andFactoryIsLenient_shouldBeReceivedByTheServer() {
-        // Given
-//        Factory.Config(lenient = true)
-        connection.open()
-        val malformedJson = """{"name":value}"""
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawString(malformedJson)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(malformedJson)
-        )
-        serverAnImplementationObserver.awaitValues(
-            any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
-        )
-    }
-
-    @Test
-    fun sendRawString_givenJsonIsMalformed_andFactoryIsNotLenient_shouldNotBeReceivedByTheServer() {
-        // Given
-        connection.open()
-        val malformedJson = """{"name":value}"""
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawString(malformedJson)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(malformedJson)
-        )
-        serverAnImplementationObserver.awaitValues()
-    }
-
-    @Test
-    fun sendRawString_givenJsonHasNullValues_andFactorySerializesNull_shouldBeReceivedByTheServer() {
-        // Given
-//        givenConnectionIsEstablished(Factory.Config(lenient = true, serializeNull = true))
-        connection.open()
-        val jsonWithNullValues = "{}"
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawString(jsonWithNullValues)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithNullValues)
-        )
-        serverAnImplementationObserver.awaitValues(
-            any { assertThat(this).isEqualTo(AnImplementation(null)) }
-        )
-    }
-
-    @Test
-    fun sendRawString_givenJsonHasUnknownKeys_andFactoryFailsOnUnknown_shouldNotBeReceivedByTheServer() {
-        // Given
-//        Factory.Config(
-//            lenient = true,
-//            serializeNull = true,
-//            failOnUnknown = true
-//        )
-
-        connection.open()
-        val jsonWithUnknownKeys = """{"taco":"delicious"}"""
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawString(jsonWithUnknownKeys)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithUnknownKeys)
-        )
-        serverAnImplementationObserver.awaitValues()
-    }
-
-    @Test
-    fun sendRawBytes_givenUtf8EncodedJsonWithUtf8Bom_shouldSkipUtf8Bom() {
-        // Given
-        connection.open()
-        val jsonWithUtf8Bom = Buffer()
-            .write(ByteString.decodeHex("EFBBBF"))
-            .writeUtf8("""{"name":"value"}""")
-            .readByteString()
-            .toByteArray()
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawBytes(jsonWithUtf8Bom)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingBytes(jsonWithUtf8Bom)
-        )
-        serverAnImplementationObserver.awaitValues(
-            any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
-        )
-    }
-
-    @Test
-    fun sendRawBytes_givenUtf16EncodedJsonWithUtf16Bom_shouldNotSkipUtf16Bom() {
-        // Given
-        connection.open()
-        val jsonWithUtf16Bom = Buffer()
-            .write(ByteString.decodeHex("FEFF"))
-            .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
-            .readByteString()
-            .toByteArray()
-        val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
-
-        // When
-        connection.client.sendRawBytes(jsonWithUtf16Bom)
-
-        // Then
-        connection.serverWebSocketEventObserver.awaitValues(
-            any<WebSocketEvent.OnConnectionOpened>(),
-            any<WebSocketEvent.OnMessageReceived>().containingBytes(jsonWithUtf16Bom)
-        )
-        serverAnImplementationObserver.awaitValues()
-    }
-
-    private fun createMoshi(): Moshi = Moshi.Builder()
-        .add(VerifyJsonQualifierJsonAdapterFactory())
-        .add(Adapters())
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
-    companion object {
-        @Retention(AnnotationRetention.RUNTIME)
-        @JsonQualifier
-        annotation class SkipMoshi
-
-        @Retention(AnnotationRetention.RUNTIME)
-        @JsonQualifier
-        annotation class Qualifier
-
-        @Retention(AnnotationRetention.RUNTIME)
-        annotation class NonQualifer
-
-        interface AnInterface {
-            val name: String?
+            // Then
+            assertThat(isSuccessful).isTrue()
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
+            )
+            serverAnImplementationObserver.awaitValues(
+                any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
+            )
         }
 
-        data class AnImplementation(override val name: String?) : AnInterface
+        @Test
+        fun sendAnImplementation_shouldBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val data = AnImplementation("value")
+            val expectedSerializedData = """{"name":"value"}"""
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
-        class VerifyJsonQualifierJsonAdapterFactory : JsonAdapter.Factory {
-            override fun create(
-                type: Type,
-                annotations: Set<Annotation>,
-                moshi: Moshi
-            ): JsonAdapter<*>? {
-                for (annotation in annotations) {
-                    assert(annotation.annotationClass.java.isAnnotationPresent(JsonQualifier::class.java)) {
-                        "Non-@JsonQualifier annotation: $annotation"
-                    }
-                }
-                return null
-            }
+            // When
+            val isSuccessful = connection.client.sendAnImplementation(data)
+
+            // Then
+            assertThat(isSuccessful).isTrue()
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
+            )
+            serverAnImplementationObserver.awaitValues(
+                any<AnImplementation> { assertThat(this).isEqualTo(data) }
+            )
         }
 
-        @Suppress("UNUSED")
-        class Adapters {
-            @ToJson
-            fun write(jsonWriter: JsonWriter, anInterface: AnInterface) {
-                jsonWriter.beginObject()
-                jsonWriter.name("name").value(anInterface.name)
-                jsonWriter.endObject()
-            }
+        @Test
+        fun sendAnnotatedString_shouldBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val data = "value"
+            val expectedSerializedData = """"qualified!""""
+            val expectedDeserializedSerializedData = "it worked!"
+            val serverAnnotatedStringObserver = connection.server.observeAnnotatedString().test()
 
-            @FromJson
-            fun read(jsonReader: JsonReader): AnInterface {
-                jsonReader.beginObject()
+            // When
+            val isSuccessful = connection.client.sendAnnotatedString(data)
 
-                var name: String? = null
-                while (jsonReader.hasNext()) {
-                    when (jsonReader.nextName()) {
-                        "name" -> name = jsonReader.nextString()
-                    }
-                }
-
-                jsonReader.endObject()
-                return AnImplementation(name!!)
-            }
-
-            @ToJson
-            fun write(writer: JsonWriter, @Suppress("UNUSED_PARAMETER") @Qualifier value: String) {
-                writer.value("qualified!")
-            }
-
-            @FromJson
-            @Qualifier
-            fun readQualified(reader: JsonReader): String {
-                val string = reader.nextString()
-                if (string == "qualified!") {
-                    return "it worked!"
-                }
-                throw AssertionError("Found: $string")
-            }
+            // Then
+            assertThat(isSuccessful).isTrue()
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(expectedSerializedData)
+            )
+            serverAnnotatedStringObserver.awaitValues(
+                any<String> { assertThat(this).isEqualTo(expectedDeserializedSerializedData) }
+            )
         }
 
-        internal interface Service {
-            @Receive
-            fun observeEvents(): Stream<WebSocketEvent>
+        @Test
+        fun sendRawString_givenJsonIsMalformed_andFactoryIsNotLenient_shouldNotBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val malformedJson = """{"name":value}"""
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
-            @Send
-            fun sendRawString(@SkipMoshi message: String): Boolean
+            // When
+            connection.client.sendRawString(malformedJson)
 
-            @Send
-            fun sendRawBytes(@SkipMoshi message: ByteArray): Boolean
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(malformedJson)
+            )
+            serverAnImplementationObserver.awaitValues()
+        }
 
-            @Send
-            fun sendAnImplementation(impl: AnImplementation): Boolean
+        @Test
+        fun sendRawBytes_givenUtf8EncodedJsonWithUtf8Bom_shouldSkipUtf8Bom() {
+            // Given
+            connection.open()
+            val jsonWithUtf8Bom = Buffer()
+                .write(ByteString.decodeHex("EFBBBF"))
+                .writeUtf8("""{"name":"value"}""")
+                .readByteString()
+                .toByteArray()
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
-            @Receive
-            fun observeAnImplementation(): Stream<AnImplementation>
+            // When
+            connection.client.sendRawBytes(jsonWithUtf8Bom)
 
-            @Send
-            fun sendAnInterface(impl: AnInterface): Boolean
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingBytes(jsonWithUtf8Bom)
+            )
+            serverAnImplementationObserver.awaitValues(
+                any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
+            )
+        }
 
-            @Send
-            fun sendAnnotatedString(@Qualifier @NonQualifer message: String): Boolean
+        @Test
+        fun sendRawBytes_givenUtf16EncodedJsonWithUtf16Bom_shouldNotSkipUtf16Bom() {
+            // Given
+            connection.open()
+            val jsonWithUtf16Bom = Buffer()
+                .write(ByteString.decodeHex("FEFF"))
+                .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
+                .readByteString()
+                .toByteArray()
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
 
-            @Receive
-            @Qualifier
-            @NonQualifer
-            fun observeAnnotatedString(): Stream<String>
+            // When
+            connection.client.sendRawBytes(jsonWithUtf16Bom)
+
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingBytes(jsonWithUtf16Bom)
+            )
+            serverAnImplementationObserver.awaitValues()
         }
     }
+
+    class WithLenientConfig {
+        private val config = MoshiMessageAdapter.Factory.Config(
+            lenient = true
+        )
+        @get:Rule
+        internal val connection = OkHttpWebSocketConnection.create<Service>(
+            observeWebSocketEvent = { observeEvents() },
+            serverConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            ),
+            clientConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            )
+        )
+
+        @Test
+        fun sendRawString_givenJsonIsMalformed_andFactoryIsLenient_shouldBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val malformedJson = """{"name":value}"""
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
+
+            // When
+            connection.client.sendRawString(malformedJson)
+
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(malformedJson)
+            )
+            serverAnImplementationObserver.awaitValues(
+                any<AnImplementation> { assertThat(this).isEqualTo(AnImplementation("value")) }
+            )
+        }
+    }
+
+    class WithLenientAndSerializesNullConfig {
+        private val config = MoshiMessageAdapter.Factory.Config(
+            lenient = true,
+            serializeNull = true
+        )
+        @get:Rule
+        internal val connection = OkHttpWebSocketConnection.create<Service>(
+            observeWebSocketEvent = { observeEvents() },
+            serverConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            ),
+            clientConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            )
+        )
+
+        @Test
+        fun sendRawString_givenJsonHasNullValues_andFactorySerializesNull_shouldBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val jsonWithNullValues = "{}"
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
+
+            // When
+            connection.client.sendRawString(jsonWithNullValues)
+
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithNullValues)
+            )
+            serverAnImplementationObserver.awaitValues(
+                any { org.assertj.core.api.Assertions.assertThat(this)
+                    .isEqualTo(com.tinder.scarlet.messageadapter.moshi.AnImplementation(null)) }
+            )
+        }
+    }
+
+    class WithLenientAndSerializesNullAndFailsOnUnknownConfig {
+        private val config = MoshiMessageAdapter.Factory.Config(
+            lenient = true,
+            serializeNull = true,
+            failOnUnknown = true
+        )
+        @get:Rule
+        internal val connection = OkHttpWebSocketConnection.create<Service>(
+            observeWebSocketEvent = { observeEvents() },
+            serverConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            ),
+            clientConfiguration = OkHttpWebSocketConnection.Configuration(
+                messageAdapterFactories = listOf(
+                    createMoshiMessageAdapterFactory(config)
+                )
+            )
+        )
+
+        @Test
+        fun sendRawString_givenJsonHasUnknownKeys_andFactoryFailsOnUnknown_shouldNotBeReceivedByTheServer() {
+            // Given
+            connection.open()
+            val jsonWithUnknownKeys = """{"taco":"delicious"}"""
+            val serverAnImplementationObserver = connection.server.observeAnImplementation().test()
+
+            // When
+            connection.client.sendRawString(jsonWithUnknownKeys)
+
+            // Then
+            connection.serverWebSocketEventObserver.awaitValues(
+                any<WebSocketEvent.OnConnectionOpened>(),
+                any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithUnknownKeys)
+            )
+            serverAnImplementationObserver.awaitValues()
+        }
+
+    }
+}
+
+fun createMoshiMessageAdapterFactory(
+    config: MoshiMessageAdapter.Factory.Config = MoshiMessageAdapter.Factory.Config()
+): MoshiMessageAdapter.Factory {
+    val moshi = createMoshi()
+    return MoshiMessageAdapter.Factory(moshi, config)
+}
+
+private fun createMoshi(): Moshi = Moshi.Builder()
+    .add(VerifyJsonQualifierJsonAdapterFactory())
+    .add(Adapters())
+    .add(KotlinJsonAdapterFactory())
+    .build()
+
+@Retention(AnnotationRetention.RUNTIME)
+@JsonQualifier
+annotation class SkipMoshi
+
+@Retention(AnnotationRetention.RUNTIME)
+@JsonQualifier
+annotation class Qualifier
+
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NonQualifer
+
+interface AnInterface {
+    val name: String?
+}
+
+data class AnImplementation(override val name: String?) : AnInterface
+
+class VerifyJsonQualifierJsonAdapterFactory : JsonAdapter.Factory {
+    override fun create(
+        type: Type,
+        annotations: Set<Annotation>,
+        moshi: Moshi
+    ): JsonAdapter<*>? {
+        for (annotation in annotations) {
+            assert(annotation.annotationClass.java.isAnnotationPresent(JsonQualifier::class.java)) {
+                "Non-@JsonQualifier annotation: $annotation"
+            }
+        }
+        return null
+    }
+}
+
+@Suppress("UNUSED")
+class Adapters {
+    @ToJson
+    fun write(jsonWriter: JsonWriter, anInterface: AnInterface) {
+        jsonWriter.beginObject()
+        jsonWriter.name("name").value(anInterface.name)
+        jsonWriter.endObject()
+    }
+
+    @FromJson
+    fun read(jsonReader: JsonReader): AnInterface {
+        jsonReader.beginObject()
+
+        var name: String? = null
+        while (jsonReader.hasNext()) {
+            when (jsonReader.nextName()) {
+                "name" -> name = jsonReader.nextString()
+            }
+        }
+
+        jsonReader.endObject()
+        return AnImplementation(name!!)
+    }
+
+    @ToJson
+    fun write(writer: JsonWriter, @Suppress("UNUSED_PARAMETER") @Qualifier value: String) {
+        writer.value("qualified!")
+    }
+
+    @FromJson
+    @Qualifier
+    fun readQualified(reader: JsonReader): String {
+        val string = reader.nextString()
+        if (string == "qualified!") {
+            return "it worked!"
+        }
+        throw AssertionError("Found: $string")
+    }
+}
+
+internal interface Service {
+    @Receive
+    fun observeEvents(): Stream<WebSocketEvent>
+
+    @Send
+    fun sendRawString(@SkipMoshi message: String): Boolean
+
+    @Send
+    fun sendRawBytes(@SkipMoshi message: ByteArray): Boolean
+
+    @Send
+    fun sendAnImplementation(impl: AnImplementation): Boolean
+
+    @Receive
+    fun observeAnImplementation(): Stream<AnImplementation>
+
+    @Send
+    fun sendAnInterface(impl: AnInterface): Boolean
+
+    @Send
+    fun sendAnnotatedString(@Qualifier @NonQualifer message: String): Boolean
+
+    @Receive
+    @Qualifier
+    @NonQualifer
+    fun observeAnnotatedString(): Stream<String>
 }

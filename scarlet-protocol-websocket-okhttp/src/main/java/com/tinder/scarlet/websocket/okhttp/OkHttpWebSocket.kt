@@ -48,7 +48,8 @@ class OkHttpWebSocket(
 
     data class OpenRequest(val okHttpRequest: Request) : Protocol.OpenRequest
 
-    data class OpenResponse(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) : Protocol.OpenResponse
+    data class OpenResponse(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) :
+        Protocol.OpenResponse
 
     data class CloseRequest(val shutdownReason: ShutdownReason) : Protocol.CloseRequest
 
@@ -62,7 +63,7 @@ class OkHttpWebSocket(
     open class SimpleRequestFactory(
         private val createOpenRequestCallable: () -> OpenRequest,
         private val createCloseRequestCallable: () -> CloseRequest
-    ) : RequestFactory{
+    ) : RequestFactory {
         override fun createOpenRequest(): OpenRequest {
             return createOpenRequestCallable()
         }

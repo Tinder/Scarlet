@@ -4,9 +4,9 @@
 
 package com.tinder.app.sse.view
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.tinder.R
 import com.tinder.app.sse.domain.StockPrice
 

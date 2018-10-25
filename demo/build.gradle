@@ -42,9 +42,6 @@ dependencies {
     implementation project(':scarlet-message-adapter-protobuf')
     implementation project(':scarlet-stream-adapter-rxjava2')
 
-    implementation project(':scarlet-websocket-okhttp')
-    implementation project(':scarlet-websocket-oksse')
-
     implementation rootProject.ext.appCompat
     implementation rootProject.ext.material
     implementation rootProject.ext.multiDex

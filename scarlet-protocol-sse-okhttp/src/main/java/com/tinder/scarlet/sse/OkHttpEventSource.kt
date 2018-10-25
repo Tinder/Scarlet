@@ -37,12 +37,22 @@ class OkHttpEventSource(
 
     data class OpenRequest(val okHttpRequest: Request) : Protocol.OpenRequest
 
-    data class OpenResponse(val eventSource: EventSource, val okHttpResponse: Response) : Protocol.OpenResponse
+    data class OpenResponse(val eventSource: EventSource, val okHttpResponse: Response) :
+        Protocol.OpenResponse
 
-    data class ReceivedMessageMetaData(val id: String?, val type: String?) : Protocol.MessageMetaData
+    data class ReceivedMessageMetaData(val id: String?, val type: String?) :
+        Protocol.MessageMetaData
 
     interface RequestFactory {
         fun createOpenRequest(): OpenRequest
+    }
+
+    open class SimpleRequestFactory(
+        private val createOpenRequestCallable: () -> OpenRequest
+    ) : RequestFactory {
+        override fun createOpenRequest(): OpenRequest {
+            return createOpenRequestCallable()
+        }
     }
 }
 
@@ -80,7 +90,8 @@ class OkHttpEventSourceChannel(
 
     inner class InnerEventSourceListener : EventSourceListener() {
         override fun onOpen(eventSource: EventSource, response: Response) =
-            listener.onOpened(this@OkHttpEventSourceChannel,
+            listener.onOpened(
+                this@OkHttpEventSourceChannel,
                 OkHttpEventSource.OpenResponse(eventSource, response)
             )
 

@@ -5,10 +5,10 @@
 package com.tinder.app.sse.view
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tinder.R
 import com.tinder.app.sse.domain.MarketSnapshot
 

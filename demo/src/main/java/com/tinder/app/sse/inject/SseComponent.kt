@@ -16,6 +16,7 @@ import com.tinder.scarlet.v2.Lifecycle
 import com.tinder.scarlet.v2.Scarlet
 import com.tinder.scarlet.lifecycle.android.v2.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
+import com.tinder.scarlet.sse.OkHttpEventSource
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
@@ -67,16 +68,14 @@ interface SseComponent {
                 .add(MoshiAdapters())
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val protocol = OkHttpWebSocket(
+            val protocol = OkHttpEventSource(
                 client,
-                object : OkHttpWebSocket.RequestFactory {
-                    override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
-                        return OkHttpWebSocket.OpenRequest(Request.Builder().url(URL).build())
-                    }
-
-                    override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
-                        return OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL)
-                    }
+                OkHttpEventSource.SimpleRequestFactory {
+                    OkHttpEventSource.OpenRequest(
+                        Request.Builder().url(
+                            URL
+                        ).build()
+                    )
                 }
             )
             val configuration = Scarlet.Configuration(

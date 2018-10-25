@@ -25,7 +25,10 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
 @GdaxScope
-@Component(modules = [(GdaxComponent.GdaxModule::class)], dependencies = [(GdaxComponent.Dependency::class)])
+@Component(
+    modules = [(GdaxComponent.GdaxModule::class)],
+    dependencies = [(GdaxComponent.Dependency::class)]
+)
 interface GdaxComponent {
 
     fun inject(gdaxFragment: GdaxFragment)
@@ -64,15 +67,10 @@ interface GdaxComponent {
                 .build()
             val protocol = OkHttpWebSocket(
                 client,
-                object : OkHttpWebSocket.RequestFactory {
-                    override fun createOpenRequest(): OkHttpWebSocket.OpenRequest {
-                        return OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://ws-feed.gdax.com").build())
-                    }
-
-                    override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
-                        return OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL)
-                    }
-                }
+                OkHttpWebSocket.SimpleRequestFactory(
+                    { OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://ws-feed.gdax.com").build()) },
+                    { OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL) }
+                )
             )
             val configuration = Scarlet.Configuration(
                 protocol = protocol,
