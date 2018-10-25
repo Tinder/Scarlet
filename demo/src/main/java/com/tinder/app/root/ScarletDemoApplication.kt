@@ -13,16 +13,20 @@ import com.tinder.app.gdax.inject.DaggerGdaxComponent
 import com.tinder.app.gdax.inject.GdaxComponent
 import com.tinder.app.root.inject.ApplicationComponent
 import com.tinder.app.root.inject.DaggerApplicationComponent
+import com.tinder.app.sse.inject.DaggerSseComponent
+import com.tinder.app.sse.inject.SseComponent
 import timber.log.Timber
 import javax.inject.Inject
 
 class ScarletDemoApplication : Application(),
     ApplicationComponent.ComponentProvider,
     GdaxComponent.ComponentProvider,
-    EchoBotComponent.ComponentProvider {
+    EchoBotComponent.ComponentProvider,
+    SseComponent.ComponentProvider {
     override lateinit var applicationComponent: ApplicationComponent
     override lateinit var echoBotComponent: EchoBotComponent
     override lateinit var gdaxComponent: GdaxComponent
+    override lateinit var sseComponent: SseComponent
 
     @Inject
     lateinit var stethoInitializer: Stetho.Initializer
@@ -39,6 +43,10 @@ class ScarletDemoApplication : Application(),
             .build()
 
         gdaxComponent = DaggerGdaxComponent.builder()
+            .dependency(applicationComponent)
+            .build()
+
+        sseComponent = DaggerSseComponent.builder()
             .dependency(applicationComponent)
             .build()
 

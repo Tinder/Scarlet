@@ -15,6 +15,7 @@ import com.google.android.material.tabs.TabLayout
 import com.tinder.R
 import com.tinder.app.echo.view.EchoBotFragment
 import com.tinder.app.gdax.view.GdaxFragment
+import com.tinder.app.sse.view.SseFragment
 
 class DemoActivity : AppCompatActivity() {
 
@@ -53,7 +54,8 @@ class DemoActivity : AppCompatActivity() {
     companion object {
         private val TAB_ITEMS = listOf(
             "Echo Bot" to { EchoBotFragment() },
-            "GDAX" to { GdaxFragment() }
+            "GDAX" to { GdaxFragment() },
+            "SSE" to { SseFragment() }
         )
     }
 }
