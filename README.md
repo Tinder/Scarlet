@@ -68,6 +68,7 @@ Scarlet is driven by a [StateMachine][state-machine].
 
 TODO
 
+
 Download
 --------
 While we are working on Bintray support, Scarlet is available via [JitPack][jitpack].
