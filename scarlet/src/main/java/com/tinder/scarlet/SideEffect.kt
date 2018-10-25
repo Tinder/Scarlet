@@ -4,5 +4,4 @@
 
 package com.tinder.scarlet
 
-class SideEffect {
-}
+class SideEffect
