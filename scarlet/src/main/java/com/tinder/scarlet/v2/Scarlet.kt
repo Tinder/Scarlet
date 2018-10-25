@@ -30,6 +30,7 @@ import com.tinder.scarlet.v2.transitionadapter.ProtocolEventStateTransitionAdapt
 import com.tinder.scarlet.v2.transitionadapter.ProtocolSpecificEventStateTransitionAdapter
 import com.tinder.scarlet.v2.transitionadapter.StateStateTransitionAdapter
 import com.tinder.scarlet.v2.transitionadapter.StateTransitionAdapterResolver
+import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 
 class Scarlet internal constructor(
@@ -49,7 +50,8 @@ class Scarlet internal constructor(
         val lifecycle: Lifecycle = DEFAULT_LIFECYCLE,
         val backoffStrategy: BackoffStrategy = DEFAULT_BACKOFF_STRATEGY,
         val streamAdapterFactories: List<StreamAdapter.Factory> = emptyList(),
-        val messageAdapterFactories: List<MessageAdapter.Factory> = emptyList()
+        val messageAdapterFactories: List<MessageAdapter.Factory> = emptyList(),
+        val debug: Boolean = false
     )
 
     class Factory {
@@ -68,10 +70,10 @@ class Scarlet internal constructor(
                     configuration.lifecycle
                 ),
                 TimerEventSource(
-                    DEFAULT_SCHEDULER,
+                    getScheduler(configuration.debug),
                     configuration.backoffStrategy
                 ),
-                DEFAULT_SCHEDULER
+                getScheduler(configuration.debug)
             )
             coordinator.start()
 
@@ -115,10 +117,16 @@ class Scarlet internal constructor(
                     ProtocolEventStateTransitionAdapter.Factory(),
                     ProtocolSpecificEventStateTransitionAdapter.Factory(protocolEventAdapterFactory),
                     LifecycleStateTransitionAdapter.Factory(),
-                    DeserializationStateTransitionAdapter.Factory(deserializedValueStateTransitionAdapterFactory),
+                    DeserializationStateTransitionAdapter.Factory(
+                        deserializedValueStateTransitionAdapterFactory
+                    ),
                     deserializedValueStateTransitionAdapterFactory
                 )
             )
+        }
+
+        private fun getScheduler(isDebug: Boolean): Scheduler {
+            return if (isDebug) DEBUG_SCHEDULER else DEFAULT_SCHEDULER
         }
     }
 
@@ -128,6 +136,7 @@ class Scarlet internal constructor(
         private val RETRY_MAX_DURATION = 10000L
         private val DEFAULT_BACKOFF_STRATEGY =
             ExponentialBackoffStrategy(RETRY_BASE_DURATION, RETRY_MAX_DURATION)
-        private val DEFAULT_SCHEDULER = Schedulers.computation() // TODO same thread option for debugging
+        private val DEFAULT_SCHEDULER = Schedulers.computation()
+        private val DEBUG_SCHEDULER = Schedulers.trampoline()
     }
 }

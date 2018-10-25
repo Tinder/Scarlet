@@ -4,8 +4,8 @@ apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'maven-publish'
 
 dependencies {
-    compileOnly project(':scarlet')
-    compileOnly project(':scarlet-protocol-websocket-mockwebserver')
+    api project(':scarlet')
+    api project(':scarlet-protocol-websocket-mockwebserver')
     api rootProject.ext.assertJ
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.kotlinStdlib

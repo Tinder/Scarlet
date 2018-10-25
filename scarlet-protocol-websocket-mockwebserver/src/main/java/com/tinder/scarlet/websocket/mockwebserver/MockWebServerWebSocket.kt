@@ -53,4 +53,12 @@ class MockWebServerWebSocket(
     interface RequestFactory {
         fun createCloseRequest(): OkHttpWebSocket.CloseRequest
     }
+
+    open class SimpleRequestFactory(
+        private val createCloseRequestCallable: () -> OkHttpWebSocket.CloseRequest
+    ) : RequestFactory{
+        override fun createCloseRequest(): OkHttpWebSocket.CloseRequest {
+            return createCloseRequestCallable()
+        }
+    }
 }
