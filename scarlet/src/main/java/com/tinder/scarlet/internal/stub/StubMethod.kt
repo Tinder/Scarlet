@@ -2,16 +2,16 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.v2.stub
+package com.tinder.scarlet.internal.stub
 
 import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.StreamAdapter
-import com.tinder.scarlet.internal.servicemethod.MessageAdapterResolver
-import com.tinder.scarlet.internal.servicemethod.StreamAdapterResolver
+import com.tinder.scarlet.internal.utils.MessageAdapterResolver
+import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.utils.getParameterUpperBound
 import com.tinder.scarlet.utils.hasUnresolvableType
-import com.tinder.scarlet.v2.StateTransitionAdapter
-import com.tinder.scarlet.v2.transitionadapter.StateTransitionAdapterResolver
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
