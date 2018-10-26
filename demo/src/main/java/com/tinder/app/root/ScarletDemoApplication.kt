@@ -7,48 +7,21 @@ package com.tinder.app.root
 import android.app.Application
 import androidx.multidex.MultiDex
 import com.facebook.stetho.Stetho
-import com.tinder.app.echo.inject.DaggerEchoBotComponent
-import com.tinder.app.echo.inject.EchoBotComponent
-import com.tinder.app.gdax.inject.DaggerGdaxComponent
-import com.tinder.app.gdax.inject.GdaxComponent
-import com.tinder.app.root.inject.ApplicationComponent
-import com.tinder.app.root.inject.DaggerApplicationComponent
-import com.tinder.app.sse.inject.DaggerSseComponent
-import com.tinder.app.sse.inject.SseComponent
+import com.tinder.app.echo.koin.echoModule
+import com.tinder.app.gdax.koin.gdaxModule
+import com.tinder.app.root.koin.appModule
+import com.tinder.app.sse.koin.sseModule
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.startKoin
 import timber.log.Timber
-import javax.inject.Inject
 
-class ScarletDemoApplication : Application(),
-    ApplicationComponent.ComponentProvider,
-    GdaxComponent.ComponentProvider,
-    EchoBotComponent.ComponentProvider,
-    SseComponent.ComponentProvider {
-    override lateinit var applicationComponent: ApplicationComponent
-    override lateinit var echoBotComponent: EchoBotComponent
-    override lateinit var gdaxComponent: GdaxComponent
-    override lateinit var sseComponent: SseComponent
+class ScarletDemoApplication : Application() {
 
-    @Inject
-    lateinit var stethoInitializer: Stetho.Initializer
+    val stethoInitializer: Stetho.Initializer by inject()
 
     override fun onCreate() {
         super.onCreate()
-        applicationComponent = DaggerApplicationComponent.builder()
-            .application(this)
-            .build()
-        applicationComponent.inject(this)
-
-        echoBotComponent = DaggerEchoBotComponent.builder()
-            .dependency(applicationComponent)
-            .build()
-
-        gdaxComponent = DaggerGdaxComponent.builder()
-            .dependency(applicationComponent)
-            .build()
-
-        sseComponent = DaggerSseComponent.builder()
-            .dependency(applicationComponent)
-            .build()
+        startKoin(this, listOf(appModule, sseModule, gdaxModule, echoModule))
 
         MultiDex.install(this)
         Timber.plant(Timber.DebugTree())

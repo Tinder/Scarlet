@@ -21,19 +21,17 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.tinder.R
 import com.tinder.app.gdax.domain.Product
 import com.tinder.app.gdax.domain.Transaction
-import com.tinder.app.gdax.inject.GdaxComponent
 import com.tinder.app.gdax.presenter.GdaxPresenter
 import com.tinder.app.gdax.target.GdaxTarget
 import org.joda.time.DateTime
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
+import org.koin.android.ext.android.inject
 import java.text.DecimalFormat
-import javax.inject.Inject
 
 class GdaxFragment : Fragment(), GdaxTarget {
 
-    @Inject
-    lateinit var presenter: GdaxPresenter
+    val presenter: GdaxPresenter by inject()
     private lateinit var chart: LineChart
     private var menu: Menu? = null
 
@@ -43,8 +41,6 @@ class GdaxFragment : Fragment(), GdaxTarget {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        (context!!.applicationContext as GdaxComponent.ComponentProvider).gdaxComponent
-            .inject(this)
 
         val view = inflater.inflate(R.layout.fragment_gdax, container, false) as View
 

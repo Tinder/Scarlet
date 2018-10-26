@@ -4,13 +4,10 @@
 
 package com.tinder.app.echo.domain
 
-import com.tinder.app.echo.inject.EchoBotScope
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
-import javax.inject.Inject
 
-@EchoBotScope
-class AuthStatusRepository @Inject constructor() {
+class AuthStatusRepository {
 
     private val authStatusProcessor = BehaviorProcessor.createDefault<AuthStatus>(AuthStatus.LOGGED_IN)
 

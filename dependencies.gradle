@@ -29,6 +29,7 @@ ext {
     jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
     jsonPatch = 'com.github.fge:json-patch:1.9'
 
+    koin = 'org.koin:koin-androidx-viewmodel:1.0.1'
     dagger = 'com.google.dagger:dagger:2.12'
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.12'
     jsr250Annotations = 'javax.annotation:jsr250-api:1.0'

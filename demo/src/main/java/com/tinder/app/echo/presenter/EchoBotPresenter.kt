@@ -15,9 +15,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
-class EchoBotPresenter @Inject constructor(
+class EchoBotPresenter(
     private val chatMessageRepository: ChatMessageRepository,
     private val authStatusRepository: AuthStatusRepository
 ) {

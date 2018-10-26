@@ -22,18 +22,16 @@ import com.github.bassaer.chatmessageview.model.Message
 import com.github.bassaer.chatmessageview.view.ChatView
 import com.tinder.R
 import com.tinder.app.echo.domain.ChatMessage
-import com.tinder.app.echo.inject.EchoBotComponent
 import com.tinder.app.echo.presenter.EchoBotPresenter
 import com.tinder.app.echo.target.EchoBotTarget
 import droidninja.filepicker.FilePickerBuilder
 import droidninja.filepicker.FilePickerConst
+import org.koin.android.ext.android.inject
 import java.util.Locale
-import javax.inject.Inject
 
 class EchoBotFragment : Fragment(), EchoBotTarget {
 
-    @Inject
-    lateinit var presenter: EchoBotPresenter
+    val presenter: EchoBotPresenter by inject()
     private lateinit var chatView: ChatView
     private var menu: Menu? = null
 
@@ -43,8 +41,6 @@ class EchoBotFragment : Fragment(), EchoBotTarget {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        (context!!.applicationContext as EchoBotComponent.ComponentProvider).echoBotComponent
-            .inject(this)
 
         val view = inflater.inflate(R.layout.fragment_echo_bot, container, false) as View
 

@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -54,16 +54,13 @@ dependencies {
     implementation rootProject.ext.stethoOkHttp
     implementation rootProject.ext.timber
     implementation rootProject.ext.jodaTime
-    implementation rootProject.ext.dagger
-    kapt rootProject.ext.daggerCompiler
-    compileOnly rootProject.ext.jsr250Annotations
     implementation rootProject.ext.kotlinStdlib
     implementation rootProject.ext.mpAndroidChart
     implementation rootProject.ext.chatMessageView
     implementation rootProject.ext.filePicker
     implementation rootProject.ext.glide
-    implementation rootProject.ext.jacksonDatabind
     implementation rootProject.ext.jsonPatch
+    implementation rootProject.ext.koin
 
     testImplementation rootProject.ext.junit
 }

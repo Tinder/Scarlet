@@ -16,9 +16,8 @@ import com.tinder.scarlet.sse.EventSourceEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import timber.log.Timber
-import javax.inject.Inject
 
-class SseStockPriceRepository @Inject constructor(
+class SseStockPriceRepository constructor(
     private val stockMarketService: StockMarketService
 ) : StockPriceRepository {
 

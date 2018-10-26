@@ -7,17 +7,14 @@ package com.tinder.app.gdax.domain
 import com.tinder.app.gdax.api.GdaxService
 import com.tinder.app.gdax.api.model.ProductId
 import com.tinder.app.gdax.api.model.Subscribe
-import com.tinder.app.gdax.inject.GdaxScope
 import com.tinder.scarlet.websocket.WebSocketEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import org.joda.time.format.ISODateTimeFormat
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
 
-@GdaxScope
-class TransactionRepository @Inject constructor(
+class TransactionRepository (
     private val gdaxService: GdaxService
 ) {
 

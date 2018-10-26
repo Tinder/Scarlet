@@ -6,7 +6,6 @@ package com.tinder.app.echo.domain
 
 import android.graphics.Bitmap
 import com.tinder.app.echo.api.EchoService
-import com.tinder.app.echo.inject.EchoBotScope
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.State
@@ -18,10 +17,8 @@ import org.joda.time.DateTime
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
 
-@EchoBotScope
-class ChatMessageRepository @Inject constructor(
+class ChatMessageRepository(
     private val echoService: EchoService
 ) {
     private val messageCount = AtomicInteger()

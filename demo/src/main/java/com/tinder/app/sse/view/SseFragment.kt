@@ -11,15 +11,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tinder.R
 import com.tinder.app.sse.domain.MarketSnapshot
-import com.tinder.app.sse.inject.SseComponent
 import com.tinder.app.sse.presenter.SsePresenter
 import com.tinder.app.sse.target.SseTarget
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class SseFragment : Fragment(), SseTarget {
 
-    @Inject
-    lateinit var presenter: SsePresenter
+    val presenter: SsePresenter by inject()
 
     private lateinit var marketSnapshotView: MarketSnapshotView
 
@@ -28,9 +26,6 @@ class SseFragment : Fragment(), SseTarget {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (context!!.applicationContext as SseComponent.ComponentProvider).sseComponent
-            .inject(this)
-
         val view = inflater.inflate(R.layout.fragment_sse, container, false) as View
         marketSnapshotView = view.findViewById(R.id.marketSnapshot)
         return view

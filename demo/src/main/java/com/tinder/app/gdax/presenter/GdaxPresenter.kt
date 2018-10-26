@@ -14,9 +14,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Flowables
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class GdaxPresenter @Inject constructor(
+class GdaxPresenter(
     private val transactionRepository: TransactionRepository
 ) {
 

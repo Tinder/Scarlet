@@ -9,9 +9,8 @@ import com.tinder.app.sse.target.SseTarget
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
-import javax.inject.Inject
 
-class SsePresenter @Inject constructor(
+class SsePresenter(
     private val repository: StockPriceRepository
 ) {
     private lateinit var target: SseTarget
