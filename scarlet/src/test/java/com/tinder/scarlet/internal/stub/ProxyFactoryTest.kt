@@ -2,7 +2,6 @@ package com.tinder.scarlet.internal.stub
 
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.given
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.then
 import com.tinder.scarlet.Stream
@@ -31,20 +30,6 @@ class ProxyFactoryTest {
     }
 
     @Test
-    fun create_defaultmethod_shouldInvokeDefaultMethod() {
-        // Given
-        val stubInterface = mock<StubInterface>()
-        val service = proxyFactory.create(ExampleService::class.java, stubInterface)
-        given(platform.invokeDefaultMethod(any(), any(), any())).willReturn(true)
-
-        // When
-        service.defaultMethod()
-
-        // Then
-        then(service).should().defaultMethod()
-    }
-
-    @Test
     fun create_hashCode_shouldEqualServiceInstanceHashCode() {
         // Given
         val stubInterface = mock<StubInterface>()
@@ -68,7 +53,7 @@ class ProxyFactoryTest {
 
         // Then
         assertThat(toString)
-            .isEqualTo("Scarlet service implementation for com.tinder.scarlet.ScarletTest\$Companion\$ExampleService")
+            .isEqualTo("Scarlet service implementation for com.tinder.scarlet.internal.stub.ProxyFactoryTest\$Companion\$ExampleService")
     }
 
     @Test
@@ -101,11 +86,6 @@ class ProxyFactoryTest {
     @Suppress("UNUSED")
     companion object {
         private interface ExampleService {
-
-            fun defaultMethod() {
-                // do nothing
-            }
-
             @Send
             fun send(param1: Int)
 

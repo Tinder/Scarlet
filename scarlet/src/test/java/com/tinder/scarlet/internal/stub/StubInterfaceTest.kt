@@ -56,7 +56,7 @@ class StubInterfaceTest {
         val stubInterface = givenStubInterface()
 
         // When
-        stubInterface.invoke(RECEIVE_METHOD, arrayOf(MESSAGE))
+        stubInterface.invoke(RECEIVE_METHOD, arrayOf())
 
         // Then
         then(callback).should().receive(RECEIVE_STUB_METHOD)

@@ -42,9 +42,6 @@ class LifecycleRegistry private constructor(
 
     override fun onNext(state: LifecycleState) {
         processor.onNext(state)
-        if (state == LifecycleState.Completed) {
-            processor.onComplete()
-        }
     }
 
     override fun onComplete() {
