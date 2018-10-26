@@ -65,9 +65,9 @@ class OkHttpEventSourceChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as OkHttpEventSource.OpenRequest
+        val okHttpEventSourceOpenRequest = openRequest as OkHttpEventSource.OpenRequest
         eventSource = EventSources.createFactory(okHttpClient)
-            .newEventSource(openRequest.okHttpRequest, InnerEventSourceListener())
+            .newEventSource(okHttpEventSourceOpenRequest.okHttpRequest, InnerEventSourceListener())
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {

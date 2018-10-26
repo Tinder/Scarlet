@@ -11,6 +11,8 @@ import com.tinder.app.sse.api.model.SseMessage
 import com.tinder.app.sse.domain.MarketSnapshot
 import com.tinder.app.sse.domain.StockPrice
 import com.tinder.app.sse.domain.StockPriceRepository
+import com.tinder.scarlet.Message
+import com.tinder.scarlet.sse.EventSourceEvent
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import timber.log.Timber
@@ -28,7 +30,20 @@ class SseStockPriceRepository @Inject constructor(
     init {
         publishMarketSnapshot()
 
-        stockMarketService.observeMessage()
+        stockMarketService.observeEventSourceEvent()
+            .filter { it is EventSourceEvent.OnMessageReceived }
+            .cast(EventSourceEvent.OnMessageReceived::class.java)
+            .map {
+                val textMessage = it.message as Message.Text
+                val event = when (it.type) {
+                    SseMessage.Event.DATA.stringValue -> SseMessage.Event.DATA
+                    SseMessage.Event.PATCH.stringValue -> {
+                        SseMessage.Event.PATCH
+                    }
+                    else -> SseMessage.Event.DATA
+                }
+                SseMessage(event, textMessage.value)
+            }
             .doOnNext { message ->
                 data = when (message.event) {
                     SseMessage.Event.DATA -> mapper.readTree(message.data)
@@ -52,10 +67,12 @@ class SseStockPriceRepository @Inject constructor(
     }
 
     private fun publishMarketSnapshot() {
-        val stockPrices = data.map { StockPrice(
-            it["title"].asText(),
-            it["price"].asInt()
-        ) }
+        val stockPrices = data.map {
+            StockPrice(
+                it["title"].asText(),
+                it["price"].asInt()
+            )
+        }
         markerSnapshotProcessor.onNext(MarketSnapshot(stockPrices))
     }
 }

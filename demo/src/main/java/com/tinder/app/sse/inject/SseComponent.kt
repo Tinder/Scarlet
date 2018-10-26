@@ -70,9 +70,7 @@ interface SseComponent {
                 client,
                 OkHttpEventSource.SimpleRequestFactory {
                     OkHttpEventSource.OpenRequest(
-                        Request.Builder().url(
-                            URL
-                        ).build()
+                        Request.Builder().url(URL).build()
                     )
                 }
             )

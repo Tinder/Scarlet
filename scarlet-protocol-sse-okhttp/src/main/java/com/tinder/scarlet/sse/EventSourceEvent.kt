@@ -16,7 +16,7 @@ import java.lang.reflect.Type
 sealed class EventSourceEvent : ProtocolSpecificEvent {
     data class OnConnectionOpened(val eventSource: EventSource, val okHttpResponse: Response) : EventSourceEvent()
 
-    data class OnMessageReceived(val message: Message) : EventSourceEvent()
+    data class OnMessageReceived(val message: Message, val id: String?, val type: String?) : EventSourceEvent()
 
     object OnConnectionClosed : EventSourceEvent()
 
@@ -30,7 +30,8 @@ sealed class EventSourceEvent : ProtocolSpecificEvent {
                     EventSourceEvent.OnConnectionOpened(response.eventSource, response.okHttpResponse)
                 }
                 is ProtocolEvent.OnMessageReceived -> {
-                    EventSourceEvent.OnMessageReceived(event.message)
+                    val messageMetaData = event.messageMetaData as OkHttpEventSource.ReceivedMessageMetaData
+                    EventSourceEvent.OnMessageReceived(event.message, messageMetaData.id, messageMetaData.type)
                 }
                 is ProtocolEvent.OnClosed -> {
                     EventSourceEvent.OnConnectionClosed
