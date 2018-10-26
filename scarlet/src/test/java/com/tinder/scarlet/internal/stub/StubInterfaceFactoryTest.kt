@@ -1,15 +1,9 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
-package com.tinder.scarlet.internal.servicemethod
+package com.tinder.scarlet.internal.stub
 
 import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.given
 import com.nhaarman.mockito_kotlin.mock
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.internal.connection.Connection
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -25,7 +19,7 @@ import org.mockito.junit.MockitoRule
 import org.mockito.quality.Strictness
 
 @RunWith(Enclosed::class)
-internal class ServiceMethodExecutorFactoryTest {
+internal class StubInterfaceFactoryTest {
 
     @RunWith(Parameterized::class)
     class GivenInvalidServiceInterface(
@@ -37,27 +31,34 @@ internal class ServiceMethodExecutorFactoryTest {
         val mockitoRule: MockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS)
 
         private val platform = mock<RuntimePlatform>()
-        private val sendServiceMethodFactory = mock<ServiceMethod.Send.Factory>()
-        private val receiveServiceMethodFactory = mock<ServiceMethod.Receive.Factory>()
-        private val serviceMethodExecutorFactory = ServiceMethodExecutor.Factory(
-            platform, sendServiceMethodFactory, receiveServiceMethodFactory
+        private val callback = mock<StubInterface.Callback>()
+        private val stubMethodFactory = mock<StubMethod.Factory>()
+        private val stubInterfaceFactory = StubInterface.Factory(
+            platform, callback, stubMethodFactory
         )
 
         @Test
         fun create_shouldThrowIllegalArgumentException() {
-            // Given
-            val connection = mock<Connection>()
-
             // Then
             assertThatIllegalArgumentException()
                 .isThrownBy {
-                    serviceMethodExecutorFactory.create(serviceInterface, connection)
+                    stubInterfaceFactory.create(serviceInterface)
                 }
                 .withMessageContaining(partialErrorMessage)
         }
 
         @Suppress("UNUSED")
         companion object {
+
+            class AClass {
+                @Send
+                fun send(@Suppress("UNUSED_PARAMETER") message: String) {
+                }
+            }
+
+            interface ParentInterface
+
+            interface ChildInterface : ParentInterface
 
             private interface NoServiceMethodAnnotation {
                 fun call(param1: Int)
@@ -78,6 +79,8 @@ internal class ServiceMethodExecutorFactoryTest {
             @Parameterized.Parameters
             @JvmStatic
             fun data() = listOf(
+                param<AClass>(partialErrorMessage = "Service declarations must be interfaces"),
+                param<ChildInterface>(partialErrorMessage = "Service interfaces must not extend other interfaces"),
                 param<NoServiceMethodAnnotation>(partialErrorMessage = "one service method annotation"),
                 param<MultipleServiceMethodAnnotations>(partialErrorMessage = "one service method annotation"),
                 param<MultipleServiceMethodAnnotations2>(partialErrorMessage = "one service method annotation")
@@ -99,26 +102,24 @@ internal class ServiceMethodExecutorFactoryTest {
         val mockitoRule: MockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS)
 
         private val platform = mock<RuntimePlatform>()
-        private val sendServiceMethodFactory = mock<ServiceMethod.Send.Factory>()
-        private val receiveServiceMethodFactory = mock<ServiceMethod.Receive.Factory>()
-        private val serviceMethodExecutorFactory = ServiceMethodExecutor.Factory(
-            platform, sendServiceMethodFactory, receiveServiceMethodFactory
+        private val callback = mock<StubInterface.Callback>()
+        private val stubMethodFactory = mock<StubMethod.Factory>()
+        private val stubInterfaceFactory = StubInterface.Factory(
+            platform, callback, stubMethodFactory
         )
 
         @Test
         fun create_shouldCreateServiceMethodExecutor() {
             // Given
-            val connection = mock<Connection>()
-            given(sendServiceMethodFactory.create(eq(connection), any())).willReturn(mock())
-            given(receiveServiceMethodFactory.create(eq(connection), any())).willReturn(mock())
+            given(stubMethodFactory.create(any())).willReturn(mock())
 
             // When
-            val serviceMethodExecutor = serviceMethodExecutorFactory.create(serviceInterface, connection)
+            val stubInterface = stubInterfaceFactory.create(serviceInterface)
 
             // Then
-            val serviceMethods = serviceMethodExecutor.serviceMethods
-            val numberOfSendMethods = serviceMethods.filterValues { it is ServiceMethod.Send }.size
-            val numberOfReceiveMethods = serviceMethods.filterValues { it is ServiceMethod.Receive }.size
+            val serviceMethods = stubInterface.stubMethods
+            val numberOfSendMethods = serviceMethods.filterValues { it is StubMethod.Send }.size
+            val numberOfReceiveMethods = serviceMethods.filterValues { it is StubMethod.Receive }.size
             assertThat(numberOfSendMethods).isEqualTo(expectedNumberOfSendMethods)
             assertThat(numberOfReceiveMethods).isEqualTo(expectedNumberOfReceiveMethods)
             val expectedNumberOfMethods = expectedNumberOfSendMethods + expectedNumberOfReceiveMethods

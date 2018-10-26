@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.internal.servicemethod
+package com.tinder.scarlet.internal.utils
 
 import com.nhaarman.mockito_kotlin.given
 import com.nhaarman.mockito_kotlin.mock
@@ -17,7 +17,12 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class StreamAdapterResolverTest {
     private val streamAdapterFactory1 = mock<StreamAdapter.Factory>()
     private val streamAdapterFactory2 = mock<StreamAdapter.Factory>()
-    private val streamAdapterResolver = StreamAdapterResolver(listOf(streamAdapterFactory1, streamAdapterFactory2))
+    private val streamAdapterResolver = StreamAdapterResolver(
+        listOf(
+            streamAdapterFactory1,
+            streamAdapterFactory2
+        )
+    )
 
     @Test
     fun resolve_givenTypeIsSupportedByTheFirstStreamAdapterFactory_shouldReturnStreamAdapter() {

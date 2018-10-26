@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.lifecycle
 
-import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.LifecycleState
 import io.reactivex.Flowable
 import io.reactivex.processors.ReplayProcessor
 import io.reactivex.schedulers.TestScheduler
@@ -17,7 +17,7 @@ internal class LifecycleRegistryTest {
     @Test
     fun observeState_shouldEmitInitialLifecycleState() {
         // Given
-        val lifecycleRegistry = LifecycleRegistry(scheduler = testScheduler)
+        val lifecycleRegistry = LifecycleRegistry(throttleScheduler = testScheduler)
 
         // When
         val testSubscriber = Flowable.fromPublisher(lifecycleRegistry).test()
@@ -30,52 +30,52 @@ internal class LifecycleRegistryTest {
     @Test
     fun observeState_shouldEmitLastLifecycleState() {
         // Given
-        val lifecycleRegistry = LifecycleRegistry(scheduler = testScheduler)
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
+        val lifecycleRegistry = LifecycleRegistry(throttleScheduler = testScheduler)
+        lifecycleRegistry.onNext(LifecycleState.Started)
 
         // When
         val testSubscriber = Flowable.fromPublisher(lifecycleRegistry).test()
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
     }
 
     @Test
     fun onNext_shouldEmitLifecycleState() {
         // Given
-        val lifecycleRegistry = LifecycleRegistry(scheduler = testScheduler)
+        val lifecycleRegistry = LifecycleRegistry(throttleScheduler = testScheduler)
         val testSubscriber = Flowable.fromPublisher(lifecycleRegistry).test()
 
         // When
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
+        lifecycleRegistry.onNext(LifecycleState.Started)
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
     }
 
     @Test
     fun onNext_shouldDedupeLifecycleState() {
         // Given
-        val lifecycleRegistry = LifecycleRegistry(scheduler = testScheduler)
+        val lifecycleRegistry = LifecycleRegistry(throttleScheduler = testScheduler)
         val testSubscriber = Flowable.fromPublisher(lifecycleRegistry).test()
 
         // When
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
+        lifecycleRegistry.onNext(LifecycleState.Started)
+        lifecycleRegistry.onNext(LifecycleState.Started)
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
 
         // When
-        lifecycleRegistry.onNext(Lifecycle.State.Stopped.WithReason())
-        lifecycleRegistry.onNext(Lifecycle.State.Stopped.AndAborted)
+        lifecycleRegistry.onNext(LifecycleState.Stopped)
+        lifecycleRegistry.onNext(LifecycleState.Stopped)
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started, Lifecycle.State.Stopped.WithReason())
+        testSubscriber.assertValues(LifecycleState.Started, LifecycleState.Stopped)
     }
 
     @Test
@@ -87,20 +87,20 @@ internal class LifecycleRegistryTest {
         val lifecycle2Delay = 50L
         val lifecycle3Delay = 60L
         val lifecycle4Delay = 260L
-        ReplayProcessor.create<Lifecycle.State>()
-            .apply { onNext(Lifecycle.State.Started) }
+        ReplayProcessor.create<LifecycleState>()
+            .apply { onNext(LifecycleState.Started) }
             .delay(lifecycle1Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        ReplayProcessor.create<Lifecycle.State>()
-            .apply { onNext(Lifecycle.State.Stopped.AndAborted) }
+        ReplayProcessor.create<LifecycleState>()
+            .apply { onNext(LifecycleState.Stopped) }
             .delay(lifecycle2Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        ReplayProcessor.create<Lifecycle.State>()
-            .apply { onNext(Lifecycle.State.Started) }
+        ReplayProcessor.create<LifecycleState>()
+            .apply { onNext(LifecycleState.Started) }
             .delay(lifecycle3Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        ReplayProcessor.create<Lifecycle.State>()
-            .apply { onNext(Lifecycle.State.Stopped.AndAborted) }
+        ReplayProcessor.create<LifecycleState>()
+            .apply { onNext(LifecycleState.Stopped) }
             .delay(lifecycle4Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
 
@@ -131,27 +131,27 @@ internal class LifecycleRegistryTest {
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
 
         // When
         testScheduler.advanceTimeTo(lifecycle4Delay, TimeUnit.MILLISECONDS)
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
 
         // When
         testScheduler.advanceTimeTo(lifecycle4Delay + throttleDurationMillis, TimeUnit.MILLISECONDS)
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started, Lifecycle.State.Stopped.AndAborted)
+        testSubscriber.assertValues(LifecycleState.Started, LifecycleState.Stopped)
     }
 
     @Test
     fun onComplete_shouldTerminateLifecycleStateStream() {
         // Given
-        val lifecycleRegistry = LifecycleRegistry(scheduler = testScheduler)
+        val lifecycleRegistry = LifecycleRegistry(throttleScheduler = testScheduler)
         val testSubscriber = Flowable.fromPublisher(lifecycleRegistry).test()
 
         // When
@@ -159,7 +159,7 @@ internal class LifecycleRegistryTest {
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Destroyed)
+        testSubscriber.assertValues(LifecycleState.Completed)
         testSubscriber.assertComplete()
     }
 
@@ -172,17 +172,17 @@ internal class LifecycleRegistryTest {
         val lifecycle2Delay = 50L
         val lifecycle3Delay = 60L
         val lifecycle4Delay = 260L
-        Flowable.empty<Lifecycle.State>()
+        Flowable.empty<LifecycleState>()
             .delay(lifecycle1Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        Flowable.empty<Lifecycle.State>()
+        Flowable.empty<LifecycleState>()
             .delay(lifecycle2Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        ReplayProcessor.create<Lifecycle.State>()
-            .apply { onNext(Lifecycle.State.Started) }
+        ReplayProcessor.create<LifecycleState>()
+            .apply { onNext(LifecycleState.Started) }
             .delay(lifecycle3Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
-        Flowable.empty<Lifecycle.State>()
+        Flowable.empty<LifecycleState>()
             .delay(lifecycle4Delay, TimeUnit.MILLISECONDS, testScheduler)
             .subscribe(lifecycleRegistry)
 
@@ -216,7 +216,7 @@ internal class LifecycleRegistryTest {
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
         testSubscriber.assertNotComplete()
 
         // When
@@ -224,7 +224,7 @@ internal class LifecycleRegistryTest {
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
         testSubscriber.assertNotComplete()
 
         // When
@@ -232,7 +232,7 @@ internal class LifecycleRegistryTest {
         testScheduler.triggerActions()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started, Lifecycle.State.Destroyed)
+        testSubscriber.assertValues(LifecycleState.Started, LifecycleState.Completed)
         testSubscriber.assertComplete()
     }
 }
