@@ -103,16 +103,16 @@ internal class StateMachineFactory {
                 }
                 on(protocolClosed) {
                     if (forceClosed) {
-                        transitionTo(State.Disconnected)
-                    } else {
                         transitionTo(State.Destroyed)
+                    } else {
+                        transitionTo(State.Disconnected)
                     }
                 }
                 on(protocolFailed) {
                     if (forceClosed) {
-                        transitionTo(State.Disconnected)
-                    } else {
                         transitionTo(State.Destroyed)
+                    } else {
+                        transitionTo(State.Disconnected)
                     }
                 }
             }

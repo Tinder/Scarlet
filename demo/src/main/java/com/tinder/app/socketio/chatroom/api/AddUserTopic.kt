@@ -1,15 +1,14 @@
 package com.tinder.app.socketio.chatroom.api
 
 import com.tinder.scarlet.ProtocolEvent
-import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.ws.Receive
+import com.tinder.scarlet.ws.Send
 import io.reactivex.Flowable
 
-interface ChatRoomService {
-    @Receive
-    fun observeStateTransition(): Flowable<StateTransition>
-
+interface AddUserTopic {
     @Receive
     fun observeProtocolEvent(): Flowable<ProtocolEvent>
 
+    @Send
+    fun sendAddUser(username: String)
 }

@@ -19,9 +19,10 @@ internal class ProtocolEventStateTransitionAdapter :
             annotations: Array<Annotation>
         ): StateTransitionAdapter<Any> {
             val clazz = type.getRawType()
-            require(!ProtocolEvent::class.java.isAssignableFrom(clazz)) {
-                "Subclasses of ProtocolEvent is not supported"
-            }
+            // TODO see StateTransitionAdapter.Factory
+//            require(!clazz.isAssignableFrom(ProtocolEvent::class.java)) {
+//                "Subclasses of ProtocolEvent is not supported"
+//            }
             require(clazz == ProtocolEvent::class.java)
             return ProtocolEventStateTransitionAdapter()
         }

@@ -10,5 +10,5 @@ interface NewMessageTopic {
     fun observeNewMessage(): Flowable<NewMessageUpdate>
 
     @Send
-    fun sendNewMessage(newMessage: NewMessageUpdate)
+    fun sendNewMessage(message: String)
 }

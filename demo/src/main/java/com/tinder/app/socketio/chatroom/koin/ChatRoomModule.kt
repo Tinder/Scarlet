@@ -1,5 +1,6 @@
 package com.tinder.app.socketio.chatroom.koin
 
+import com.tinder.app.socketio.chatroom.api.AddUserTopic
 import com.tinder.app.socketio.chatroom.api.ChatRoomService
 import com.tinder.app.socketio.chatroom.api.NewMessageTopic
 import com.tinder.app.socketio.chatroom.api.TypingStartedTopic
@@ -38,6 +39,19 @@ val chatRoomModule = module {
     }
 
     // TODO add protocol to factory(protocol)
+    single {
+        val configuration = Scarlet.Configuration(
+            protocol = get(),
+            topic = Topic.Simple("add user"),
+            lifecycle = get("foreground"),
+            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
+            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
+        )
+
+        val scarlet = Scarlet.Factory().create(configuration)
+        scarlet.create<AddUserTopic>()
+    }
+
     single {
         val configuration = Scarlet.Configuration(
             protocol = get(),
@@ -103,7 +117,7 @@ val chatRoomModule = module {
         scarlet.create<UserLeftTopic>()
     }
 
-    single { ChatMessageRepository(get(), get(), get(), get(), get(), get()) }
+    single { ChatMessageRepository(get(), get(), get(), get(), get(), get(), get()) }
 
     viewModel { ChatRoomViewModel(get()) }
 
