@@ -8,6 +8,7 @@ import com.tinder.app.socketio.chatroom.api.UserJoinedTopic
 import com.tinder.app.socketio.chatroom.api.UserLeftTopic
 import com.tinder.app.socketio.chatroom.domain.ChatMessageRepository
 import com.tinder.app.socketio.chatroom.view.ChatRoomViewModel
+import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Topic
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
@@ -21,7 +22,7 @@ val chatRoomModule = module {
     // TODO sub module private
 
     single {
-        SocketIo({ CHAT_SERVER_URL })
+        SocketIo({ CHAT_SERVER_URL }) as Protocol
     }
 
     single {
@@ -36,6 +37,7 @@ val chatRoomModule = module {
         scarlet.create<ChatRoomService>()
     }
 
+    // TODO add protocol to factory(protocol)
     single {
         val configuration = Scarlet.Configuration(
             protocol = get(),
@@ -101,9 +103,9 @@ val chatRoomModule = module {
         scarlet.create<UserLeftTopic>()
     }
 
-    single { ChatMessageRepository(get(), get(), get(), get(), get()) }
+    single { ChatMessageRepository(get(), get(), get(), get(), get(), get()) }
 
-    viewModel { ChatRoomViewModel(get(), get()) }
+    viewModel { ChatRoomViewModel(get()) }
 
 }
 

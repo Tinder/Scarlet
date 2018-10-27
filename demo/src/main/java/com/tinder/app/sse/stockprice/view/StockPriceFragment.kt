@@ -25,7 +25,7 @@ class StockPriceFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_sse, container, false) as View
+        val view = inflater.inflate(R.layout.fragment_stockprice, container, false) as View
         marketSnapshotView = view.findViewById(R.id.marketSnapshot)
 
         viewModel.marketSnapshot.observe(this, Observer<MarketSnapshot> {

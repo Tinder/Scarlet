@@ -58,7 +58,6 @@ class DemoActivity : AppCompatActivity() {
             "WS - GDAX" to { GdaxFragment() },
             "SSE - Stock Price" to { StockPriceFragment() },
             "SocketIo - Chat Room" to { ChatRoomFragment() }
-
         )
     }
 }
