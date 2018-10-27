@@ -9,6 +9,7 @@ ext {
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
+    liveDateReactiveSterams = 'android.arch.lifecycle:reactivestreams:1.1.1'
 
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.2'
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
@@ -30,9 +31,6 @@ ext {
     jsonPatch = 'com.github.fge:json-patch:1.9'
 
     koin = 'org.koin:koin-androidx-viewmodel:1.0.1'
-    dagger = 'com.google.dagger:dagger:2.12'
-    daggerCompiler = 'com.google.dagger:dagger-compiler:2.12'
-    jsr250Annotations = 'javax.annotation:jsr250-api:1.0'
 
     mpAndroidChart = 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     chatMessageView = 'com.github.bassaer:chatmessageview:1.8.8'

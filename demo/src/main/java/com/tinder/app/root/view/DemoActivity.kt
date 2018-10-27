@@ -13,9 +13,9 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.tinder.R
-import com.tinder.app.echo.view.EchoBotFragment
-import com.tinder.app.gdax.view.GdaxFragment
-import com.tinder.app.sse.view.SseFragment
+import com.tinder.app.websocket.echo.view.EchoBotFragment
+import com.tinder.app.websocket.gdax.view.GdaxFragment
+import com.tinder.app.sse.stockprice.view.SseFragment
 
 class DemoActivity : AppCompatActivity() {
 
