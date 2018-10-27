@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.socketio
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
@@ -16,8 +16,8 @@ import org.json.JSONObject
 
 // TODO SocketIo server
 class SocketIo(
-    private val url: String,
-    private val options: IO.Options
+    private val url: () -> String,
+    private val options: IO.Options = IO.Options()
 ) : Protocol {
 
     private var mainChannel: SocketIoMainChannel? = null
@@ -41,7 +41,7 @@ class SocketIo(
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
                 if (channel.topic == Topic.Main) {
-                    return SocketIo.MainChannelOpenRequest(url)
+                    return SocketIo.MainChannelOpenRequest(url())
                 }
                 return SocketIo.MessageChannelOpenRequest(requireNotNull(mainChannel?.socket))
             }
@@ -64,8 +64,8 @@ class SocketIoMainChannel(
     var socket: Socket? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as SocketIo.MainChannelOpenRequest
-        val socket = IO.socket(openRequest.url, options)
+        val mainChannelOpenRequest = openRequest as SocketIo.MainChannelOpenRequest
+        val socket = IO.socket(mainChannelOpenRequest.url, options)
         socket
             .on(Socket.EVENT_CONNECT) {
                 listener.onOpened(this)
@@ -104,8 +104,8 @@ class SocketIoMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as SocketIo.MessageChannelOpenRequest
-        socket = openRequest.socket
+        val messageChannelOpenRequest = openRequest as SocketIo.MessageChannelOpenRequest
+        socket = messageChannelOpenRequest.socket
         socket?.on(topic.id) {
             val jsonObject = it[0] as JSONObject
             messageQueueListener?.onMessageReceived(this, this, Message.Text(jsonObject.toString()))

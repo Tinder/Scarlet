@@ -4,11 +4,9 @@
 
 package com.tinder.app.websocket.echo.domain
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import com.tinder.app.websocket.echo.api.EchoService
-import com.tinder.app.websocket.echo.view.EchoBotViewModel
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.State
@@ -64,7 +62,7 @@ class ChatMessageRepository(
             .subscribe({ event ->
                 val description = when (event) {
                     is WebSocketEvent.OnConnectionOpened -> "\uD83D\uDEF0️ On WebSocket Connection Opened"
-                    is WebSocketEvent.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket MessageUpdate Received"
+                    is WebSocketEvent.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket NewMessageUpdate Received"
                     is WebSocketEvent.OnConnectionClosing -> "\uD83D\uDEF0️ On WebSocket Connection Closing"
                     is WebSocketEvent.OnConnectionClosed -> "\uD83D\uDEF0️ On WebSocket Connection Closed"
                     is WebSocketEvent.OnConnectionFailed -> "\uD83D\uDEF0️ On WebSocket Connection Failed"
