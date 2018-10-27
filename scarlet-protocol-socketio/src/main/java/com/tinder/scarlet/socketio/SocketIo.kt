@@ -43,7 +43,7 @@ class SocketIo(
                 if (channel.topic == Topic.Main) {
                     return SocketIo.MainChannelOpenRequest(url())
                 }
-                return SocketIo.MessageChannelOpenRequest(requireNotNull(mainChannel?.socket))
+                return SocketIo.MessageChannelOpenRequest(mainChannel?.socket)
             }
         }
     }
@@ -54,7 +54,7 @@ class SocketIo(
 
     data class MainChannelOpenRequest(val url: String) : Protocol.OpenRequest
 
-    data class MessageChannelOpenRequest(val socket: Socket) : Protocol.OpenRequest
+    data class MessageChannelOpenRequest(val socket: Socket?) : Protocol.OpenRequest
 }
 
 class SocketIoMainChannel(
@@ -106,6 +106,10 @@ class SocketIoMessageChannel(
     override fun open(openRequest: Protocol.OpenRequest) {
         val messageChannelOpenRequest = openRequest as SocketIo.MessageChannelOpenRequest
         socket = messageChannelOpenRequest.socket
+        if (socket == null) {
+            listener.onFailed(this, IllegalStateException("main topic is null"))
+            return
+        }
         socket?.on(topic.id) {
             val jsonObject = it[0] as JSONObject
             messageQueueListener?.onMessageReceived(this, this, Message.Text(jsonObject.toString()))
