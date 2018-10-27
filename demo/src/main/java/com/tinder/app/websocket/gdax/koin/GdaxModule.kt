@@ -5,13 +5,14 @@ import com.squareup.moshi.Moshi
 import com.tinder.app.websocket.gdax.api.GdaxService
 import com.tinder.app.websocket.gdax.api.MoshiAdapters
 import com.tinder.app.websocket.gdax.domain.TransactionRepository
-import com.tinder.app.websocket.gdax.presenter.GdaxPresenter
+import com.tinder.app.websocket.gdax.view.GdaxViewModel
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import okhttp3.Request
+import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
 val gdaxModule = module {
@@ -40,6 +41,6 @@ val gdaxModule = module {
 
     single { TransactionRepository(get()) }
 
-    factory { GdaxPresenter(get()) }
+    viewModel { GdaxViewModel(get()) }
 
 }

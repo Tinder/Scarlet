@@ -26,7 +26,7 @@ val echoModule = module {
         val protocol = OkHttpWebSocket(
             get(),
             OkHttpWebSocket.SimpleRequestFactory(
-                { OkHttpWebSocket.OpenRequest(Request.Builder().url("ws://demos.kaazing.com/echo").build()) },
+                { OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://demos.kaazing.com/echo").build()) },
                 { OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL) }
             )
         )

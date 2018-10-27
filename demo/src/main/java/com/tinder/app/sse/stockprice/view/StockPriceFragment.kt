@@ -9,15 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.tinder.R
 import com.tinder.app.sse.stockprice.domain.MarketSnapshot
-import com.tinder.app.sse.stockprice.presenter.SsePresenter
-import com.tinder.app.sse.stockprice.target.SseTarget
 import org.koin.android.ext.android.inject
 
-class SseFragment : Fragment(), SseTarget {
+class StockPriceFragment : Fragment() {
 
-    val presenter: SsePresenter by inject()
+    private val viewModel: StockPriceViewModel by inject()
 
     private lateinit var marketSnapshotView: MarketSnapshotView
 
@@ -28,20 +27,11 @@ class SseFragment : Fragment(), SseTarget {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_sse, container, false) as View
         marketSnapshotView = view.findViewById(R.id.marketSnapshot)
+
+        viewModel.marketSnapshot.observe(this, Observer<MarketSnapshot> {
+            marketSnapshotView.showMarketSnapshot(it)
+        })
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.takeTarget(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.dropTarget()
-    }
-
-    override fun showMarketSnapshot(marketSnapshot: MarketSnapshot) {
-        marketSnapshotView.showMarketSnapshot(marketSnapshot)
-    }
 }

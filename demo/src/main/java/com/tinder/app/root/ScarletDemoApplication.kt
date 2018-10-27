@@ -10,6 +10,7 @@ import com.facebook.stetho.Stetho
 import com.tinder.app.websocket.echo.koin.echoModule
 import com.tinder.app.websocket.gdax.koin.gdaxModule
 import com.tinder.app.root.koin.appModule
+import com.tinder.app.socketio.chatroom.koin.chatRoomModule
 import com.tinder.app.sse.stockprice.koin.sseModule
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
@@ -21,7 +22,7 @@ class ScarletDemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        startKoin(this, listOf(appModule, sseModule, gdaxModule, echoModule))
+        startKoin(this, listOf(appModule, sseModule, gdaxModule, echoModule, chatRoomModule))
 
         MultiDex.install(this)
         Timber.plant(Timber.DebugTree())

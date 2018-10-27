@@ -8,6 +8,8 @@ interface Topic {
     val id: String
 
     object Main : Topic {
-        override val id = ""
+        override val id = "__main__"
     }
+
+    data class Simple(override val id: String) : Topic
 }

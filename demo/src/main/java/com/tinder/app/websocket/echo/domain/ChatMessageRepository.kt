@@ -50,7 +50,7 @@ class ChatMessageRepository(
                             State.Destroyed -> "\uD83D\uDCA5 Destroyed"
                         }
                     }
-                    Event.OnShouldConnect -> "⏰ On Retry"
+                    Event.OnShouldConnect -> "⏰ Should Connect"
                 }
                 val chatMessage =
                     ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
@@ -64,7 +64,7 @@ class ChatMessageRepository(
             .subscribe({ event ->
                 val description = when (event) {
                     is WebSocketEvent.OnConnectionOpened -> "\uD83D\uDEF0️ On WebSocket Connection Opened"
-                    is WebSocketEvent.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket Message Received"
+                    is WebSocketEvent.OnMessageReceived -> "\uD83D\uDEF0️ On WebSocket MessageUpdate Received"
                     is WebSocketEvent.OnConnectionClosing -> "\uD83D\uDEF0️ On WebSocket Connection Closing"
                     is WebSocketEvent.OnConnectionClosed -> "\uD83D\uDEF0️ On WebSocket Connection Closed"
                     is WebSocketEvent.OnConnectionFailed -> "\uD83D\uDEF0️ On WebSocket Connection Failed"

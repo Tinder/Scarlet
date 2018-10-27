@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -21,17 +22,15 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.tinder.R
 import com.tinder.app.websocket.gdax.domain.Product
 import com.tinder.app.websocket.gdax.domain.Transaction
-import com.tinder.app.websocket.gdax.presenter.GdaxPresenter
-import com.tinder.app.websocket.gdax.target.GdaxTarget
 import org.joda.time.DateTime
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import org.koin.android.ext.android.inject
 import java.text.DecimalFormat
 
-class GdaxFragment : Fragment(), GdaxTarget {
+class GdaxFragment : Fragment() {
 
-    val presenter: GdaxPresenter by inject()
+    private val viewModel: GdaxViewModel by inject()
     private lateinit var chart: LineChart
     private var menu: Menu? = null
 
@@ -40,18 +39,28 @@ class GdaxFragment : Fragment(), GdaxTarget {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
         val view = inflater.inflate(R.layout.fragment_gdax, container, false) as View
 
         chart = view.findViewById(R.id.chart)
+
+        viewModel.currentTransactions
+            .observe(this, Observer<GdaxViewModel.CurrentTransactions> {
+                showTransactions(it.product, it.transactions)
+            })
 
         return view
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         with(menu) {
-            val subMenu = addSubMenu(Menu.NONE, CURRENCIES_SUB_MENU_ID, Menu.NONE, CURRENCIES_SUB_MENU_TITLE)
+            val subMenu =
+                addSubMenu(Menu.NONE, CURRENCIES_SUB_MENU_ID, Menu.NONE, CURRENCIES_SUB_MENU_TITLE)
             subMenu.item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
             with(subMenu) {
                 add(BTC_USD_MENU_ITEM_TITLE)
@@ -65,14 +74,14 @@ class GdaxFragment : Fragment(), GdaxTarget {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.title) {
-            BTC_USD_MENU_ITEM_TITLE -> presenter.handleShowBTC()
-            ETH_USD_MENU_ITEM_TITLE -> presenter.handleShowETH()
-            LTC_USD_MENU_ITEM_TITLE -> presenter.handleShowLTC()
+            BTC_USD_MENU_ITEM_TITLE -> viewModel.handleShowBTC()
+            ETH_USD_MENU_ITEM_TITLE -> viewModel.handleShowETH()
+            LTC_USD_MENU_ITEM_TITLE -> viewModel.handleShowLTC()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun showTransactions(product: Product, transactions: List<Transaction>) {
+    private fun showTransactions(product: Product, transactions: List<Transaction>) {
         val chartTitle = "$product-USD"
         menu?.findItem(CURRENCIES_SUB_MENU_ID)?.title = chartTitle
 
@@ -139,16 +148,6 @@ class GdaxFragment : Fragment(), GdaxTarget {
             data = LineData(priceLineDataSet, minPriceLineDataSet)
             invalidate()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        presenter.takeTarget(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.dropTarget()
     }
 
     companion object {

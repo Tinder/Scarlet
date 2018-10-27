@@ -2,16 +2,17 @@ package com.tinder.app.sse.stockprice.koin
 
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
-import com.tinder.app.websocket.gdax.api.MoshiAdapters
 import com.tinder.app.sse.stockprice.api.SseStockPriceRepository
 import com.tinder.app.sse.stockprice.api.StockMarketService
 import com.tinder.app.sse.stockprice.domain.StockPriceRepository
-import com.tinder.app.sse.stockprice.presenter.SsePresenter
+import com.tinder.app.sse.stockprice.view.StockPriceViewModel
+import com.tinder.app.websocket.gdax.api.MoshiAdapters
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.sse.OkHttpEventSource
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import okhttp3.Request
+import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
 val sseModule = module {
@@ -41,7 +42,7 @@ val sseModule = module {
 
     single { SseStockPriceRepository(get()) as StockPriceRepository }
 
-    factory { SsePresenter(get()) }
+    viewModel { StockPriceViewModel(get()) }
 
 }
 

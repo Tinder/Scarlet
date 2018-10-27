@@ -4,11 +4,19 @@ import com.facebook.stetho.DumperPluginsProvider
 import com.facebook.stetho.Stetho
 import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module.module
 
 val appModule = module {
 
-    factory { OkHttpClient.Builder().build() }
+    factory {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor()
+                    .setLevel(HttpLoggingInterceptor.Level.BASIC)
+            )
+            .build()
+    }
 
     single("foreground") { AndroidLifecycle.ofApplicationForeground(get()) }
 
