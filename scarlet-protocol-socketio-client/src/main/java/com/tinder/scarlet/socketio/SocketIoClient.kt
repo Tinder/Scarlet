@@ -15,21 +15,24 @@ import io.socket.client.Socket
 import org.json.JSONObject
 
 // TODO SocketIo server
-class SocketIo(
+class SocketIoClient(
     private val url: () -> String,
     private val options: IO.Options = IO.Options()
 ) : Protocol {
 
+    // TOdo remove this!!
     private var mainChannel: SocketIoMainChannel? = null
 
     override fun createChannelFactory(): Channel.Factory {
         return object : Channel.Factory {
             override fun create(topic: Topic, listener: Channel.Listener): Channel {
+
                 if (topic == Topic.Main) {
                     mainChannel = SocketIoMainChannel(
                         options,
                         listener
                     )
+
                     return mainChannel!!
                 }
                 return SocketIoMessageChannel(topic, listener)
@@ -41,9 +44,9 @@ class SocketIo(
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
                 if (channel.topic == Topic.Main) {
-                    return SocketIo.MainChannelOpenRequest(url())
+                    return SocketIoClient.MainChannelOpenRequest(url())
                 }
-                return SocketIo.MessageChannelOpenRequest(mainChannel?.socket)
+                return SocketIoClient.MessageChannelOpenRequest(mainChannel?.socket)
             }
         }
     }
@@ -64,7 +67,7 @@ class SocketIoMainChannel(
     var socket: Socket? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val mainChannelOpenRequest = openRequest as SocketIo.MainChannelOpenRequest
+        val mainChannelOpenRequest = openRequest as SocketIoClient.MainChannelOpenRequest
         val socket = IO.socket(mainChannelOpenRequest.url, options)
         socket
             .on(Socket.EVENT_CONNECT) {
@@ -104,7 +107,7 @@ class SocketIoMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val messageChannelOpenRequest = openRequest as SocketIo.MessageChannelOpenRequest
+        val messageChannelOpenRequest = openRequest as SocketIoClient.MessageChannelOpenRequest
         socket = messageChannelOpenRequest.socket
         if (socket == null) {
             listener.onFailed(this, IllegalStateException("main topic is null"))
@@ -138,9 +141,13 @@ class SocketIoMessageChannel(
     override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
         val socket = socket ?: return false
         when (message) {
-            is Message.Text -> socket.emit(topic.id, message.value)
-            is Message.Bytes -> {
-                socket.emit(topic.id, message.value)
+            is Message.Text -> when (topic) {
+                Topic.Main -> socket.send(message.value)
+                else -> socket.emit(topic.id, message.value)
+            }
+            is Message.Bytes -> when (topic) {
+                Topic.Main -> socket.send(message.value)
+                else -> socket.emit(topic.id, message.value)
             }
         }
         return true

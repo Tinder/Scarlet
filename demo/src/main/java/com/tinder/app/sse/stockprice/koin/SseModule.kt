@@ -31,12 +31,11 @@ val sseModule = module {
             }
         )
         val configuration = Scarlet.Configuration(
-            protocol = protocol,
             lifecycle = get("foreground"),
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        val scarlet = Scarlet.Factory().create(configuration)
+        val scarlet = Scarlet.Factory().create(protocol, configuration)
         scarlet.create<StockMarketService>()
     }
 

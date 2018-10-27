@@ -13,7 +13,7 @@ import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Topic
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
-import com.tinder.scarlet.socketio.SocketIo
+import com.tinder.scarlet.socketio.SocketIoClient
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
@@ -23,98 +23,86 @@ val chatRoomModule = module {
     // TODO sub module private
 
     single {
-        SocketIo({ CHAT_SERVER_URL }) as Protocol
+        SocketIoClient({ CHAT_SERVER_URL }) as Protocol
     }
 
-    single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
+    factory("default") {
+        Scarlet.Configuration(
             lifecycle = get("foreground"),
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
+    }
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<ChatRoomService>()
+    single {
+        Scarlet.Factory().create(get(), get("default"))
+            .create<ChatRoomService>()
     }
 
     // TODO add protocol to factory(protocol)
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("add user"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
-
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<AddUserTopic>()
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("default")
+                    .copy(topic = Topic.Simple("add user"))
+            )
+            .create<AddUserTopic>()
     }
 
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("new message"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("default")
+                    .copy(topic = Topic.Simple("new message"))
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<NewMessageTopic>()
+            )
+            .create<NewMessageTopic>()
     }
 
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("typing"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("default")
+                    .copy(topic = Topic.Simple("typing"))
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<TypingStartedTopic>()
+            )
+            .create<TypingStartedTopic>()
     }
 
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("stop typing"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("default")
+                    .copy(topic = Topic.Simple("stop typing"))
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<TypingStoppedTopic>()
+            )
+            .create<TypingStoppedTopic>()
     }
 
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("user joined"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("user joined")
+                    .copy(topic = Topic.Simple("stop typing"))
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<UserJoinedTopic>()
+            )
+            .create<UserJoinedTopic>()
     }
 
     single {
-        val configuration = Scarlet.Configuration(
-            protocol = get(),
-            topic = Topic.Simple("user left"),
-            lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
-            streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
-        )
+        Scarlet.Factory()
+            .create(
+                get(),
+                get<Scarlet.Configuration>("user left")
+                    .copy(topic = Topic.Simple("stop typing"))
 
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<UserLeftTopic>()
+            )
+            .create<UserLeftTopic>()
     }
 
     single { ChatMessageRepository(get(), get(), get(), get(), get(), get(), get()) }

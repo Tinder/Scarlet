@@ -9,16 +9,6 @@ import com.tinder.scarlet.internal.coordinator.LifecycleEventSource
 import com.tinder.scarlet.internal.coordinator.Session
 import com.tinder.scarlet.internal.coordinator.StateMachineFactory
 import com.tinder.scarlet.internal.coordinator.TimerEventSource
-import com.tinder.scarlet.internal.utils.MessageAdapterResolver
-import com.tinder.scarlet.internal.utils.StreamAdapterResolver
-import com.tinder.scarlet.internal.utils.RuntimePlatform
-import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
-import com.tinder.scarlet.retry.BackoffStrategy
-import com.tinder.scarlet.retry.ExponentialBackoffStrategy
-import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
-import com.tinder.scarlet.lifecycle.DefaultLifecycle
-import com.tinder.scarlet.internal.stub.StubInterface
-import com.tinder.scarlet.internal.stub.StubMethod
 import com.tinder.scarlet.internal.statetransition.DeserializationStateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.DeserializedValueStateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.EventStateTransitionAdapter
@@ -29,6 +19,16 @@ import com.tinder.scarlet.internal.statetransition.ProtocolSpecificEventStateTra
 import com.tinder.scarlet.internal.statetransition.StateStateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.stub.ProxyFactory
+import com.tinder.scarlet.internal.stub.StubInterface
+import com.tinder.scarlet.internal.stub.StubMethod
+import com.tinder.scarlet.internal.utils.MessageAdapterResolver
+import com.tinder.scarlet.internal.utils.RuntimePlatform
+import com.tinder.scarlet.internal.utils.StreamAdapterResolver
+import com.tinder.scarlet.lifecycle.DefaultLifecycle
+import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
+import com.tinder.scarlet.retry.BackoffStrategy
+import com.tinder.scarlet.retry.ExponentialBackoffStrategy
+import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 
@@ -48,7 +48,6 @@ class Scarlet internal constructor(
     inline fun <reified T : Any> create(): T = create(T::class.java)
 
     data class Configuration(
-        val protocol: Protocol,
         val topic: Topic = Topic.Main,
         val lifecycle: Lifecycle = DEFAULT_LIFECYCLE,
         val backoffStrategy: BackoffStrategy = DEFAULT_BACKOFF_STRATEGY,
@@ -59,14 +58,12 @@ class Scarlet internal constructor(
 
     class Factory {
 
-        // TODO protocol coordinator cache
-
-        fun create(configuration: Configuration): Scarlet {
+        fun create(protocol: Protocol, configuration: Configuration = Configuration()): Scarlet {
 
             val coordinator = Coordinator(
                 StateMachineFactory(),
                 Session(
-                    configuration.protocol,
+                    protocol,
                     configuration.topic
                 ),
                 LifecycleEventSource(
@@ -90,7 +87,7 @@ class Scarlet internal constructor(
                     messageAdapterResolver,
                     createStateTransitionAdapterResolver(
                         messageAdapterResolver,
-                        configuration.protocol.createEventAdapterFactory()
+                        protocol.createEventAdapterFactory()
                     )
                 )
             )

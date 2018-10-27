@@ -31,13 +31,13 @@ val echoModule = module {
             )
         )
         val configuration = Scarlet.Configuration(
-            protocol = protocol,
             lifecycle = get("login"),
             messageAdapterFactories = listOf(BitmapMessageAdapter.Factory()),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create<EchoService>()
+        Scarlet.Factory()
+            .create(protocol, configuration)
+            .create<EchoService>()
     }
 
     single { ChatMessageRepository(get()) }

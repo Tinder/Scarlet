@@ -1,10 +1,10 @@
 package com.tinder.scarlet.testutils
 
+import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.MessageAdapter
+import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter
-import com.tinder.scarlet.LifecycleState
-import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
@@ -107,7 +107,11 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 }
 
                 override fun onError(throwable: Throwable) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(Level.WARNING, "server webSocket error", throwable)
+                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(
+                        Level.WARNING,
+                        "server webSocket error",
+                        throwable
+                    )
                 }
 
                 override fun onComplete() {
@@ -120,7 +124,11 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 }
 
                 override fun onError(throwable: Throwable) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(Level.WARNING, "client webSocket error", throwable)
+                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(
+                        Level.WARNING,
+                        "client webSocket error",
+                        throwable
+                    )
                 }
 
                 override fun onComplete() {
@@ -137,13 +145,12 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 }
             )
             val configuration = Scarlet.Configuration(
-                protocol = protocol,
                 lifecycle = serverLifecycleRegistry,
                 messageAdapterFactories = serverConfiguration.messageAdapterFactories,
                 streamAdapterFactories = serverConfiguration.streamAdapterFactories,
                 debug = true
             )
-            return Scarlet.Factory().create(configuration)
+            return Scarlet.Factory().create(protocol, configuration)
                 .create(clazz)
         }
 
@@ -155,13 +162,12 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                     { OkHttpWebSocket.CloseRequest(clientConfiguration.shutdownReason) })
             )
             val configuration = Scarlet.Configuration(
-                protocol = protocol,
                 lifecycle = clientLifecycleRegistry,
                 messageAdapterFactories = clientConfiguration.messageAdapterFactories,
                 streamAdapterFactories = clientConfiguration.streamAdapterFactories,
                 debug = true
             )
-            val scarlet = Scarlet.Factory().create(configuration)
+            val scarlet = Scarlet.Factory().create(protocol, configuration)
             return scarlet.create(clazz)
         }
 
@@ -178,7 +184,8 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
     )
 
     companion object {
-        private val LOGGER = Logger.getLogger(com.tinder.scarlet.testutils.OkHttpWebSocketConnection::class.java.name)
+        private val LOGGER =
+            Logger.getLogger(com.tinder.scarlet.testutils.OkHttpWebSocketConnection::class.java.name)
 
         inline fun <reified SERVICE : Any> create(
             noinline observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>,

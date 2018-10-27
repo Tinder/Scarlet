@@ -30,13 +30,13 @@ val gdaxModule = module {
             )
         )
         val configuration = Scarlet.Configuration(
-            protocol = protocol,
             lifecycle = get("foreground"),
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        val scarlet = Scarlet.Factory().create(configuration)
-        scarlet.create< GdaxService>()
+        Scarlet.Factory()
+            .create(protocol, configuration)
+            .create<GdaxService>()
     }
 
     single { TransactionRepository(get()) }

@@ -11,5 +11,4 @@ interface ChatRoomService {
 
     @Receive
     fun observeProtocolEvent(): Flowable<ProtocolEvent>
-
 }
