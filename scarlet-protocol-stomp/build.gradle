@@ -5,11 +5,6 @@ apply plugin: 'maven-publish'
 
 dependencies {
     api project(':scarlet-core')
-    api rootProject.ext.okHttp
-    api rootProject.ext.mockWebServer
-    implementation rootProject.ext.okHttpServerSentEvent
-    implementation rootProject.ext.socketIo
-    implementation rootProject.ext.pahoMqtt
     implementation files('libs/gozirra-client-0.4.1.jar')
 
     implementation project(':scarlet-core-internal')
@@ -21,6 +16,13 @@ dependencies {
     testImplementation rootProject.ext.mockito
     testImplementation rootProject.ext.kotlinReflect
     testImplementation rootProject.ext.assertJ
+
+    testImplementation 'org.apache.activemq.tooling:activemq-junit:5.13.1'
+    testImplementation  group: 'org.apache.activemq', name: 'activemq-jaas', version: '5.15.6'
+    testImplementation  group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+
+    testImplementation 'org.apache.activemq:activemq-broker:5.15.6'
+    testImplementation 'org.apache.activemq:activemq-stomp:5.15.6'
 }
 
 dokka {

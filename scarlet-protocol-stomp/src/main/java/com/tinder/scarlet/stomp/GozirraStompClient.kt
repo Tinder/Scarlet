@@ -13,9 +13,8 @@ import net.ser1.stomp.Client
 import javax.security.auth.login.LoginException
 
 class GozirraStompClient(
-    private val openRequestFactory: GozirraStompClient.RequestFactory
+    private val openRequestFactory: RequestFactory
 ) : Protocol {
-    private var mainChannel: StompMainChannel? = null
 
     override fun createChannelFactory(): Channel.Factory {
         return object : Channel.Factory {
@@ -24,11 +23,6 @@ class GozirraStompClient(
                 parent: Channel?
             ): Channel {
                 return StompMainChannel(listener)
-//                if (topic == Topic.Main) {
-//                    mainChannel = StompMainChannel(listener)
-//                    return mainChannel!!
-//                }
-//                return StompMessageChannel(topic, listener)
             }
         }
     }
@@ -37,13 +31,6 @@ class GozirraStompClient(
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
                 return openRequestFactory.createClientOpenRequest()
-//                if (channel.topic == Topic.Main) {
-//                    return openRequestFactory.createClientOpenRequest()
-//                }
-//                return GozirraStompClient.DestinationOpenRequest(
-//                    requireNotNull(mainChannel?.client),
-//                    openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
-//                )
             }
         }
     }
@@ -54,20 +41,14 @@ class GozirraStompClient(
 
     interface RequestFactory {
         fun createClientOpenRequest(): ClientOpenRequest
-        fun createDestinationOpenRequestHeader(destination: String): Map<String, String>
     }
 
 
     open class SimpleRequestFactory(
-        private val createClientOpenRequestCallable: () -> ClientOpenRequest,
-        private val createDestinationOpenRequestHeaderCallable: (String) -> Map<String, String>
+        private val createClientOpenRequestCallable: () -> ClientOpenRequest
     ) : RequestFactory {
         override fun createClientOpenRequest(): ClientOpenRequest {
             return createClientOpenRequestCallable()
-        }
-
-        override fun createDestinationOpenRequestHeader(destination: String): Map<String, String> {
-            return createDestinationOpenRequestHeaderCallable(destination)
         }
     }
 
@@ -78,12 +59,58 @@ class GozirraStompClient(
         val password: String
     ) : Protocol.OpenRequest
 
+    data class MessageMetaData(val headers: Map<String, String>) : Protocol.MessageMetaData
+}
+
+class GozirraStompDestination(
+    val destination: String,
+    private val openRequestFactory: RequestFactory
+) : Protocol {
+
+    override fun createChannelFactory(): Channel.Factory {
+        return object : Channel.Factory {
+            override fun create(
+                listener: Channel.Listener,
+                parent: Channel?
+            ): Channel {
+                require(parent is StompMainChannel)
+                return StompMessageChannel(parent as StompMainChannel, destination, listener)
+            }
+        }
+    }
+
+    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
+        return object : Protocol.OpenRequest.Factory {
+            override fun create(channel: Channel): Protocol.OpenRequest {
+                return DestinationOpenRequest(
+                    openRequestFactory.createDestinationOpenRequestHeader(destination)
+                )
+            }
+        }
+    }
+
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
+        return object : ProtocolEventAdapter.Factory {}
+    }
+
+    interface RequestFactory {
+        fun createDestinationOpenRequestHeader(destination: String): Map<String, String>
+    }
+
+
+    open class SimpleRequestFactory(
+        private val createDestinationOpenRequestHeaderCallable: (String) -> Map<String, String>
+    ) : RequestFactory {
+
+        override fun createDestinationOpenRequestHeader(destination: String): Map<String, String> {
+            return createDestinationOpenRequestHeaderCallable(destination)
+        }
+    }
+
     data class DestinationOpenRequest(
-        val client: Client,
         val headers: Map<String, String>
     ) : Protocol.OpenRequest
 
-    data class MessageMetaData(val headers: Map<String, String>) : Protocol.MessageMetaData
 }
 
 class StompMainChannel(
@@ -129,7 +156,8 @@ class StompMainChannel(
 }
 
 class StompMessageChannel(
-    val topic: String,
+    val mainChannel : StompMainChannel,
+    val destination: String,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
@@ -137,10 +165,10 @@ class StompMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as GozirraStompClient.DestinationOpenRequest
-        client = openRequest.client
+        val destinationOpenRequest = openRequest as GozirraStompDestination.DestinationOpenRequest
+        client = mainChannel.client
         client?.subscribe(
-            topic,
+            destination,
             { headers, message ->
                 messageQueueListener?.onMessageReceived(
                     this,
@@ -148,7 +176,9 @@ class StompMessageChannel(
                     Message.Text(message),
                     GozirraStompClient.MessageMetaData(headers as Map<String, String>)
                 )
-            }, openRequest.headers
+            },
+            // This map is modified by gozirra internally
+            destinationOpenRequest.headers.toMutableMap()
         )
         listener.onOpened(this)
     }
@@ -158,7 +188,7 @@ class StompMessageChannel(
     }
 
     override fun forceClose() {
-        client?.unsubscribe(topic)
+        client?.unsubscribe(destination)
         client = null
         listener.onClosed(this)
     }
@@ -172,7 +202,7 @@ class StompMessageChannel(
     override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
         val client = client ?: return false
         when (message) {
-            is Message.Text -> client.send(topic, message.value)
+            is Message.Text -> client.send(destination, message.value)
             is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
         }
         return true

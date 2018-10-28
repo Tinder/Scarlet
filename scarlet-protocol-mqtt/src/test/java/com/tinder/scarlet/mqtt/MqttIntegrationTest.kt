@@ -1,4 +1,4 @@
-package com.tindre.scarlet.stomp
+package com.tinder.scarlet.mqtt
 
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.ProtocolEvent
@@ -21,7 +21,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 
-class StompIntegrationTest {
+class MqttIntegrationTest {
     @get:Rule
     val broker = object : EmbeddedActiveMQBroker() {
         override fun configure() {
@@ -149,7 +149,7 @@ class StompIntegrationTest {
 
     companion object {
         private val LOGGER =
-            Logger.getLogger(StompIntegrationTest::class.java.name)
+            Logger.getLogger(MqttIntegrationTest::class.java.name)
 
 
         interface StompService {
