@@ -12,8 +12,8 @@ import com.tinder.scarlet.ProtocolEventAdapter
 import net.ser1.stomp.Client
 import javax.security.auth.login.LoginException
 
-class StompProtocol(
-    private val openRequestFactory: StompProtocol.RequestFactory
+class GozirraStompClient(
+    private val openRequestFactory: GozirraStompClient.RequestFactory
 ) : Protocol {
     private var mainChannel: StompMainChannel? = null
 
@@ -40,7 +40,7 @@ class StompProtocol(
 //                if (channel.topic == Topic.Main) {
 //                    return openRequestFactory.createClientOpenRequest()
 //                }
-//                return StompProtocol.DestinationOpenRequest(
+//                return GozirraStompClient.DestinationOpenRequest(
 //                    requireNotNull(mainChannel?.client),
 //                    openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
 //                )
@@ -55,6 +55,20 @@ class StompProtocol(
     interface RequestFactory {
         fun createClientOpenRequest(): ClientOpenRequest
         fun createDestinationOpenRequestHeader(destination: String): Map<String, String>
+    }
+
+
+    open class SimpleRequestFactory(
+        private val createClientOpenRequestCallable: () -> ClientOpenRequest,
+        private val createDestinationOpenRequestHeaderCallable: (String) -> Map<String, String>
+    ) : RequestFactory {
+        override fun createClientOpenRequest(): ClientOpenRequest {
+            return createClientOpenRequestCallable()
+        }
+
+        override fun createDestinationOpenRequestHeader(destination: String): Map<String, String> {
+            return createDestinationOpenRequestHeaderCallable(destination)
+        }
     }
 
     data class ClientOpenRequest(
@@ -78,7 +92,7 @@ class StompMainChannel(
     var client: Client? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val (url, port, login, password) = openRequest as StompProtocol.ClientOpenRequest
+        val (url, port, login, password) = openRequest as GozirraStompClient.ClientOpenRequest
         try {
             val client = Client(url, port, login, password)
             client.addErrorListener { _, _ ->
@@ -123,7 +137,7 @@ class StompMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as StompProtocol.DestinationOpenRequest
+        val openRequest = openRequest as GozirraStompClient.DestinationOpenRequest
         client = openRequest.client
         client?.subscribe(
             topic,
@@ -132,7 +146,7 @@ class StompMessageChannel(
                     this,
                     this,
                     Message.Text(message),
-                    StompProtocol.MessageMetaData(headers as Map<String, String>)
+                    GozirraStompClient.MessageMetaData(headers as Map<String, String>)
                 )
             }, openRequest.headers
         )
