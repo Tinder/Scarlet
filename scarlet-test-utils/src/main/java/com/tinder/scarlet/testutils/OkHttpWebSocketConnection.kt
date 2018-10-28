@@ -103,11 +103,11 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
             clientWebSocketEventObserver = client.observeWebSocketEvent().test()
             server.observeWebSocketEvent().start(object : Stream.Observer<WebSocketEvent> {
                 override fun onNext(data: WebSocketEvent) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.info("server webSocket event: $data")
+                    LOGGER.info("server webSocket event: $data")
                 }
 
                 override fun onError(throwable: Throwable) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(
+                    LOGGER.log(
                         Level.WARNING,
                         "server webSocket error",
                         throwable
@@ -115,16 +115,16 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 }
 
                 override fun onComplete() {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.info("server webSocket completed")
+                    LOGGER.info("server webSocket completed")
                 }
             })
             client.observeWebSocketEvent().start(object : Stream.Observer<WebSocketEvent> {
                 override fun onNext(data: WebSocketEvent) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.info("client webSocket event: $data")
+                    LOGGER.info("client webSocket event: $data")
                 }
 
                 override fun onError(throwable: Throwable) {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.log(
+                    LOGGER.log(
                         Level.WARNING,
                         "client webSocket error",
                         throwable
@@ -132,7 +132,7 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 }
 
                 override fun onComplete() {
-                    com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Companion.LOGGER.info("client webSocket completed")
+                    LOGGER.info("client webSocket completed")
                 }
             })
         }
@@ -185,14 +185,14 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
 
     companion object {
         private val LOGGER =
-            Logger.getLogger(com.tinder.scarlet.testutils.OkHttpWebSocketConnection::class.java.name)
+            Logger.getLogger(OkHttpWebSocketConnection::class.java.name)
 
         inline fun <reified SERVICE : Any> create(
             noinline observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>,
-            serverConfiguration: Configuration = com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Configuration(),
-            clientConfiguration: Configuration = com.tinder.scarlet.testutils.OkHttpWebSocketConnection.Configuration()
+            serverConfiguration: Configuration = OkHttpWebSocketConnection.Configuration(),
+            clientConfiguration: Configuration = OkHttpWebSocketConnection.Configuration()
         ): OkHttpWebSocketConnection<SERVICE> {
-            return com.tinder.scarlet.testutils.OkHttpWebSocketConnection(
+            return OkHttpWebSocketConnection(
                 SERVICE::class.java,
                 observeWebSocketEvent,
                 serverConfiguration,
