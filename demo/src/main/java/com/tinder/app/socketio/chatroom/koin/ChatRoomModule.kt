@@ -11,8 +11,8 @@ import com.tinder.app.socketio.chatroom.domain.ChatMessageRepository
 import com.tinder.app.socketio.chatroom.view.ChatRoomViewModel
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
-import com.tinder.scarlet.socketio.SocketIoClient
-import com.tinder.scarlet.socketio.SocketIoTopic
+import com.tinder.scarlet.socketio.client.SocketIoClient
+import com.tinder.scarlet.socketio.client.SocketIoTopic
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module

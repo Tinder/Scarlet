@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.socketio
+package com.tinder.scarlet.socketio.client
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
@@ -13,7 +13,6 @@ import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
 
-// TODO SocketIo server
 class SocketIoClient(
     private val url: () -> String,
     private val options: IO.Options = IO.Options()
@@ -36,7 +35,7 @@ class SocketIoClient(
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
-                return SocketIoClient.MainChannelOpenRequest(url())
+                return MainChannelOpenRequest(url())
             }
         }
     }
@@ -46,8 +45,6 @@ class SocketIoClient(
     }
 
     data class MainChannelOpenRequest(val url: String) : Protocol.OpenRequest
-
-    class MessageChannelOpenRequest() : Protocol.OpenRequest
 }
 
 class SocketIoTopic(
@@ -61,15 +58,11 @@ class SocketIoTopic(
                 parent: Channel?
             ): Channel {
                 require(parent is SocketIoMainChannel)
-                return SocketIoMessageChannel(parent as SocketIoMainChannel, topic, listener)
-            }
-        }
-    }
-
-    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return object : Protocol.OpenRequest.Factory {
-            override fun create(channel: Channel): Protocol.OpenRequest {
-                return SocketIoClient.MessageChannelOpenRequest()
+                return SocketIoMessageChannel(
+                    parent as SocketIoMainChannel,
+                    topic,
+                    listener
+                )
             }
         }
     }
@@ -128,7 +121,6 @@ internal class SocketIoMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val messageChannelOpenRequest = openRequest as SocketIoClient.MessageChannelOpenRequest
         socket = parent.socket
         if (socket == null) {
             listener.onFailed(this, IllegalStateException("main topic is null"))
@@ -136,7 +128,9 @@ internal class SocketIoMessageChannel(
         }
         socket?.on(topic) {
             val jsonObject = it[0] as JSONObject
-            messageQueueListener?.onMessageReceived(this, this, Message.Text(jsonObject.toString()))
+            messageQueueListener?.onMessageReceived(this, this,
+                Message.Text(jsonObject.toString())
+            )
         }
         listener.onOpened(this)
     }
