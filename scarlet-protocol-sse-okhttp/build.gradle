@@ -6,10 +6,7 @@ apply plugin: 'maven-publish'
 dependencies {
     api project(':scarlet-core')
     api rootProject.ext.okHttp
-    api rootProject.ext.mockWebServer
     implementation rootProject.ext.okHttpServerSentEvent
-    implementation rootProject.ext.socketIo
-    implementation rootProject.ext.pahoMqtt
 
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava

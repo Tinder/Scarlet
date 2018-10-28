@@ -9,9 +9,11 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallback
-import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 
@@ -44,7 +46,7 @@ class PahoMqttClient(
     }
 
     interface MqttClientFactory {
-        fun create(): MqttClient
+        fun create(): MqttAsyncClient
     }
 
     interface MqttConnectOptionsFactory {
@@ -99,7 +101,7 @@ class MqttMainChannel(
     private val pahoMqttClientClientFactory: PahoMqttClient.MqttClientFactory,
     private val listener: Channel.Listener
 ) : Channel {
-    var client: MqttClient? = null
+    var client: MqttAsyncClient? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
 //        if (client != null) {
@@ -109,18 +111,37 @@ class MqttMainChannel(
         val (options) = openRequest as PahoMqttClient.ClientOpenRequest
         val client = pahoMqttClientClientFactory.create()
         client.setCallback(InnerMqttCallback())
-        client.connect(options)
-        listener.onOpened(this)
+        client.connect(options, object : IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {
+                listener.onOpened(this@MqttMainChannel)
+            }
+
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                listener.onFailed(this@MqttMainChannel, exception)
+            }
+        })
         this.client = client
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
-        forceClose()
+        client?.disconnect(null,
+            object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    listener.onClosed(this@MqttMainChannel)
+                    client = null
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    listener.onFailed(this@MqttMainChannel, exception)
+                    client = null
+                }
+            })
     }
 
     override fun forceClose() {
         try {
-            client?.disconnect()
+            client?.disconnectForcibly()
+            client = null
             listener.onClosed(this)
         } catch (e: Throwable) {
             listener.onFailed(this, e)
@@ -133,6 +154,7 @@ class MqttMainChannel(
 
     inner class InnerMqttCallback : MqttCallback {
         override fun messageArrived(topic: String, message: MqttMessage) {
+            topic
         }
 
         override fun connectionLost(cause: Throwable) {
@@ -150,14 +172,25 @@ class MqttMessageChannel(
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
-    private var client: MqttClient? = null
+    private var client: MqttAsyncClient? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val topicFilterOpenRequest = openRequest as PahoMqttTopicFilter.TopicFilterOpenRequest
         client = mqttMainChannel.client
         client?.subscribe(
-            topicFilter, topicFilterOpenRequest.qos
+            topicFilter,
+            topicFilterOpenRequest.qos,
+            null,
+            object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    listener.onOpened(this@MqttMessageChannel)
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    listener.onFailed(this@MqttMessageChannel, exception)
+                }
+            }
         ) { topic, message ->
             // TODO topic may be different from topic filter. should be added to meta data
             messageQueueListener?.onMessageReceived(
@@ -167,7 +200,6 @@ class MqttMessageChannel(
                 PahoMqttClient.ReceivedMessageMetaData(message.id)
             )
         }
-        listener.onOpened(this)
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
@@ -175,9 +207,20 @@ class MqttMessageChannel(
     }
 
     override fun forceClose() {
-        client?.unsubscribe(topicFilter)
-        client = null
-        listener.onClosed(this)
+//        client?.unsubscribe(topicFilter,
+//            null,
+//            object : IMqttActionListener {
+//                override fun onSuccess(asyncActionToken: IMqttToken?) {
+//                    listener.onClosed(this@MqttMessageChannel)
+//                    client = null
+//                }
+//
+//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+//                    listener.onFailed(this@MqttMessageChannel, exception)
+//                    client = null
+//
+//                }
+//            })
     }
 
     override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {

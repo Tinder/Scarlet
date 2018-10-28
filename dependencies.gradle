@@ -46,8 +46,15 @@ ext {
     mockWebServer = 'com.squareup.okhttp3:mockwebserver:3.11.0'
     timber = 'com.jakewharton.timber:timber:4.6.0'
     okSse = 'com.github.heremaps:oksse:0.9.0'
-    socketIo = 'io.socket:socket.io-client:1.0.0'
+    socketIoClient = 'io.socket:socket.io-client:1.0.0'
+    nettySocketIoServer = 'com.corundumstudio.socketio:netty-socketio:1.7.12'
     pahoMqtt = 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
+    activeMqJUnit = 'org.apache.activemq.tooling:activemq-junit:5.13.1'
+    activeMqBroker = 'org.apache.activemq:activemq-broker:5.15.6'
+    activeMqStomp = 'org.apache.activemq:activemq-stomp:5.15.6'
+    activeMqMqtt = 'org.apache.activemq:activemq-mqtt:5.15.6'
+    slf4jSimple  = 'org.slf4j:slf4j-simple:1.7.25'
+
 
     junit = 'junit:junit:4.12'
     mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
