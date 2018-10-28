@@ -44,6 +44,8 @@ internal class TimerEventSource(
         override fun onComplete() {
         }
 
-        override fun onError(throwable: Throwable) = throw throwable
+        override fun onError(throwable: Throwable) {
+            throw throwable
+        }
     }
 }

@@ -15,13 +15,10 @@ import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 
-class Mqtt(
+class PahoMqttClient(
     private val mqttClientFactory: MqttClientFactory,
-    private val mqttConnectOptionsFactory: MqttConnectOptionsFactory,
-    private val qos: Int
+    private val mqttConnectOptionsFactory: MqttConnectOptionsFactory
 ) : Protocol {
-
-    private var mainChannel: MqttMainChannel? = null
 
     override fun createChannelFactory(): Channel.Factory {
         return object : Channel.Factory {
@@ -30,11 +27,6 @@ class Mqtt(
                 parent: Channel?
             ): Channel {
                 return MqttMainChannel(mqttClientFactory, listener)
-//                if (topic == Topic.Main) {
-//                    mainChannel = MqttMainChannel(mqttClientFactory, listener)
-//                    return mainChannel!!
-//                }
-//                return MqttMessageChannel(topic, listener)
             }
         }
     }
@@ -42,14 +34,7 @@ class Mqtt(
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
-                return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
-//                if (channel.topic == Topic.Main) {
-//                    return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
-//                }
-//                return Mqtt.TopicOpenRequest(
-//                    requireNotNull(mainChannel?.client),
-//                    qos
-//                )
+                return PahoMqttClient.ClientOpenRequest(mqttConnectOptionsFactory.create())
             }
         }
     }
@@ -70,31 +55,62 @@ class Mqtt(
         val options: MqttConnectOptions
     ) : Protocol.OpenRequest
 
-    data class TopicOpenRequest(
-        val client: MqttClient,
-        val qos: Int
-    ) : Protocol.OpenRequest
-
     data class ReceivedMessageMetaData(
         val id: Int
     ) : Protocol.MessageMetaData
 }
 
+class PahoMqttTopicFilter(
+    private val topicFilter: String,
+    private val qos: Int = 1
+) : Protocol {
+    override fun createChannelFactory(): Channel.Factory {
+        return object : Channel.Factory {
+            override fun create(
+                listener: Channel.Listener,
+                parent: Channel?
+            ): Channel {
+                require(parent is MqttMainChannel)
+                return MqttMessageChannel(parent as MqttMainChannel, topicFilter, listener)
+            }
+        }
+    }
+
+    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
+        return object : Protocol.OpenRequest.Factory {
+            override fun create(channel: Channel): Protocol.OpenRequest {
+                return TopicFilterOpenRequest(
+                    qos
+                )
+            }
+        }
+    }
+
+    override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
+        return object : ProtocolEventAdapter.Factory {}
+    }
+
+    data class TopicFilterOpenRequest(
+        val qos: Int
+    ) : Protocol.OpenRequest
+}
+
 class MqttMainChannel(
-    private val mqttClientFactory: Mqtt.MqttClientFactory,
+    private val pahoMqttClientClientFactory: PahoMqttClient.MqttClientFactory,
     private val listener: Channel.Listener
 ) : Channel {
     var client: MqttClient? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        if (client != null) {
-            client?.reconnect()
-            return
-        }
-        val (options) = openRequest as Mqtt.ClientOpenRequest
-        val client = mqttClientFactory.create()
+//        if (client != null) {
+//            client?.reconnect()
+//            return
+//        }
+        val (options) = openRequest as PahoMqttClient.ClientOpenRequest
+        val client = pahoMqttClientClientFactory.create()
         client.setCallback(InnerMqttCallback())
         client.connect(options)
+        listener.onOpened(this)
         this.client = client
     }
 
@@ -129,7 +145,8 @@ class MqttMainChannel(
 }
 
 class MqttMessageChannel(
-    private val topic: String,
+    private val mqttMainChannel: MqttMainChannel,
+    private val topicFilter: String,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
@@ -137,16 +154,17 @@ class MqttMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openRequest = openRequest as Mqtt.TopicOpenRequest
-        client = openRequest.client
+        val topicFilterOpenRequest = openRequest as PahoMqttTopicFilter.TopicFilterOpenRequest
+        client = mqttMainChannel.client
         client?.subscribe(
-            topic, openRequest.qos
-        ) { _, message ->
+            topicFilter, topicFilterOpenRequest.qos
+        ) { topic, message ->
+            // TODO topic may be different from topic filter. should be added to meta data
             messageQueueListener?.onMessageReceived(
                 this,
                 this,
                 Message.Bytes(message.payload),
-                Mqtt.ReceivedMessageMetaData(message.id)
+                PahoMqttClient.ReceivedMessageMetaData(message.id)
             )
         }
         listener.onOpened(this)
@@ -157,7 +175,7 @@ class MqttMessageChannel(
     }
 
     override fun forceClose() {
-        client?.unsubscribe(topic)
+        client?.unsubscribe(topicFilter)
         client = null
         listener.onClosed(this)
     }
@@ -172,7 +190,7 @@ class MqttMessageChannel(
         val client = client ?: return false
         when (message) {
             is Message.Text -> throw IllegalArgumentException("String are not supported")
-            is Message.Bytes -> client.publish(topic, MqttMessage(message.value)) // TODO qos
+            is Message.Bytes -> client.publish(topicFilter, MqttMessage(message.value)) // TODO qos
         }
         return true
     }

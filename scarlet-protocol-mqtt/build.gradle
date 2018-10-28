@@ -23,6 +23,7 @@ dependencies {
 
     testImplementation 'org.apache.activemq:activemq-broker:5.15.6'
     testImplementation 'org.apache.activemq:activemq-stomp:5.15.6'
+    testImplementation 'org.apache.activemq:activemq-mqtt:5.15.6'
 }
 
 dokka {
