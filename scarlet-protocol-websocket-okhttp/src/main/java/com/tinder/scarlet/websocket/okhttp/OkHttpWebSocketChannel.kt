@@ -4,11 +4,10 @@
 
 package com.tinder.scarlet.websocket.okhttp
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
-import com.tinder.scarlet.Topic
 import com.tinder.scarlet.websocket.ShutdownReason
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -19,7 +18,6 @@ class OkHttpWebSocketChannel(
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
-    override val topic: Topic = Topic.Main
     private var webSocket: WebSocket? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
@@ -118,10 +116,10 @@ class OkHttpWebSocketChannel(
         private val webSocketFactory: WebSocketFactory
     ) : Channel.Factory {
 
-        override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic != Topic.Main) {
-                return null
-            }
+        override fun create(
+            listener: Channel.Listener,
+            parent: Channel?
+        ): Channel? {
             return OkHttpWebSocketChannel(
                 webSocketFactory,
                 listener

@@ -35,8 +35,7 @@ val echoModule = module {
             messageAdapterFactories = listOf(BitmapMessageAdapter.Factory()),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        Scarlet.Factory()
-            .create(protocol, configuration)
+        Scarlet(protocol, configuration)
             .create<EchoService>()
     }
 

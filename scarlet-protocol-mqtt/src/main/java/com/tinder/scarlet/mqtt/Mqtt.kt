@@ -4,12 +4,11 @@
 
 package com.tinder.scarlet.mqtt
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
-import com.tinder.scarlet.Topic
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttClient
@@ -26,12 +25,16 @@ class Mqtt(
 
     override fun createChannelFactory(): Channel.Factory {
         return object : Channel.Factory {
-            override fun create(topic: Topic, listener: Channel.Listener): Channel {
-                if (topic == Topic.Main) {
-                    mainChannel = MqttMainChannel(mqttClientFactory, listener)
-                    return mainChannel!!
-                }
-                return MqttMessageChannel(topic, listener)
+            override fun create(
+                listener: Channel.Listener,
+                parent: Channel?
+            ): Channel {
+                return MqttMainChannel(mqttClientFactory, listener)
+//                if (topic == Topic.Main) {
+//                    mainChannel = MqttMainChannel(mqttClientFactory, listener)
+//                    return mainChannel!!
+//                }
+//                return MqttMessageChannel(topic, listener)
             }
         }
     }
@@ -39,13 +42,14 @@ class Mqtt(
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
-                if (channel.topic == Topic.Main) {
-                    return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
-                }
-                return Mqtt.TopicOpenRequest(
-                    requireNotNull(mainChannel?.client),
-                    qos
-                )
+                return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
+//                if (channel.topic == Topic.Main) {
+//                    return Mqtt.ClientOpenRequest(mqttConnectOptionsFactory.create())
+//                }
+//                return Mqtt.TopicOpenRequest(
+//                    requireNotNull(mainChannel?.client),
+//                    qos
+//                )
             }
         }
     }
@@ -125,7 +129,7 @@ class MqttMainChannel(
 }
 
 class MqttMessageChannel(
-    override val topic: Topic,
+    private val topic: String,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
@@ -136,7 +140,7 @@ class MqttMessageChannel(
         val openRequest = openRequest as Mqtt.TopicOpenRequest
         client = openRequest.client
         client?.subscribe(
-            topic.id, openRequest.qos
+            topic, openRequest.qos
         ) { _, message ->
             messageQueueListener?.onMessageReceived(
                 this,
@@ -153,7 +157,7 @@ class MqttMessageChannel(
     }
 
     override fun forceClose() {
-        client?.unsubscribe(topic.id)
+        client?.unsubscribe(topic)
         client = null
         listener.onClosed(this)
     }
@@ -168,7 +172,7 @@ class MqttMessageChannel(
         val client = client ?: return false
         when (message) {
             is Message.Text -> throw IllegalArgumentException("String are not supported")
-            is Message.Bytes -> client.publish(topic.id, MqttMessage(message.value)) // TODO qos
+            is Message.Bytes -> client.publish(topic, MqttMessage(message.value)) // TODO qos
         }
         return true
     }

@@ -35,7 +35,7 @@ val sseModule = module {
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        val scarlet = Scarlet.Factory().create(protocol, configuration)
+        val scarlet = Scarlet(protocol, configuration)
         scarlet.create<StockMarketService>()
     }
 

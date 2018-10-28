@@ -10,21 +10,21 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEvent
-import com.tinder.scarlet.Topic
 
 internal class Session(
     private val protocol: Protocol,
-    private val topic: Topic
+    private val parent: Session?
 ) {
     private val channelFactory = protocol.createChannelFactory()
     private val listener = Listener()
-    private var channelCache: ChannelCache? = null
+    private var channelDefinition: ChannelDefinition? = null
     private lateinit var eventSourceCallback: EventCallback
 
     fun start(eventSourceCallback: EventCallback) {
         this.eventSourceCallback = eventSourceCallback
-        val channel = requireNotNull(channelFactory.create(topic, listener))
-        channelCache = ChannelCache(
+        val channel =
+            requireNotNull(channelFactory.create(listener, parent?.channelDefinition?.channel))
+        channelDefinition = ChannelDefinition(
             channel,
             channel.createMessageQueue(listener),
             protocol.createOpenRequestFactory(channel),
@@ -34,30 +34,30 @@ internal class Session(
     }
 
     fun stop() {
-        channelCache = null
+        channelDefinition = null
     }
 
     fun openSession() {
-        val session = channelCache ?: return
+        val session = channelDefinition ?: return
         val openRequest = session.openRequestFactory.create(session.channel)
         session.channel.open(openRequest)
     }
 
     fun send(message: Message): Boolean {
-        val session = channelCache ?: return false
+        val session = channelDefinition ?: return false
         val messageQueue = session.messageQueue ?: return false
         val metaData = session.sendingMessageMetaDataFactory.create(session.channel, message)
         return messageQueue.send(message, metaData)
     }
 
     fun closeSession() {
-        val session = channelCache ?: return
+        val session = channelDefinition ?: return
         val closeRequest = session.closeRequestFactory.create(session.channel)
         session.channel.close(closeRequest)
     }
 
     fun forceCloseSession() {
-        val session = channelCache ?: return
+        val session = channelDefinition ?: return
         session.channel.forceClose()
     }
 
@@ -136,7 +136,7 @@ internal class Session(
         }
     }
 
-    private class ChannelCache(
+    private class ChannelDefinition(
         val channel: Channel,
         val messageQueue: MessageQueue?,
         val openRequestFactory: Protocol.OpenRequest.Factory,

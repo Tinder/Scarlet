@@ -34,8 +34,7 @@ val gdaxModule = module {
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
-        Scarlet.Factory()
-            .create(protocol, configuration)
+        Scarlet(protocol, configuration)
             .create<GdaxService>()
     }
 

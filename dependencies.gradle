@@ -11,6 +11,7 @@ ext {
     constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
     liveDateReactiveSterams = 'android.arch.lifecycle:reactivestreams:1.1.1'
 
+    rxBinding = 'com.jakewharton.rxbinding3:rxbinding:3.0.0-alpha1'
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.2'
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
     rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.2'

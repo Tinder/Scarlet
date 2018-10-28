@@ -4,12 +4,11 @@
 
 package com.tinder.scarlet.stomp
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
-import com.tinder.scarlet.Topic
 import net.ser1.stomp.Client
 import javax.security.auth.login.LoginException
 
@@ -20,12 +19,16 @@ class StompProtocol(
 
     override fun createChannelFactory(): Channel.Factory {
         return object : Channel.Factory {
-            override fun create(topic: Topic, listener: Channel.Listener): Channel {
-                if (topic == Topic.Main) {
-                    mainChannel = StompMainChannel(listener)
-                    return mainChannel!!
-                }
-                return StompMessageChannel(topic, listener)
+            override fun create(
+                listener: Channel.Listener,
+                parent: Channel?
+            ): Channel {
+                return StompMainChannel(listener)
+//                if (topic == Topic.Main) {
+//                    mainChannel = StompMainChannel(listener)
+//                    return mainChannel!!
+//                }
+//                return StompMessageChannel(topic, listener)
             }
         }
     }
@@ -33,13 +36,14 @@ class StompProtocol(
     override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
         return object : Protocol.OpenRequest.Factory {
             override fun create(channel: Channel): Protocol.OpenRequest {
-                if (channel.topic == Topic.Main) {
-                    return openRequestFactory.createClientOpenRequest()
-                }
-                return StompProtocol.DestinationOpenRequest(
-                    requireNotNull(mainChannel?.client),
-                    openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
-                )
+                return openRequestFactory.createClientOpenRequest()
+//                if (channel.topic == Topic.Main) {
+//                    return openRequestFactory.createClientOpenRequest()
+//                }
+//                return StompProtocol.DestinationOpenRequest(
+//                    requireNotNull(mainChannel?.client),
+//                    openRequestFactory.createDestinationOpenRequestHeader(channel.topic.id)
+//                )
             }
         }
     }
@@ -111,7 +115,7 @@ class StompMainChannel(
 }
 
 class StompMessageChannel(
-    override val topic: Topic,
+    val topic: String,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
@@ -122,7 +126,7 @@ class StompMessageChannel(
         val openRequest = openRequest as StompProtocol.DestinationOpenRequest
         client = openRequest.client
         client?.subscribe(
-            topic.id,
+            topic,
             { headers, message ->
                 messageQueueListener?.onMessageReceived(
                     this,
@@ -140,7 +144,7 @@ class StompMessageChannel(
     }
 
     override fun forceClose() {
-        client?.unsubscribe(topic.id)
+        client?.unsubscribe(topic)
         client = null
         listener.onClosed(this)
     }
@@ -154,7 +158,7 @@ class StompMessageChannel(
     override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
         val client = client ?: return false
         when (message) {
-            is Message.Text -> client.send(topic.id, message.value)
+            is Message.Text -> client.send(topic, message.value)
             is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
         }
         return true

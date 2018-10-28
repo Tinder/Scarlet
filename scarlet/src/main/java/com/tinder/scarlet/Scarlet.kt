@@ -25,17 +25,67 @@ import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.lifecycle.DefaultLifecycle
+import com.tinder.scarlet.lifecycle.FlowableLifecycle
 import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
 import com.tinder.scarlet.retry.BackoffStrategy
 import com.tinder.scarlet.retry.ExponentialBackoffStrategy
 import com.tinder.scarlet.streamadapter.builtin.BuiltInStreamAdapterFactory
+import com.tinder.scarlet.ws.Receive
+import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 
-class Scarlet internal constructor(
-    private val stubInterfaceFactory: StubInterface.Factory,
-    private val proxyFactory: ProxyFactory
+class Scarlet(
+    private val protocol: Protocol,
+    private val configuration: Configuration = Configuration(),
+    private val parent: Scarlet? = null
 ) {
+
+    private val session: Session = Session(
+        protocol,
+        parent?.session
+    )
+    private val stubInterfaceFactory: StubInterface.Factory
+    private val proxyFactory: ProxyFactory
+
+    interface OnConnectionOpenService {
+        @Receive
+        fun observeProtocolEvent(): Stream<ProtocolEvent>
+    }
+
+    init {
+
+        val coordinator = Coordinator(
+            StateMachineFactory(),
+            session,
+            LifecycleEventSource(
+                parentScope() ?: configuration.lifecycle
+            ),
+            TimerEventSource(
+                getScheduler(configuration.debug),
+                configuration.backoffStrategy
+            ),
+            getScheduler(configuration.debug)
+        )
+        coordinator.start()
+
+        val messageAdapterResolver = configuration.createMessageAdapterResolver()
+
+        stubInterfaceFactory = StubInterface.Factory(
+            RuntimePlatform.get(),
+            coordinator,
+            StubMethod.Factory(
+                configuration.createStreamAdapterResolver(),
+                messageAdapterResolver,
+                createStateTransitionAdapterResolver(
+                    messageAdapterResolver,
+                    protocol.createEventAdapterFactory()
+                )
+            )
+        )
+
+        proxyFactory = ProxyFactory(RuntimePlatform.get())
+    }
 
     fun <T> create(service: Class<T>): T {
         val stubInterface = stubInterfaceFactory.create(service)
@@ -47,8 +97,23 @@ class Scarlet internal constructor(
      */
     inline fun <reified T : Any> create(): T = create(T::class.java)
 
+    private fun parentScope(): Lifecycle? {
+        val parent = parent ?: return null
+        val protocolEventStream = parent.create<OnConnectionOpenService>().observeProtocolEvent()
+        val parentConnectionOpenFlowable = Flowable.fromPublisher(protocolEventStream)
+            .flatMap {
+                when (it) {
+                    is ProtocolEvent.OnOpened -> Flowable.just(LifecycleState.Started)
+                    is ProtocolEvent.OnClosed,
+                    is ProtocolEvent.OnFailed -> Flowable.just(LifecycleState.Stopped)
+                    else -> Flowable.empty()
+                }
+            }
+        return configuration.lifecycle
+            .combineWith(FlowableLifecycle(parentConnectionOpenFlowable))
+    }
+
     data class Configuration(
-        val topic: Topic = Topic.Main,
         val lifecycle: Lifecycle = DEFAULT_LIFECYCLE,
         val backoffStrategy: BackoffStrategy = DEFAULT_BACKOFF_STRATEGY,
         val streamAdapterFactories: List<StreamAdapter.Factory> = emptyList(),
@@ -56,46 +121,17 @@ class Scarlet internal constructor(
         val debug: Boolean = false
     )
 
-    class Factory {
-
-        fun create(protocol: Protocol, configuration: Configuration = Configuration()): Scarlet {
-
-            val coordinator = Coordinator(
-                StateMachineFactory(),
-                Session(
-                    protocol,
-                    configuration.topic
-                ),
-                LifecycleEventSource(
-                    configuration.lifecycle
-                ),
-                TimerEventSource(
-                    getScheduler(configuration.debug),
-                    configuration.backoffStrategy
-                ),
-                getScheduler(configuration.debug)
+    private companion object {
+        private val DEFAULT_LIFECYCLE = DefaultLifecycle()
+        private const val RETRY_BASE_DURATION = 1000L
+        private const val RETRY_MAX_DURATION = 10000L
+        private val DEFAULT_BACKOFF_STRATEGY =
+            ExponentialBackoffStrategy(
+                RETRY_BASE_DURATION,
+                RETRY_MAX_DURATION
             )
-            coordinator.start()
-
-            val messageAdapterResolver = configuration.createMessageAdapterResolver()
-
-            val stubInterfaceFactory = StubInterface.Factory(
-                RuntimePlatform.get(),
-                coordinator,
-                StubMethod.Factory(
-                    configuration.createStreamAdapterResolver(),
-                    messageAdapterResolver,
-                    createStateTransitionAdapterResolver(
-                        messageAdapterResolver,
-                        protocol.createEventAdapterFactory()
-                    )
-                )
-            )
-
-            val proxyFactory = ProxyFactory(RuntimePlatform.get())
-
-            return Scarlet(stubInterfaceFactory, proxyFactory)
-        }
+        private val DEFAULT_SCHEDULER = Schedulers.computation()
+        private val DEBUG_SCHEDULER = Schedulers.trampoline()
 
         private fun Configuration.createStreamAdapterResolver(): StreamAdapterResolver {
             return StreamAdapterResolver(streamAdapterFactories + BuiltInStreamAdapterFactory())
@@ -132,18 +168,5 @@ class Scarlet internal constructor(
         private fun getScheduler(isDebug: Boolean): Scheduler {
             return if (isDebug) DEBUG_SCHEDULER else DEFAULT_SCHEDULER
         }
-    }
-
-    private companion object {
-        private val DEFAULT_LIFECYCLE = DefaultLifecycle()
-        private const val RETRY_BASE_DURATION = 1000L
-        private const val RETRY_MAX_DURATION = 10000L
-        private val DEFAULT_BACKOFF_STRATEGY =
-            ExponentialBackoffStrategy(
-                RETRY_BASE_DURATION,
-                RETRY_MAX_DURATION
-            )
-        private val DEFAULT_SCHEDULER = Schedulers.computation()
-        private val DEBUG_SCHEDULER = Schedulers.trampoline()
     }
 }

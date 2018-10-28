@@ -11,6 +11,7 @@ import com.tinder.app.socketio.chatroom.api.TypingStartedTopic
 import com.tinder.app.socketio.chatroom.api.TypingStoppedTopic
 import com.tinder.app.socketio.chatroom.api.UserJoinedTopic
 import com.tinder.app.socketio.chatroom.api.UserLeftTopic
+import com.tinder.app.socketio.chatroom.api.model.TypingStatusUpdate
 import com.tinder.app.socketio.chatroom.domain.model.ChatMessage
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState
@@ -145,7 +146,7 @@ class ChatMessageRepository(
 
     fun observeChatMessage(): Flowable<List<ChatMessage>> = messagesProcessor
 
-    fun addNewMessage(text: String) {
+    fun sendNewMessage(text: String) {
         Completable.fromAction {
             val chatMessage = ChatMessage(generateMessageId(), text, ChatMessage.Source.Sent)
             addChatMessage(chatMessage)
@@ -159,6 +160,22 @@ class ChatMessageRepository(
     fun clearAllMessages() {
         messagesRef.set(listOf())
         messagesProcessor.onNext(listOf())
+    }
+
+    fun sendTypingStarted() {
+        Completable.fromAction {
+            typingStartedTopic.sendTypingStarted(TypingStatusUpdate(USER_NAME))
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
+    }
+
+    fun sendTypingStopped() {
+        Completable.fromAction {
+            typingStoppedTopic.sendTypingStopped(TypingStatusUpdate(USER_NAME))
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     private fun addChatMessage(chatMessage: ChatMessage) {

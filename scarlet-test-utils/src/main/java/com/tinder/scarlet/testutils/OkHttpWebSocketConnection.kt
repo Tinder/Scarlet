@@ -150,7 +150,7 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 streamAdapterFactories = serverConfiguration.streamAdapterFactories,
                 debug = true
             )
-            return Scarlet.Factory().create(protocol, configuration)
+            return Scarlet(protocol, configuration)
                 .create(clazz)
         }
 
@@ -167,7 +167,7 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
                 streamAdapterFactories = clientConfiguration.streamAdapterFactories,
                 debug = true
             )
-            val scarlet = Scarlet.Factory().create(protocol, configuration)
+            val scarlet = Scarlet(protocol, configuration)
             return scarlet.create(clazz)
         }
 

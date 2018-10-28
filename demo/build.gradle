@@ -47,6 +47,7 @@ dependencies {
     implementation rootProject.ext.multiDex
     implementation rootProject.ext.constraintLayout
     implementation rootProject.ext.liveDateReactiveSterams
+    implementation rootProject.ext.rxBinding
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxAndroid
     implementation rootProject.ext.rxKotlin

@@ -5,8 +5,6 @@
 package com.tinder.scarlet
 
 interface Channel : MessageQueue.Factory {
-    val topic: Topic
-        get() = Topic.Main
 
     fun open(openRequest: Protocol.OpenRequest)
 
@@ -22,6 +20,9 @@ interface Channel : MessageQueue.Factory {
     }
 
     interface Factory {
-        fun create(topic: Topic, listener: Listener): Channel?
+        fun create(
+            listener: Listener,
+            parent: Channel?
+        ): Channel?
     }
 }

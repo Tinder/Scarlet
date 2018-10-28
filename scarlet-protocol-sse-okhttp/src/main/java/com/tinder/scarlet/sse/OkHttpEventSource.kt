@@ -9,7 +9,6 @@ import com.tinder.scarlet.Channel
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
-import com.tinder.scarlet.Topic
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -60,7 +59,6 @@ class OkHttpEventSourceChannel(
     private val okHttpClient: OkHttpClient,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
-    override val topic: Topic = Topic.Main
     private var eventSource: EventSource? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
@@ -117,10 +115,10 @@ class OkHttpEventSourceChannel(
         private val okHttpClient: OkHttpClient
     ) : Channel.Factory, MessageQueue.Factory {
 
-        override fun create(topic: Topic, listener: Channel.Listener): Channel? {
-            if (topic != Topic.Main) {
-                return null
-            }
+        override fun create(
+            listener: Channel.Listener,
+            parent: Channel?
+        ): Channel? {
             return OkHttpEventSourceChannel(
                 okHttpClient,
                 listener
