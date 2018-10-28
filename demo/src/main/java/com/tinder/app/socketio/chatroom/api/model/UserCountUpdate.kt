@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.socketio.chatroom.api.model
 
 import com.squareup.moshi.Json

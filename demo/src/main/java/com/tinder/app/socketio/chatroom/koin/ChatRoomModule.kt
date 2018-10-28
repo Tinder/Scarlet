@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.socketio.chatroom.koin
 
 import com.tinder.app.socketio.chatroom.api.AddUserTopic

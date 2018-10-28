@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.scarlet.testutils
 
 import com.tinder.scarlet.LifecycleState

@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.scarlet.internal.statetransition
 
 import com.nhaarman.mockito_kotlin.given

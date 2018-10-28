@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.sse.stockprice.view
 
 import androidx.lifecycle.LiveDataReactiveStreams

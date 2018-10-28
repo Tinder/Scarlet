@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.websocket.echo.view
 
 import androidx.lifecycle.LiveData

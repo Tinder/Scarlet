@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 ext {
     minSdkVersion = 21
     minSdkVersionAndroidLifecycle = 19

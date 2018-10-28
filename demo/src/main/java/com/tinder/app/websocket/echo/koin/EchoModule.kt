@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.websocket.echo.koin
 
 import com.tinder.app.websocket.echo.api.BitmapMessageAdapter

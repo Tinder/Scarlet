@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.scarlet.socketio
 
 import com.corundumstudio.socketio.AckCallback

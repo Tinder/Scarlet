@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 package com.tinder.app.root.koin
 
 import com.facebook.stetho.DumperPluginsProvider
