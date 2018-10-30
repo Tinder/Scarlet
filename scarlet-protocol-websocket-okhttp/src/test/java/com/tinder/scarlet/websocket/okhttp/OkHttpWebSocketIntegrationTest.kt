@@ -6,7 +6,7 @@ package com.tinder.scarlet.websocket.okhttp
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
 import com.tinder.scarlet.testutils.containingText
 import com.tinder.scarlet.testutils.withClosedReason

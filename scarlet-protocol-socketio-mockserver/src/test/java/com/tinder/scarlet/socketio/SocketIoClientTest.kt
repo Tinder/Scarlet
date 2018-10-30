@@ -6,7 +6,7 @@ package com.tinder.scarlet.socketio
 
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.testutils.SocketIoConnection
+import com.tinder.scarlet.testutils.rule.SocketIoConnection
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.containingBytes2
 import com.tinder.scarlet.testutils.containingText2

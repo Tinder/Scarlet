@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.testutils
+package com.tinder.scarlet.testutils.rule
 
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.MessageAdapter
@@ -10,6 +10,9 @@ import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import com.tinder.scarlet.testutils.TestStreamObserver
+import com.tinder.scarlet.testutils.any
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.ShutdownReason
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.websocket.mockwebserver.MockWebServerWebSocket
@@ -193,8 +196,8 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
 
         inline fun <reified SERVICE : Any> create(
             noinline observeWebSocketEvent: SERVICE.() -> Stream<WebSocketEvent>,
-            serverConfiguration: Configuration = OkHttpWebSocketConnection.Configuration(),
-            clientConfiguration: Configuration = OkHttpWebSocketConnection.Configuration()
+            serverConfiguration: Configuration = Configuration(),
+            clientConfiguration: Configuration = Configuration()
         ): OkHttpWebSocketConnection<SERVICE> {
             return OkHttpWebSocketConnection(
                 SERVICE::class.java,

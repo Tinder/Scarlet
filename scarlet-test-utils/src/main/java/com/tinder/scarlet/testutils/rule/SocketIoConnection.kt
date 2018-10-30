@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.testutils
+package com.tinder.scarlet.testutils.rule
 
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.MessageAdapter
@@ -14,6 +14,9 @@ import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.socketio.client.SocketIoClient
 import com.tinder.scarlet.socketio.server.MockSocketIoServer
 import com.tinder.scarlet.socketio.server.SocketIoEventName
+import com.tinder.scarlet.testutils.TestStreamObserver
+import com.tinder.scarlet.testutils.any
+import com.tinder.scarlet.testutils.test
 import org.junit.rules.ExternalResource
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -186,8 +189,8 @@ class SocketIoConnection<SERVICE : Any>(
 
         inline fun <reified SERVICE : Any> create(
             noinline observeProtocolEvent: SERVICE.() -> Stream<ProtocolEvent>,
-            serverConfiguration: Configuration = SocketIoConnection.Configuration(),
-            clientConfiguration: Configuration = SocketIoConnection.Configuration()
+            serverConfiguration: Configuration = Configuration(),
+            clientConfiguration: Configuration = Configuration()
         ): SocketIoConnection<SERVICE> {
             portNumber += 1
             return SocketIoConnection(
