@@ -6,10 +6,10 @@ package com.tinder.scarlet.socketio
 
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.Stream
-import com.tinder.scarlet.testutils.rule.SocketIoConnection
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.containingBytes2
 import com.tinder.scarlet.testutils.containingText2
+import com.tinder.scarlet.testutils.rule.SocketIoConnection
 import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -22,7 +22,9 @@ class SocketIoClientTest {
 
     @get:Rule
     internal val connection = SocketIoConnection.create<Service>(
-        observeProtocolEvent = { observeProtocolEvent() }
+        observeProtocolEvent = { observeProtocolEvent() },
+        clientConfiguration = SocketIoConnection.Configuration(EVENT_NAME),
+        serverConfiguration = SocketIoConnection.Configuration(EVENT_NAME)
     )
 
     @Test
@@ -103,6 +105,8 @@ class SocketIoClientTest {
     }
 
     companion object {
+
+        private const val EVENT_NAME = "AnEvent"
 
         internal interface Service {
             @Receive

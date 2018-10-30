@@ -11,9 +11,8 @@ import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
-import com.tinder.scarlet.socketio.client.SocketIoClient
-import com.tinder.scarlet.socketio.server.MockSocketIoServer
-import com.tinder.scarlet.socketio.server.SocketIoEventName
+import com.tinder.scarlet.stomp.GozirraStompClient
+import com.tinder.scarlet.stomp.GozirraStompDestination
 import com.tinder.scarlet.testutils.TestStreamObserver
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.test
@@ -24,24 +23,17 @@ import org.junit.runners.model.Statement
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class SocketIoConnection<SERVICE : Any>(
+class GozirraStompConnection<SERVICE : Any>(
     private val clazz: Class<SERVICE>,
     private val observeProtocolEvent: SERVICE.() -> Stream<ProtocolEvent>,
-    private val serverConfiguration: Configuration,
     private val clientConfiguration: Configuration
 ) : TestRule {
 
     val client: SERVICE
         get() = clientAndServer.client
-    val server: SERVICE
-        get() = clientAndServer.server
     val clientProtocolEventObserver: TestStreamObserver<ProtocolEvent>
         get() = clientAndServer.clientProtocolEventObserver
-    val serverProtocolEventObserver: TestStreamObserver<ProtocolEvent>
-        get() = clientAndServer.serverProtocolEventObserver
 
-    private val serverUrlString by lazy { "http://localhost:$portNumber" }
-    private val serverLifecycleRegistry = LifecycleRegistry()
     private val clientLifecycleRegistry = LifecycleRegistry()
 
     private val clientAndServer = ClientAndServer()
@@ -52,7 +44,6 @@ class SocketIoConnection<SERVICE : Any>(
     }
 
     fun open() {
-        serverLifecycleRegistry.onNext(LifecycleState.Started)
         clientLifecycleRegistry.onNext(LifecycleState.Started)
         blockUntilConnectionIsEstablish()
     }
@@ -65,103 +56,56 @@ class SocketIoConnection<SERVICE : Any>(
         clientLifecycleRegistry.onNext(LifecycleState.Completed)
     }
 
-    fun serverClosure() {
-        serverLifecycleRegistry.onNext(LifecycleState.Stopped)
-    }
-
-    fun serverTerminate() {
-        clientLifecycleRegistry.onNext(LifecycleState.Completed)
-    }
-
     private fun blockUntilConnectionIsEstablish() {
         clientProtocolEventObserver.awaitValues(
-            any<ProtocolEvent.OnOpened>()
-        )
-        serverProtocolEventObserver.awaitValues(
             any<ProtocolEvent.OnOpened>()
         )
     }
 
     private inner class ClientAndServer : ExternalResource() {
         lateinit var client: SERVICE
-        lateinit var server: SERVICE
         lateinit var clientProtocolEventObserver: TestStreamObserver<ProtocolEvent>
-        lateinit var serverProtocolEventObserver: TestStreamObserver<ProtocolEvent>
 
         override fun before() {
             createClientAndServer()
         }
 
         override fun after() {
-            serverLifecycleRegistry.onNext(LifecycleState.Completed)
             clientLifecycleRegistry.onNext(LifecycleState.Completed)
         }
 
         private fun createClientAndServer() {
-            server = createServer()
-            serverProtocolEventObserver = server.observeProtocolEvent().test()
             client = createClient()
             clientProtocolEventObserver = client.observeProtocolEvent().test()
-            server.observeProtocolEvent().start(object : Stream.Observer<ProtocolEvent> {
-                override fun onNext(data: ProtocolEvent) {
-                    LOGGER.info("server protocol event: $data")
-                }
-
-                override fun onError(throwable: Throwable) {
-                    LOGGER.log(
-                        Level.WARNING,
-                        "server protocol error",
-                        throwable
-                    )
-                }
-
-                override fun onComplete() {
-                    LOGGER.info("server protocol completed")
-                }
-            })
             client.observeProtocolEvent().start(object : Stream.Observer<ProtocolEvent> {
                 override fun onNext(data: ProtocolEvent) {
-                    LOGGER.info("client protocol event: $data")
+                    LOGGER.info("$this: client stomp event: $data")
                 }
 
                 override fun onError(throwable: Throwable) {
                     LOGGER.log(
                         Level.WARNING,
-                        "client protocol error",
+                        "$this: client stomp error",
                         throwable
                     )
                 }
 
                 override fun onComplete() {
-                    LOGGER.info("client protocol completed")
+                    LOGGER.info("client stomp completed")
                 }
             })
-        }
-
-        private fun createServer(): SERVICE {
-            val config = com.corundumstudio.socketio.Configuration().apply {
-                setHostname("localhost")
-                setPort(portNumber)
-            }
-            val protocol = MockSocketIoServer(config)
-            val configuration = Scarlet.Configuration(
-                lifecycle = serverLifecycleRegistry,
-                messageAdapterFactories = serverConfiguration.messageAdapterFactories,
-                streamAdapterFactories = serverConfiguration.streamAdapterFactories,
-                debug = true
-            )
-            val mainScarlet = Scarlet(protocol, configuration)
-            return Scarlet(
-                SocketIoEventName(serverConfiguration.eventName),
-                configuration,
-                mainScarlet
-            )
-                .create(clazz)
         }
 
         private fun createClient(): SERVICE {
-            val protocol = SocketIoClient(
-                { serverUrlString }
+            val protocol = GozirraStompClient(
+                GozirraStompClient.SimpleRequestFactory {
+                    GozirraStompClient.ClientOpenRequest(
+                        clientConfiguration.host,
+                        clientConfiguration.port,
+                        clientConfiguration.login,
+                        clientConfiguration.password
+                    )
+                }
             )
             val configuration = Scarlet.Configuration(
                 lifecycle = clientLifecycleRegistry,
@@ -171,7 +115,12 @@ class SocketIoConnection<SERVICE : Any>(
             )
             val mainScarlet = Scarlet(protocol, configuration)
             return Scarlet(
-                com.tinder.scarlet.socketio.client.SocketIoEventName(clientConfiguration.eventName),
+                GozirraStompDestination(
+                    "/queue/test",
+                    GozirraStompDestination.SimpleRequestFactory {
+                        emptyMap()
+                    }
+                ),
                 configuration,
                 mainScarlet
             )
@@ -181,27 +130,25 @@ class SocketIoConnection<SERVICE : Any>(
     }
 
     data class Configuration(
-        val eventName: String,
+        val host: String,
+        val port: Int,
+        val login: String,
+        val password: String,
         val messageAdapterFactories: List<MessageAdapter.Factory> = emptyList(),
         val streamAdapterFactories: List<StreamAdapter.Factory> = emptyList()
     )
 
     companion object {
         private val LOGGER =
-            Logger.getLogger(SocketIoConnection::class.java.name)
-
-        var portNumber = 9092
+            Logger.getLogger(GozirraStompConnection::class.java.name)
 
         inline fun <reified SERVICE : Any> create(
             noinline observeProtocolEvent: SERVICE.() -> Stream<ProtocolEvent>,
-            serverConfiguration: Configuration,
             clientConfiguration: Configuration
-        ): SocketIoConnection<SERVICE> {
-            portNumber += 1
-            return SocketIoConnection(
+        ): GozirraStompConnection<SERVICE> {
+            return GozirraStompConnection(
                 SERVICE::class.java,
                 observeProtocolEvent,
-                serverConfiguration,
                 clientConfiguration
             )
         }

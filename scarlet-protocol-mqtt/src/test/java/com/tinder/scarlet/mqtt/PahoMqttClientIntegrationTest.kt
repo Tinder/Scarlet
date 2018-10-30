@@ -40,7 +40,7 @@ import java.util.logging.Logger
 // TODO mqtt sandboxes https://iot.eclipse.org/getting-started/#sandboxes
 
 
-class PahoMqttClientIntegrationTest {
+class rPahoMqttClientIntegrationTest {
     @get:Rule
     val broker = object : EmbeddedActiveMQBroker() {
         override fun configure() {
@@ -204,16 +204,16 @@ class PahoMqttClientIntegrationTest {
 
     @Test
     fun test2() {
-//        val connection = StompConnection()
-//        connection.open("localhost", 61613)
+//        val connection2 = StompConnection()
+//        connection2.open("localhost", 61613)
 //
-//        connection.connect("system", "manager")
-//        connection.begin("tx1")
-//        connection.send("/queue/test", "message1", "tx1", null)
-//        connection.send("/queue/test", "message2", "tx1", null)
-//        connection.commit("tx1")
+//        connection2.connect("system", "manager")
+//        connection2.begin("tx1")
+//        connection2.send("/queue/test", "message1", "tx1", null)
+//        connection2.send("/queue/test", "message2", "tx1", null)
+//        connection2.commit("tx1")
 //
-//        connection.disconnect()
+//        connection2.disconnect()
 
         createClientAndConnect()
         val queueTextObserver = queueTestClient.observeProtocolEvent().test()
