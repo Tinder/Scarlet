@@ -16,7 +16,7 @@ interface Channel : MessageQueue.Factory {
         fun onOpened(channel: Channel, response: Protocol.OpenResponse = Protocol.OpenResponse.Empty)
         fun onClosing(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
         fun onClosed(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
-        fun onFailed(channel: Channel, throwable: Throwable?)
+        fun onFailed(channel: Channel, shouldRetry: Boolean, throwable: Throwable?)
     }
 
     interface Factory {

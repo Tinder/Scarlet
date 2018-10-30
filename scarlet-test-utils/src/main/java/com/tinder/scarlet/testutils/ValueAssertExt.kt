@@ -23,6 +23,22 @@ inline fun <reified T : ProtocolEvent> ValueAssert<Event.OnProtocolEvent>.withPr
     assertThat(protocolEvent).isInstanceOf(T::class.java)
 }
 
+fun ValueAssert<ProtocolEvent.OnMessageReceived>.containingText2(expectedText: String): ValueAssert<ProtocolEvent.OnMessageReceived> {
+    return assert {
+        assertThat(message).isInstanceOf(Message.Text::class.java)
+        val (text) = message as Message.Text
+        assertThat(text).isEqualTo(expectedText)
+    }
+}
+
+fun ValueAssert<ProtocolEvent.OnMessageReceived>.containingBytes2(expectedBytes: ByteArray) : ValueAssert<ProtocolEvent.OnMessageReceived>{
+    return assert {
+        assertThat(message).isInstanceOf(Message.Bytes::class.java)
+        val (bytes) = message as Message.Bytes
+        assertThat(bytes).isEqualTo(expectedBytes)
+    }
+}
+
 fun ValueAssert<WebSocketEvent.OnMessageReceived>.containingText(expectedText: String): ValueAssert<WebSocketEvent.OnMessageReceived> {
     return assert {
         assertThat(message).isInstanceOf(Message.Text::class.java)

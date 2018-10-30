@@ -107,7 +107,7 @@ class OkHttpWebSocketChannel(
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            listener.onFailed(this@OkHttpWebSocketChannel, t)
+            listener.onFailed(this@OkHttpWebSocketChannel, true, t)
             this@OkHttpWebSocketChannel.webSocket = null
         }
     }

@@ -71,13 +71,13 @@ internal class StateMachineFactory {
                 }
                 on(lifecycleStopped) {
                     transitionTo(
-                        State.Disconnecting(forceClosed = false),
+                        State.Disconnecting(shouldRetry = true),
                         SideEffect.CloseProtocol
                     )
                 }
                 on(lifecycleDestroyed) {
                     transitionTo(
-                        State.Disconnecting(forceClosed = true),
+                        State.Disconnecting(shouldRetry = false),
                         SideEffect.ForceCloseProtocol
                     )
                 }
@@ -86,15 +86,22 @@ internal class StateMachineFactory {
                 }
                 on(protocolClosing) {
                     transitionTo(
-                        State.Disconnecting(forceClosed = false),
+                        State.Disconnecting(shouldRetry = true),
                         SideEffect.CloseProtocol
                     )
                 }
                 on(protocolFailed) {
-                    transitionTo(
-                        State.WillConnect(retryCount = 0),
-                        SideEffect.ScheduleRetry(0)
-                    )
+                    val protocolEvent = it.protocolEvent as ProtocolEvent.OnFailed
+                    if (protocolEvent.shouldRetry) {
+                        transitionTo(
+                            State.WillConnect(retryCount = 0),
+                            SideEffect.ScheduleRetry(0)
+                        )
+                    } else {
+                        transitionTo(
+                            State.Disconnecting(shouldRetry = false)
+                        )
+                    }
                 }
             }
             state<State.Disconnecting> {
@@ -102,17 +109,17 @@ internal class StateMachineFactory {
                     dontTransition()
                 }
                 on(protocolClosed) {
-                    if (forceClosed) {
-                        transitionTo(State.Destroyed)
-                    } else {
+                    if (shouldRetry) {
                         transitionTo(State.Disconnected)
+                    } else {
+                        transitionTo(State.Destroyed)
                     }
                 }
                 on(protocolFailed) {
-                    if (forceClosed) {
-                        transitionTo(State.Destroyed)
-                    } else {
+                    if (shouldRetry) {
                         transitionTo(State.Disconnected)
+                    } else {
+                        transitionTo(State.Destroyed)
                     }
                 }
             }

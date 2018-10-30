@@ -29,7 +29,7 @@ class StompIntegrationTest {
     @get:Rule
     val broker = object : EmbeddedActiveMQBroker() {
         override fun configure() {
-            brokerService.addConnector("stomp://localhost:61613?trace=true")
+            brokerService.addConnector("stomp://localhost:61613")
         }
     }
 

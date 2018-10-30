@@ -123,14 +123,14 @@ class StompMainChannel(
         try {
             val client = Client(url, port, login, password)
             client.addErrorListener { _, _ ->
-                listener.onFailed(this, null)
+                listener.onFailed(this, true, null)
             }
             this.client = client
             listener.onOpened(this)
         } catch (e: LoginException) {
-            listener.onFailed(this, e)
+            listener.onFailed(this, true, e)
         } catch (e: Throwable) {
-            listener.onFailed(this, e)
+            listener.onFailed(this, true, e)
         }
     }
 
@@ -144,9 +144,9 @@ class StompMainChannel(
             client = null
             listener.onClosed(this)
         } catch (e: LoginException) {
-            listener.onFailed(this, e)
+            listener.onFailed(this, true, e)
         } catch (e: Throwable) {
-            listener.onFailed(this, e)
+            listener.onFailed(this, true, e)
         }
     }
 

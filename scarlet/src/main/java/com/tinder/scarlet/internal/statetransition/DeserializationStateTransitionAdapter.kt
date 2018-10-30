@@ -22,11 +22,12 @@ internal class DeserializationStateTransitionAdapter(
         val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
         val protocolEvent = event.protocolEvent as? ProtocolEvent.OnMessageReceived
             ?: return null
+        val message = protocolEvent.message
         return try {
             val deserializedValue = messageAdapter.fromMessage(protocolEvent.message)
-            Deserialization.Success(deserializedValue)
+            Deserialization.Success(deserializedValue, message)
         } catch (throwable: Throwable) {
-            Deserialization.Error<Any>(throwable)
+            Deserialization.Error<Any>(throwable, message)
         }
     }
 

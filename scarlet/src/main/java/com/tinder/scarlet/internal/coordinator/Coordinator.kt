@@ -42,6 +42,8 @@ internal class Coordinator(
     override fun receive(stubMethod: StubMethod.Receive): Any {
         val stream = Flowable.defer<StateTransition> { publishProcessor }
             .observeOn(scheduler)
+                // TODO handle deserialization here
+                // TODO pass deserialzed value to protocol event so that sse event can use deserailized message
             .flatMap { stubMethod.stateTransitionAdatper.adapt(it)?.let { Flowable.just(it) } ?: Flowable.empty() }
             .toStream()
         return stubMethod.streamAdapter.adapt(stream)

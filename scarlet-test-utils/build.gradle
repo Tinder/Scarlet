@@ -10,6 +10,8 @@ apply plugin: 'maven-publish'
 dependencies {
     api project(':scarlet')
     api project(':scarlet-protocol-websocket-mockwebserver')
+    api project(':scarlet-protocol-socketio-mockserver')
+    api project(':scarlet-protocol-stomp')
     api rootProject.ext.assertJ
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.kotlinStdlib

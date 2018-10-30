@@ -2,20 +2,18 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.socketio.client
+package com.tinder.scarlet.socketio.server
 
+import com.corundumstudio.socketio.Configuration
+import com.corundumstudio.socketio.SocketIOServer
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolEventAdapter
-import io.socket.client.IO
-import io.socket.client.Socket
-import org.json.JSONObject
 
-class SocketIoClient(
-    private val url: () -> String,
-    private val options: IO.Options = IO.Options()
+class MockSocketIoServer(
+    private val configuration: Configuration = Configuration()
 ) : Protocol {
 
     override fun createChannelFactory(): Channel.Factory {
@@ -25,17 +23,9 @@ class SocketIoClient(
                 parent: Channel?
             ): Channel {
                 return SocketIoMainChannel(
-                    options,
+                    configuration,
                     listener
                 )
-            }
-        }
-    }
-
-    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return object : Protocol.OpenRequest.Factory {
-            override fun create(channel: Channel): Protocol.OpenRequest {
-                return MainChannelOpenRequest(url())
             }
         }
     }
@@ -43,8 +33,6 @@ class SocketIoClient(
     override fun createEventAdapterFactory(): ProtocolEventAdapter.Factory {
         return object : ProtocolEventAdapter.Factory {}
     }
-
-    data class MainChannelOpenRequest(val url: String) : Protocol.OpenRequest
 }
 
 class SocketIoEventName(
@@ -74,36 +62,34 @@ class SocketIoEventName(
 }
 
 internal class SocketIoMainChannel(
-    private val options: IO.Options,
+    val configuration: Configuration,
     private val listener: Channel.Listener
 ) : Channel {
-    var socket: Socket? = null
+
+    var socketIoServer: SocketIOServer? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val mainChannelOpenRequest = openRequest as SocketIoClient.MainChannelOpenRequest
-        val socket = IO.socket(mainChannelOpenRequest.url, options)
-        socket
-            .on(Socket.EVENT_CONNECT) {
-                listener.onOpened(this)
+        socketIoServer = SocketIOServer(configuration)
+        socketIoServer?.startAsync()?.addListener {
+            if (it.isSuccess) {
+                listener.onOpened(this@SocketIoMainChannel)
+            } else {
+                listener.onFailed(
+                    this@SocketIoMainChannel,
+                    shouldRetry = true,
+                    throwable = it.cause()
+                )
             }
-            .on(Socket.EVENT_DISCONNECT) {
-                listener.onClosed(this)
-            }
-            .on(Socket.EVENT_ERROR) {
-                listener.onFailed(this, true, null)
-            }
-        socket.open()
-        this.socket = socket
+        }
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
-        socket?.disconnect()
-        socket = null
+        forceClose()
     }
 
     override fun forceClose() {
-        socket?.disconnect()
-        socket = null
+        socketIoServer?.stop()
+        listener.onClosed(this)
     }
 
     override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue? {
@@ -117,51 +103,39 @@ internal class SocketIoMessageChannel(
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
-    private var socket: Socket? = null
+    private var server: SocketIOServer? = null
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        socket = parent.socket
-        if (socket == null) {
-            listener.onFailed(this, true, IllegalStateException("socket is null"))
+        server = parent.socketIoServer
+        if (server == null) {
+            listener.onFailed(this, true, IllegalStateException("main eventName is null"))
             return
         }
-        socket?.on(eventName) {
-            val value = it[0]
-            when (value) {
-                is JSONObject -> {
-                    messageQueueListener?.onMessageReceived(
-                        this, this,
-                        Message.Text(value.toString())
-                    )
-
-                }
-                is String -> {
-                    messageQueueListener?.onMessageReceived(
-                        this, this,
-                        Message.Text(value.toString())
-                    )
-                }
-                is ByteArray -> {
-                    messageQueueListener?.onMessageReceived(
-                        this, this,
-                        Message.Bytes(value)
-                    )
-                }
+        server?.removeAllListeners(eventName)
+        server?.addEventListener(
+            eventName,
+            Any::class.java
+        ) { client, data, ackRequest ->
+            when (data) {
+                is String -> messageQueueListener?.onMessageReceived(this, this, Message.Text(data))
+                is ByteArray -> messageQueueListener?.onMessageReceived(
+                    this,
+                    this,
+                    Message.Bytes(data)
+                )
             }
         }
         listener.onOpened(this)
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
-        socket?.off(eventName)
-        socket = null
-        listener.onClosed(this)
+        forceClose()
     }
 
     override fun forceClose() {
-        socket?.off(eventName)
-        socket = null
+        server?.removeAllListeners(eventName)
+        server = null
         listener.onClosed(this)
     }
 
@@ -172,10 +146,10 @@ internal class SocketIoMessageChannel(
     }
 
     override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
-        val socket = socket ?: return false
+        val server = server ?: return false
         when (message) {
-            is Message.Text -> socket.emit(eventName, message.value)
-            is Message.Bytes -> socket.emit(eventName, message.value)
+            is Message.Text -> server.broadcastOperations.sendEvent(eventName, message.value)
+            is Message.Bytes -> server.broadcastOperations.sendEvent(eventName, message.value)
         }
         return true
     }

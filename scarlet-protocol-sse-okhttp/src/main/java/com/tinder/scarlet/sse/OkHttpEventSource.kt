@@ -107,7 +107,7 @@ class OkHttpEventSourceChannel(
         }
 
         override fun onFailure(eventSource: EventSource?, t: Throwable?, response: Response?) {
-            listener.onFailed(this@OkHttpEventSourceChannel, t)
+            listener.onFailed(this@OkHttpEventSourceChannel, true, t)
         }
     }
 

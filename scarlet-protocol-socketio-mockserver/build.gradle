@@ -9,7 +9,8 @@ apply plugin: 'maven-publish'
 
 dependencies {
     api project(':scarlet-core')
-    api rootProject.ext.socketIoClient
+    api project(':scarlet-protocol-socketio-client')
+    api rootProject.ext.nettySocketIoServer
 
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava

@@ -93,10 +93,11 @@ internal class Session(
             )
         }
 
-        override fun onFailed(channel: Channel, throwable: Throwable?) {
+        override fun onFailed(channel: Channel, shouldRetry: Boolean, throwable: Throwable?) {
             eventSourceCallback.onEvent(
                 Event.OnProtocolEvent(
                     ProtocolEvent.OnFailed(
+                        shouldRetry,
                         throwable
                     )
                 )

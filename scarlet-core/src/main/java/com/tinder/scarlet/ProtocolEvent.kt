@@ -28,5 +28,8 @@ sealed class ProtocolEvent {
         val response: Protocol.CloseResponse
     ) : ProtocolEvent()
 
-    data class OnFailed(val throwable: Throwable?) : ProtocolEvent()
+    data class OnFailed(
+        val shouldRetry: Boolean,
+        val throwable: Throwable?
+    ) : ProtocolEvent()
 }

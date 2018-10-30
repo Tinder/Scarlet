@@ -10,8 +10,8 @@ import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type
 
-internal class ProtocolEventStateTransitionAdapter :
-    StateTransitionAdapter<Any> {
+internal class ProtocolEventStateTransitionAdapter : StateTransitionAdapter<Any> {
+
     override fun adapt(stateTransition: StateTransition): Any? {
         val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
         return event.protocolEvent

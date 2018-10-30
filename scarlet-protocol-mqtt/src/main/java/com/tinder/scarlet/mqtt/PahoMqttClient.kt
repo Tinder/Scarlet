@@ -117,7 +117,7 @@ class MqttMainChannel(
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                listener.onFailed(this@MqttMainChannel, exception)
+                listener.onFailed(this@MqttMainChannel, true, exception)
             }
         })
         this.client = client
@@ -132,7 +132,7 @@ class MqttMainChannel(
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    listener.onFailed(this@MqttMainChannel, exception)
+                    listener.onFailed(this@MqttMainChannel, true, exception)
                     client = null
                 }
             })
@@ -144,7 +144,7 @@ class MqttMainChannel(
             client = null
             listener.onClosed(this)
         } catch (e: Throwable) {
-            listener.onFailed(this, e)
+            listener.onFailed(this, true, e)
         }
     }
 
@@ -158,7 +158,7 @@ class MqttMainChannel(
         }
 
         override fun connectionLost(cause: Throwable) {
-            listener.onFailed(this@MqttMainChannel, cause)
+            listener.onFailed(this@MqttMainChannel, true, cause)
         }
 
         override fun deliveryComplete(token: IMqttDeliveryToken) {
@@ -188,7 +188,7 @@ class MqttMessageChannel(
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    listener.onFailed(this@MqttMessageChannel, exception)
+                    listener.onFailed(this@MqttMessageChannel, true, exception)
                 }
             }
         ) { topic, message ->

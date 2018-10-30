@@ -16,7 +16,7 @@ import com.tinder.app.socketio.chatroom.view.ChatRoomViewModel
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.socketio.client.SocketIoClient
-import com.tinder.scarlet.socketio.client.SocketIoTopic
+import com.tinder.scarlet.socketio.client.SocketIoEventName
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
@@ -47,7 +47,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("add user"),
+            SocketIoEventName("add user"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
@@ -56,7 +56,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("new message"),
+            SocketIoEventName("new message"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
@@ -65,7 +65,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("typing"),
+            SocketIoEventName("typing"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
@@ -74,7 +74,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("stop typing"),
+            SocketIoEventName("stop typing"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
@@ -83,7 +83,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("user joined"),
+            SocketIoEventName("user joined"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
@@ -92,7 +92,7 @@ val chatRoomModule = module {
 
     single {
         Scarlet(
-            SocketIoTopic("user left"),
+            SocketIoEventName("user left"),
             get("default"),
             get(CHAT_ROOM_SCARLET)
         )
