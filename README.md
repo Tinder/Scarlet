@@ -3,7 +3,7 @@ Scarlet
 [![CircleCI](https://circleci.com/gh/Tinder/Scarlet.svg?style=svg)](https://circleci.com/gh/Tinder/Scarlet)
 [![Release](https://jitpack.io/v/tinder/scarlet.svg)](https://jitpack.io/#tinder/scarlet)
 
-A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
+A Retrofit inspired persistent connection client for Kotlin, Java, and Android.
 
 Tutorial
 ---
@@ -15,12 +15,12 @@ Usage
 In this example, we read the realtime Bitcoin price from [Gdax WebSocket Feed][gdax-websocket-feed].
 For more information, please check out the [demo app][demo-app].
 
-Declare a WebSocket client using an interface:
+Declare a persistent connection client using an interface:
 
 ~~~ kotlin
 interface GdaxService {
 	@Receive
-	fun observeWebSocketEvent(): Flowable<WebSocket.Event>
+	fun observeWebSocketEvent(): Flowable<WebSocketEvent>
 	@Send
 	fun sendSubscribe(subscribe: Subscribe)
 	@Receive
@@ -31,11 +31,20 @@ interface GdaxService {
 Use Scarlet to create an implementation:
 
 ~~~ kotlin
-val scarletInstance = Scarlet.Builder()
+val protocol = OkHttpWebSocket(
+    okHttpClient,
+		OkHttpWebSocket.SimpleRequestFactory(
+		    { Request.Builder().url("wss://ws-feed.gdax.com").build() },
+		    { ShutdownReason.GRACEFUL }
+		)
+)
+val configuration = Scarlet.Configuration(
+    messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
+    streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
+)
+val scarletInstance = Scarlet(protocol, configuration)
+Scarlet.Builder()
     .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed.gdax.com"))
-    .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
-    .addStreamAdapterFactory(RxJava2StreamAdapter.Factory())
-    .build()
 
 val gdaxService = scarletInstance.create<GdaxService>()
 ~~~
@@ -50,7 +59,7 @@ val BITCOIN_TICKER_SUBSCRIBE_MESSAGE = Subscribe(
 )
 
 gdaxService.observeWebSocketEvent()
-    .filter { it is WebSocket.Event.OnConnectionOpened<*> }
+    .filter { it is WebSocketEvent.OnConnectionOpened }
     .subscribe({
         gdaxService.sendSubscribe(BITCOIN_TICKER_SUBSCRIBE_MESSAGE)
     })
@@ -81,7 +90,7 @@ While we are working on Bintray support, Scarlet is available via [JitPack][jitp
 <dependency>
     <groupId>com.github.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>latestVersion</version>
+    <version>0.2.x-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -92,13 +101,18 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-implementation 'com.github.tinder.scarlet:scarlet:$latestVersion'
+implementation 'com.github.tinder.scarlet:scarlet:$0.2.x-SNAPSHOT'
 ```
 
 ### Plug-in Roadmap
-`WebSocket.Factory`
-- [x] `OkHttpClient`
-- [x] `MockHttpServer`
+`Protocol`
+- [x] `OkHttpWebSocket`
+- [x] `MockWebServerWebSocket`
+- [x] `OkHttpEventSource`
+- [x] `SocketIoClient`
+- [x] `MockSocketIoServer`
+- [x] `GozirraStompClient`
+- [x] `PahoMqttClient`
 
 `MessageAdapter.Factory`
 - [x] `moshi`
