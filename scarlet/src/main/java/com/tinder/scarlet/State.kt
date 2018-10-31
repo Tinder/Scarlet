@@ -4,25 +4,18 @@
 
 package com.tinder.scarlet
 
-import io.reactivex.disposables.Disposable
-
 sealed class State {
-    data class WaitingToRetry internal constructor(
-        internal val timerDisposable: Disposable,
-        val retryCount: Int,
-        val retryInMillis: Long
-    ) : State()
-
-    data class Connecting internal constructor(
-        internal val session: Session,
+    data class WillConnect internal constructor(
         val retryCount: Int
     ) : State()
 
-    data class Connected internal constructor(
-        internal val session: Session
+    data class Connecting internal constructor(
+        val retryCount: Int
     ) : State()
 
-    object Disconnecting : State()
+    object Connected : State()
+
+    data class Disconnecting(val shouldRetry: Boolean) : State()
 
     object Disconnected : State()
 

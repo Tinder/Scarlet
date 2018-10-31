@@ -26,8 +26,9 @@ class TestStreamObserver<out T : Any>(stream: Stream<T>) {
         get() = testSubscriber.completions()
 
     fun awaitCount(exactly: Int) {
+        testSubscriber.assertNoErrors()
         testSubscriber.awaitCount(exactly)
-        assertThat(values.size).isEqualTo(exactly)
+        assertThat(values).describedAs("values: $values").hasSize(exactly)
     }
 
     fun awaitValues(vararg valueAsserts: ValueAssert<Any>) {
@@ -37,7 +38,18 @@ class TestStreamObserver<out T : Any>(stream: Stream<T>) {
             try {
                 valueAssert.execute(value)
             } catch (cause: AssertionError) {
-                throw AssertionError("Assertion at index $index failed", cause)
+                throw AssertionError("assertion at index $index failed", cause)
+            }
+        }
+    }
+
+    fun awaitValuesIncluding(vararg valueAsserts: ValueAssert<Any>) {
+        testSubscriber.assertNoErrors()
+        valueAsserts.zip(values).forEachIndexed { index, (valueAssert, value) ->
+            try {
+                valueAssert.execute(value)
+            } catch (cause: AssertionError) {
+                throw AssertionError("assertion at index $index failed", cause)
             }
         }
     }

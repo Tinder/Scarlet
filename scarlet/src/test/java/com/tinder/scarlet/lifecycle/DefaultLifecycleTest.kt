@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.lifecycle
 
-import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.LifecycleState
 import io.reactivex.Flowable
 import org.junit.Test
 
@@ -18,6 +18,6 @@ internal class DefaultLifecycleTest {
         val testSubscriber = Flowable.fromPublisher(defaultLifecycle).test()
 
         // Then
-        testSubscriber.assertValues(Lifecycle.State.Started)
+        testSubscriber.assertValues(LifecycleState.Started)
     }
 }

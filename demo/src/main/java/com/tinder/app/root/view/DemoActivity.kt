@@ -13,8 +13,10 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.tinder.R
-import com.tinder.app.echo.view.EchoBotFragment
-import com.tinder.app.gdax.view.GdaxFragment
+import com.tinder.app.socketio.chatroom.view.ChatRoomFragment
+import com.tinder.app.websocket.echo.view.EchoBotFragment
+import com.tinder.app.websocket.gdax.view.GdaxFragment
+import com.tinder.app.sse.stockprice.view.StockPriceFragment
 
 class DemoActivity : AppCompatActivity() {
 
@@ -52,8 +54,10 @@ class DemoActivity : AppCompatActivity() {
 
     companion object {
         private val TAB_ITEMS = listOf(
-            "Echo Bot" to { EchoBotFragment() },
-            "GDAX" to { GdaxFragment() }
+            "WS - Echo Bot" to { EchoBotFragment() },
+            "WS - GDAX" to { GdaxFragment() },
+            "SSE - Stock Price" to { StockPriceFragment() },
+            "SocketIo - Chat Room" to { ChatRoomFragment() }
         )
     }
 }

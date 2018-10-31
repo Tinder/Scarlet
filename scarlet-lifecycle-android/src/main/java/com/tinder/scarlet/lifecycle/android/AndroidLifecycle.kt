@@ -19,7 +19,10 @@ object AndroidLifecycle {
         application: Application,
         throttleTimeoutMillis: Long = APPLICATION_THROTTLE_TIMEOUT_MILLIS
     ): Lifecycle =
-        ApplicationResumedLifecycle(application, LifecycleRegistry(throttleTimeoutMillis))
+        ApplicationResumedLifecycle(
+            application,
+            LifecycleRegistry(throttleTimeoutMillis)
+        )
             .combineWith(ConnectivityOnLifecycle(application))
 
     @JvmStatic
@@ -29,6 +32,9 @@ object AndroidLifecycle {
         lifecycleOwner: LifecycleOwner,
         throttleTimeoutMillis: Long = ACTIVITY_THROTTLE_TIMEOUT_MILLIS
     ): Lifecycle =
-        LifecycleOwnerResumedLifecycle(lifecycleOwner, LifecycleRegistry(throttleTimeoutMillis))
+        LifecycleOwnerResumedLifecycle(
+            lifecycleOwner,
+            LifecycleRegistry(throttleTimeoutMillis)
+        )
             .combineWith(ConnectivityOnLifecycle(application))
 }

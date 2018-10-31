@@ -9,39 +9,17 @@ import org.reactivestreams.Publisher
 /**
  * Used to control when to start and stop WebSocket connections.
  */
-interface Lifecycle : Publisher<Lifecycle.State> {
+interface Lifecycle : Publisher<LifecycleState> {
 
     /**
      * Returns a lifecycle that starts only when all source Lifecycles are start.
      */
-    fun combineWith(vararg others: Lifecycle): Lifecycle
+    fun combineWith(vararg others: Lifecycle): Lifecycle {
+        return combineWith(others.toList())
+    }
 
     /**
-     * Used to trigger the start and stop of WebSocket connections.
+     * Returns a lifecycle that starts only when all source Lifecycles are start.
      */
-    sealed class State {
-        /**
-         * Start and maintain a WebSocket connection.
-         */
-        object Started : State()
-
-        /**
-         * Stop the web socket connection.
-         */
-        sealed class Stopped : State() {
-            /**
-             * Stop after sending all pending messages.
-             */
-            data class WithReason(
-                val shutdownReason: ShutdownReason = ShutdownReason.GRACEFUL
-            ) : Stopped()
-
-            /**
-             * Stop and discard all pending messages.
-             */
-            object AndAborted : Stopped()
-        }
-
-        object Destroyed : State()
-    }
+    fun combineWith(others: List<Lifecycle>): Lifecycle
 }

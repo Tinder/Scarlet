@@ -1,3 +1,7 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 ext {
     minSdkVersion = 21
     minSdkVersionAndroidLifecycle = 19
@@ -9,7 +13,9 @@ ext {
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
+    liveDateReactiveSterams = 'android.arch.lifecycle:reactivestreams:1.1.1'
 
+    rxBinding = 'com.jakewharton.rxbinding3:rxbinding:3.0.0-alpha1'
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.2'
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
     rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.2'
@@ -29,9 +35,7 @@ ext {
     jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
     jsonPatch = 'com.github.fge:json-patch:1.9'
 
-    dagger = 'com.google.dagger:dagger:2.12'
-    daggerCompiler = 'com.google.dagger:dagger-compiler:2.12'
-    jsr250Annotations = 'javax.annotation:jsr250-api:1.0'
+    koin = 'org.koin:koin-androidx-viewmodel:1.0.1'
 
     mpAndroidChart = 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     chatMessageView = 'com.github.bassaer:chatmessageview:1.8.8'
@@ -40,11 +44,21 @@ ext {
     glide = 'com.github.bumptech.glide:glide:4.5.0'
 
     okHttp = 'com.squareup.okhttp3:okhttp:3.11.0'
+    okHttpServerSentEvent = 'com.squareup.okhttp3:okhttp-sse:3.11.0'
     okHttpLoggingInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     okio = 'com.squareup.okio:okio:1.13.0'
     mockWebServer = 'com.squareup.okhttp3:mockwebserver:3.11.0'
     timber = 'com.jakewharton.timber:timber:4.6.0'
     okSse = 'com.github.heremaps:oksse:0.9.0'
+    socketIoClient = 'io.socket:socket.io-client:1.0.0'
+    nettySocketIoServer = 'com.corundumstudio.socketio:netty-socketio:1.7.12'
+    pahoMqtt = 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
+    activeMqJUnit = 'org.apache.activemq.tooling:activemq-junit:5.13.1'
+    activeMqBroker = 'org.apache.activemq:activemq-broker:5.15.6'
+    activeMqStomp = 'org.apache.activemq:activemq-stomp:5.15.6'
+    activeMqMqtt = 'org.apache.activemq:activemq-mqtt:5.15.6'
+    slf4jSimple  = 'org.slf4j:slf4j-simple:1.7.25'
+
 
     junit = 'junit:junit:4.12'
     mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'

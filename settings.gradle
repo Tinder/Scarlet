@@ -1,11 +1,20 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 include ':scarlet-core'
 include ':scarlet-core-internal'
 include ':scarlet'
 include ':scarlet-test-utils'
 include ':scarlet-message-adapter-builtin'
 include ':scarlet-stream-adapter-builtin'
-include ':scarlet-websocket-okhttp'
-include ':scarlet-websocket-mockwebserver'
+include ':scarlet-protocol-mqtt'
+include ':scarlet-protocol-socketio-client'
+include ':scarlet-protocol-socketio-mockserver'
+include ':scarlet-protocol-sse-okhttp'
+include ':scarlet-protocol-stomp'
+include ':scarlet-protocol-websocket-mockserver'
+include ':scarlet-protocol-websocket-okhttp'
 include ':scarlet-message-adapter-moshi'
 include ':scarlet-message-adapter-protobuf'
 include ':scarlet-message-adapter-gson'

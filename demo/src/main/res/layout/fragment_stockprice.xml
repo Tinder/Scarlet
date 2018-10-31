@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ © 2018 Match Group, LLC.
+  -->
+
+<com.tinder.app.sse.stockprice.view.MarketSnapshotView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/marketSnapshot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/view_market_snapshot" />
+
+</com.tinder.app.sse.stockprice.view.MarketSnapshotView>
+

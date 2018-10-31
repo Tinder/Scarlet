@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.lifecycle
 
-import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.LifecycleState
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -19,7 +19,8 @@ class LifecycleRegistryBackpressureTest {
     fun givenBlockedSubscriber_shouldNotThrowException() {
         // Given
         val lifecycleRegistry = LifecycleRegistry()
-        val blockedLifecycleFlowable = Flowable.fromPublisher(lifecycleRegistry).observeOn(createBlockedScheduler())
+        val blockedLifecycleFlowable = Flowable.fromPublisher(lifecycleRegistry)
+            .observeOn(createBlockedScheduler())
 
         // When
         val testSubscriber = blockedLifecycleFlowable.test()
@@ -45,20 +46,20 @@ class LifecycleRegistryBackpressureTest {
         return executorService
     }
 
-    private fun generateLifecycleStates(): Flowable<Lifecycle.State> = Flowable.range(0, 1000)
+    private fun generateLifecycleStates(): Flowable<LifecycleState> = Flowable.range(0, 1000)
         .map {
             if (it % 2 == 0) {
-                Lifecycle.State.Started
+                LifecycleState.Started
             } else {
-                Lifecycle.State.Stopped.AndAborted
+                LifecycleState.Stopped
             }
         }
 
-    private fun getExpectedLifecycleStates(): List<Lifecycle.State> {
+    private fun getExpectedLifecycleStates(): List<LifecycleState> {
         val ringBufferSize = Flowable.bufferSize().toLong()
         return generateLifecycleStates()
             .take(ringBufferSize)
-            .concatWith(Flowable.just(Lifecycle.State.Destroyed))
+            .concatWith(Flowable.just(LifecycleState.Completed))
             .blockingIterable().toList()
     }
 

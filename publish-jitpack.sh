@@ -28,9 +28,19 @@
 
 ./gradlew scarlet-stream-adapter-coroutines:build scarlet-stream-adapter-coroutines:publishToMavenLocal
 
-./gradlew scarlet-websocket-okhttp:build scarlet-websocket-okhttp:publishToMavenLocal
+./gradlew scarlet-protocol-mqtt:build scarlet-protocol-mqtt:publishToMavenLocal
 
-./gradlew scarlet-websocket-mockwebserver:build scarlet-websocket-mockwebserver:publishToMavenLocal
+./gradlew scarlet-protocol-socketio-client:build scarlet-protocol-socketio-client:publishToMavenLocal
+
+./gradlew scarlet-protocol-socketio-mockserver:build scarlet-protocol-socketio-mockserver:publishToMavenLocal
+
+./gradlew scarlet-protocol-sse-okhttp:build scarlet-protocol-sse-okhttp:publishToMavenLocal
+
+./gradlew scarlet-protocol-stomp:build scarlet-protocol-stomp:publishToMavenLocal
+
+./gradlew scarlet-protocol-websocket-mockserver:build scarlet-protocol-websocket-mockserver:publishToMavenLocal
+
+./gradlew scarlet-protocol-websocket-okhttp:build scarlet-protocol-websocket-okhttp:publishToMavenLocal
 
 ./gradlew scarlet-lifecycle-android:assemble scarlet-lifecycle-android:generatePomFileForAarPublication
 ./gradlew scarlet-lifecycle-android:publishToMavenLocal

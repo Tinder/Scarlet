@@ -8,7 +8,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.ShutdownReason
+import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
 internal class ApplicationResumedLifecycle(
@@ -17,16 +17,18 @@ internal class ApplicationResumedLifecycle(
 ) : Lifecycle by lifecycleRegistry {
 
     init {
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
+        lifecycleRegistry.onNext(LifecycleState.Started)
         application.registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks())
     }
 
     private inner class ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
-        override fun onActivityPaused(activity: Activity?) = lifecycleRegistry.onNext(
-            Lifecycle.State.Stopped.WithReason(ShutdownReason(1000, "App is paused"))
-        )
+        override fun onActivityPaused(activity: Activity?) {
+            lifecycleRegistry.onNext(LifecycleState.Stopped)
+        }
 
-        override fun onActivityResumed(activity: Activity?) = lifecycleRegistry.onNext(Lifecycle.State.Started)
+        override fun onActivityResumed(activity: Activity?) {
+            lifecycleRegistry.onNext(LifecycleState.Started)
+        }
 
         override fun onActivityStarted(activity: Activity?) {}
 

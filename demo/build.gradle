@@ -1,6 +1,10 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -25,12 +29,18 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LGPL-3.0.txt'
     }
 }
 
 dependencies {
     implementation project(':scarlet')
-    implementation project(':scarlet-websocket-okhttp')
+    implementation project(':scarlet-protocol-mqtt')
+    implementation project(':scarlet-protocol-socketio-client')
+    implementation project(':scarlet-protocol-sse-okhttp')
+    implementation project(':scarlet-protocol-stomp')
+    implementation project(':scarlet-protocol-websocket-okhttp')
     implementation project(':scarlet-lifecycle-android')
     implementation project(':scarlet-message-adapter-moshi')
     implementation project(':scarlet-message-adapter-protobuf')
@@ -40,6 +50,8 @@ dependencies {
     implementation rootProject.ext.material
     implementation rootProject.ext.multiDex
     implementation rootProject.ext.constraintLayout
+    implementation rootProject.ext.liveDateReactiveSterams
+    implementation rootProject.ext.rxBinding
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxAndroid
     implementation rootProject.ext.rxKotlin
@@ -48,14 +60,13 @@ dependencies {
     implementation rootProject.ext.stethoOkHttp
     implementation rootProject.ext.timber
     implementation rootProject.ext.jodaTime
-    implementation rootProject.ext.dagger
-    kapt rootProject.ext.daggerCompiler
-    compileOnly rootProject.ext.jsr250Annotations
     implementation rootProject.ext.kotlinStdlib
     implementation rootProject.ext.mpAndroidChart
     implementation rootProject.ext.chatMessageView
     implementation rootProject.ext.filePicker
     implementation rootProject.ext.glide
+    implementation rootProject.ext.jsonPatch
+    implementation rootProject.ext.koin
 
     testImplementation rootProject.ext.junit
 }
