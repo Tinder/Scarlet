@@ -33,10 +33,10 @@ Use Scarlet to create an implementation:
 ~~~ kotlin
 val protocol = OkHttpWebSocket(
     okHttpClient,
-		OkHttpWebSocket.SimpleRequestFactory(
-		    { Request.Builder().url("wss://ws-feed.gdax.com").build() },
-		    { ShutdownReason.GRACEFUL }
-		)
+    OkHttpWebSocket.SimpleRequestFactory(
+        { Request.Builder().url("wss://ws-feed.gdax.com").build() },
+        { ShutdownReason.GRACEFUL }
+    )
 )
 val configuration = Scarlet.Configuration(
     messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
