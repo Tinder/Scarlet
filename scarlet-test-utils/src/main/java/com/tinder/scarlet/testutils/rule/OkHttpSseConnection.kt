@@ -102,9 +102,7 @@ class OkHttpSseConnection<SERVICE : Any>(
             val protocol = OkHttpEventSource(
                 createOkHttpClient(),
                 OkHttpEventSource.SimpleRequestFactory {
-                    OkHttpEventSource.OpenRequest(
-                        Request.Builder().url(clientConfiguration.serverUrl()).build()
-                    )
+                    Request.Builder().url(clientConfiguration.serverUrl()).build()
                 }
             )
             val configuration = Scarlet.Configuration(

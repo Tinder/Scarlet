@@ -29,8 +29,8 @@ val gdaxModule = module {
         val protocol = OkHttpWebSocket(
             get(),
             OkHttpWebSocket.SimpleRequestFactory(
-                { OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://ws-feed.gdax.com").build()) },
-                { OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL) }
+                { Request.Builder().url("wss://ws-feed.gdax.com").build() },
+                { ShutdownReason.GRACEFUL }
             )
         )
         val configuration = Scarlet.Configuration(

@@ -63,15 +63,15 @@ class OkHttpWebSocket(
     }
 
     open class SimpleRequestFactory(
-        private val createOpenRequestCallable: () -> OpenRequest,
-        private val createCloseRequestCallable: () -> CloseRequest
+        private val createOpenRequestCallable: () -> Request,
+        private val createCloseRequestCallable: () -> ShutdownReason
     ) : RequestFactory {
         override fun createOpenRequest(): OpenRequest {
-            return createOpenRequestCallable()
+            return OpenRequest(createOpenRequestCallable())
         }
 
         override fun createCloseRequest(): CloseRequest {
-            return createCloseRequestCallable()
+            return CloseRequest(createCloseRequestCallable())
         }
     }
 }

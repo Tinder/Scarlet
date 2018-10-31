@@ -48,10 +48,10 @@ class OkHttpEventSource(
     }
 
     open class SimpleRequestFactory(
-        private val createOpenRequestCallable: () -> OpenRequest
+        private val createOpenRequestCallable: () -> Request
     ) : RequestFactory {
         override fun createOpenRequest(): OpenRequest {
-            return createOpenRequestCallable()
+            return OpenRequest(createOpenRequestCallable())
         }
     }
 }

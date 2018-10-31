@@ -165,8 +165,8 @@ class OkHttpWebSocketConnection<SERVICE : Any>(
             val protocol = OkHttpWebSocket(
                 createOkHttpClient(),
                 OkHttpWebSocket.SimpleRequestFactory(
-                    { OkHttpWebSocket.OpenRequest(Request.Builder().url(serverUrlString).build()) },
-                    { OkHttpWebSocket.CloseRequest(clientConfiguration.shutdownReason) })
+                    { Request.Builder().url(serverUrlString).build() },
+                    { clientConfiguration.shutdownReason })
             )
             val configuration = Scarlet.Configuration(
                 lifecycle = clientLifecycleRegistry,

@@ -30,8 +30,8 @@ val echoModule = module {
         val protocol = OkHttpWebSocket(
             get(),
             OkHttpWebSocket.SimpleRequestFactory(
-                { OkHttpWebSocket.OpenRequest(Request.Builder().url("wss://demos.kaazing.com/echo").build()) },
-                { OkHttpWebSocket.CloseRequest(ShutdownReason.GRACEFUL) }
+                { Request.Builder().url("wss://demos.kaazing.com/echo").build() },
+                { ShutdownReason.GRACEFUL }
             )
         )
         val configuration = Scarlet.Configuration(
