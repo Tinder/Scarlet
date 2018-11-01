@@ -33,10 +33,10 @@ Use Scarlet to create an implementation:
 ~~~ kotlin
 val protocol = OkHttpWebSocket(
     okHttpClient,
-		OkHttpWebSocket.SimpleRequestFactory(
-		    { Request.Builder().url("wss://ws-feed.gdax.com").build() },
-		    { ShutdownReason.GRACEFUL }
-		)
+    OkHttpWebSocket.SimpleRequestFactory(
+        { Request.Builder().url("wss://ws-feed.gdax.com").build() },
+        { ShutdownReason.GRACEFUL }
+    )
 )
 val configuration = Scarlet.Configuration(
     messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
@@ -90,7 +90,7 @@ While we are working on Bintray support, Scarlet is available via [JitPack][jitp
 <dependency>
     <groupId>com.github.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>0.2.x-SNAPSHOT</version>
+    <version>0.2.1-alpha1</version>
 </dependency>
 ```
 
@@ -101,7 +101,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-implementation 'com.github.tinder.scarlet:scarlet:$0.2.x-SNAPSHOT'
+implementation 'com.github.tinder.scarlet:scarlet:$0.2.1-alpha1'
 ```
 
 ### Plug-in Roadmap
