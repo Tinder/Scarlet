@@ -7,7 +7,7 @@ A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
 Update
 ---
-We are working on a new version of Scarlet that supports other persistent connection protocols: ServerSentEvent, Socket IO, STOMP, and MQTT. It can be found on the [`0.2.x`](https://github.com/Tinder/Scarlet/tree/0.2.x) branch and is available at `com.github.tinder:scarlet:0.2.1-alpha1`.
+We are working on a new version of Scarlet that supports other persistent connection protocols: ServerSentEvent, Socket IO, STOMP, and MQTT. It can be found on the [`0.2.x`](https://github.com/Tinder/Scarlet/tree/0.2.x) branch and is available at `com.github.tinder:scarlet:0.2.1-alpha4`.
 
 
 Tutorial
