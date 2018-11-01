@@ -43,9 +43,6 @@ val configuration = Scarlet.Configuration(
     streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
 )
 val scarletInstance = Scarlet(protocol, configuration)
-Scarlet.Builder()
-    .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed.gdax.com"))
-
 val gdaxService = scarletInstance.create<GdaxService>()
 ~~~
 
