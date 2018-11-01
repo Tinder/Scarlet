@@ -90,7 +90,7 @@ While we are working on Bintray support, Scarlet is available via [JitPack][jitp
 <dependency>
     <groupId>com.github.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>0.2.1-alpha1</version>
+    <version>0.2.1-alpha4</version>
 </dependency>
 ```
 
@@ -101,7 +101,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-implementation 'com.github.tinder.scarlet:scarlet:$0.2.1-alpha1'
+implementation 'com.github.tinder.scarlet:scarlet:$0.2.1-alpha4'
 ```
 
 ### Plug-in Roadmap
