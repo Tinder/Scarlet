@@ -19,8 +19,6 @@ dependencies {
     testImplementation rootProject.ext.assertJ
 }
 
-kotlin { experimental { coroutines 'enable' } }
-
 dokka {
     outputFormat = 'javadoc'
     outputDirectory = "$buildDir/javadoc"

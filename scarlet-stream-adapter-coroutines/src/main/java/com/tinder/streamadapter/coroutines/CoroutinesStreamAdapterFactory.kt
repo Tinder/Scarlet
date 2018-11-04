@@ -6,7 +6,7 @@ package com.tinder.streamadapter.coroutines
 
 import com.tinder.scarlet.StreamAdapter
 import com.tinder.scarlet.utils.getRawType
-import kotlinx.coroutines.experimental.channels.ReceiveChannel
+import kotlinx.coroutines.channels.ReceiveChannel
 import java.lang.reflect.Type
 
 /**
