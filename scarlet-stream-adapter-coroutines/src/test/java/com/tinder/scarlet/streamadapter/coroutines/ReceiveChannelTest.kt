@@ -47,7 +47,7 @@ class ReceiveChannelTest {
         // Given
         givenConnectionIsEstablished()
         val textMessage1 = "Hello"
-        val textMessage2 = "Hi"
+        val textMessage2 = "Hi!"
         val bytesMessage1 = "Yo".toByteArray()
         val bytesMessage2 = "Sup".toByteArray()
         val testTextChannel = server.observeText()
