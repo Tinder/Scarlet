@@ -19,8 +19,8 @@ import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
-import kotlinx.coroutines.experimental.runBlocking
-import kotlinx.coroutines.experimental.channels.ReceiveChannel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +47,7 @@ class ReceiveChannelTest {
         // Given
         givenConnectionIsEstablished()
         val textMessage1 = "Hello"
-        val textMessage2 = "Hi"
+        val textMessage2 = "Hi!"
         val bytesMessage1 = "Yo".toByteArray()
         val bytesMessage2 = "Sup".toByteArray()
         val testTextChannel = server.observeText()
