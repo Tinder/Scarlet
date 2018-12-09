@@ -25,7 +25,7 @@ Declare a WebSocket client using an interface:
 ~~~ kotlin
 interface GdaxService {
 	@Receive
-	fun observeWebSocketEvent(): Flowable<WebSocket.Event>
+	fun observeWebSocketEvent(): Flowable<Event>
 	@Send
 	fun sendSubscribe(subscribe: Subscribe)
 	@Receive
