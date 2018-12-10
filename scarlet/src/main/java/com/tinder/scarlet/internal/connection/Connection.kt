@@ -153,7 +153,7 @@ internal class Connection(
             }
         }
 
-        fun observeEvent(): Flowable<Event> = eventProcessor
+        fun observeEvent(): Flowable<Event> = eventProcessor.onBackpressureBuffer()
 
         fun subscribe() {
             lifecycle.subscribe(lifecycleStateSubscriber)
