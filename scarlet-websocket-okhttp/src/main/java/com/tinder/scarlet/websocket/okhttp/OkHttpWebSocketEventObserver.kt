@@ -16,7 +16,7 @@ import okio.ByteString
 internal class OkHttpWebSocketEventObserver : WebSocketListener() {
     private val processor = PublishProcessor.create<WebSocket.Event>().toSerialized()
 
-    fun observe(): Flowable<WebSocket.Event> = processor
+    fun observe(): Flowable<WebSocket.Event> = processor.onBackpressureBuffer()
 
     fun terminate() = processor.onComplete()
 
