@@ -10,6 +10,7 @@ ext {
     buildToolsVersion = '28.0.3'
 
     appCompat = 'androidx.appcompat:appcompat:1.0.0'
+    lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.0.0-rc01'
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'

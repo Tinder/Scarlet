@@ -31,6 +31,7 @@ dependencies {
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxKotlin
     implementation rootProject.ext.appCompat
+    implementation rootProject.ext.lifecycleExtensions
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation rootProject.ext.junit
