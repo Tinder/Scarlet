@@ -26,6 +26,7 @@ import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.lifecycle.DefaultLifecycle
 import com.tinder.scarlet.lifecycle.FlowableLifecycle
+import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
 import com.tinder.scarlet.retry.BackoffStrategy
 import com.tinder.scarlet.retry.ExponentialBackoffStrategy
@@ -55,6 +56,7 @@ class Scarlet private constructor(
             StateMachineFactory(),
             session,
             LifecycleEventSource(
+                getScheduler(configuration.debug),
                 parentScope() ?: configuration.lifecycle
             ),
             TimerEventSource(
@@ -109,8 +111,10 @@ class Scarlet private constructor(
                     else -> Flowable.empty()
                 }
             }
+        val lifecycleRegistry = LifecycleRegistry()
+        parentConnectionOpenFlowable.subscribe(lifecycleRegistry)
         return configuration.lifecycle
-            .combineWith(FlowableLifecycle(parentConnectionOpenFlowable))
+            .combineWith(lifecycleRegistry)
     }
 
     data class Configuration(

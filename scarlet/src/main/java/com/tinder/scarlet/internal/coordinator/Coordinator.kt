@@ -9,9 +9,9 @@ import com.tinder.scarlet.Event
 import com.tinder.scarlet.SideEffect
 import com.tinder.scarlet.State
 import com.tinder.scarlet.StateTransition
-import com.tinder.scarlet.utils.toStream
 import com.tinder.scarlet.internal.stub.StubInterface
 import com.tinder.scarlet.internal.stub.StubMethod
+import com.tinder.scarlet.utils.toStream
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.processors.PublishProcessor
@@ -28,8 +28,8 @@ internal class Coordinator(
     private val publishProcessor = PublishProcessor.create<StateTransition>()
 
     fun start() {
-        lifecycleEventSource.start(this)
         session.start(this)
+        lifecycleEventSource.start(this)
     }
 
     @Synchronized
@@ -52,6 +52,29 @@ internal class Coordinator(
     @Synchronized
     override fun onEvent(event: Event) {
         val transition = stateMachine.transition(event) as? StateMachine.Transition.Valid ?: return
+
+        when (transition.toState) {
+            is State.WillConnect -> {
+                lifecycleEventSource.resume()
+            }
+            is State.Connecting -> {
+                lifecycleEventSource.pause()
+            }
+            is State.Connected -> {
+                lifecycleEventSource.resume()
+            }
+            is State.Disconnecting -> {
+                lifecycleEventSource.pause()
+            }
+            is State.Disconnected -> {
+                lifecycleEventSource.resume()
+            }
+            is State.Destroyed -> {
+                session.stop()
+                lifecycleEventSource.stop()
+            }
+        }
+
         with(transition.sideEffect) {
             when (this) {
                 is SideEffect.OpenProtocol -> {
@@ -82,17 +105,7 @@ internal class Coordinator(
         )
 
         when (transition.toState) {
-            is State.WillConnect -> {
-                lifecycleEventSource.requestNext()
-            }
-            is State.Connected -> {
-                lifecycleEventSource.requestNext()
-            }
-            is State.Disconnected -> {
-                lifecycleEventSource.requestNext()
-            }
             is State.Destroyed -> {
-                session.stop()
                 publishProcessor.onComplete()
             }
         }
