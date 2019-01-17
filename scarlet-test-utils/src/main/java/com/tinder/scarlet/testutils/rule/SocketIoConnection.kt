@@ -142,6 +142,9 @@ class SocketIoConnection<SERVICE : Any>(
             val config = com.corundumstudio.socketio.Configuration().apply {
                 hostname = "localhost"
                 port = portNumber
+                firstDataTimeout = 300
+                pingTimeout = 300
+                upgradeTimeout = 300
             }
             val protocol = MockSocketIoServer(config)
             val configuration = Scarlet.Configuration(
