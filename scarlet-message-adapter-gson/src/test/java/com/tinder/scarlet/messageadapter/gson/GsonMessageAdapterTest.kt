@@ -184,9 +184,6 @@ internal class GsonMessageAdapterTest {
             @Receive
             fun observeEvents(): Stream<WebSocketEvent>
 
-            @Receive
-            fun observeStateTransition(): Stream<StateTransition>
-
             @Send
             fun sendString(message: String): Boolean
 

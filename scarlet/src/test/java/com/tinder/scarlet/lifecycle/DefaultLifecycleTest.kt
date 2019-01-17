@@ -20,4 +20,14 @@ internal class DefaultLifecycleTest {
         // Then
         testSubscriber.assertValues(LifecycleState.Started)
     }
+
+    @Test
+    fun observeState_shouldNotTerminate() {
+        // When
+        val testSubscriber = Flowable.fromPublisher(defaultLifecycle).test()
+
+        // Then
+        testSubscriber.assertNotTerminated()
+    }
+
 }
