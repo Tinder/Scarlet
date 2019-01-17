@@ -41,6 +41,7 @@ internal class Coordinator(
     @Synchronized
     override fun receive(stubMethod: StubMethod.Receive): Any {
         val stream = Flowable.defer<StateTransition> { publishProcessor }
+            .onBackpressureBuffer()
             .observeOn(scheduler)
                 // TODO handle deserialization here
                 // TODO pass deserialzed value to protocol event so that sse event can use deserailized message
