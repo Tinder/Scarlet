@@ -14,4 +14,3 @@ internal class DefaultLifecycle(
         lifecycleRegistry.onNext(LifecycleState.Started)
     }
 }
-

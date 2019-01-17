@@ -81,5 +81,4 @@ class TimerEventSourceTest {
         // Then
         then(eventCallback).should(never()).onEvent(Event.OnShouldConnect)
     }
-
 }

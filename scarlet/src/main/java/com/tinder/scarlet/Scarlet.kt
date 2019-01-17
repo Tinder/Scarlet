@@ -25,7 +25,6 @@ import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.lifecycle.DefaultLifecycle
-import com.tinder.scarlet.lifecycle.FlowableLifecycle
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
 import com.tinder.scarlet.retry.BackoffStrategy

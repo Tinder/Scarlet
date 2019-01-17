@@ -96,5 +96,4 @@ class LifecycleEventSourceTest {
         then(eventCallback).should().onEvent(Event.OnLifecycleStateChange(LifecycleState.Started))
         then(eventCallback).should().onEvent(Event.OnLifecycleStateChange(LifecycleState.Stopped))
     }
-
 }

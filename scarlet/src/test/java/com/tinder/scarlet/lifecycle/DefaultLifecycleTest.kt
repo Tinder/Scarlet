@@ -29,5 +29,4 @@ internal class DefaultLifecycleTest {
         // Then
         testSubscriber.assertNotTerminated()
     }
-
 }
