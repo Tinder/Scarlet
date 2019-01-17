@@ -13,7 +13,7 @@ ext {
     lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.0.0-rc01'
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
-    constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     liveDateReactiveSterams = 'android.arch.lifecycle:reactivestreams:1.1.1'
 
     rxBinding = 'com.jakewharton.rxbinding3:rxbinding:3.0.0-alpha1'
@@ -30,7 +30,7 @@ ext {
 
     moshi = 'com.squareup.moshi:moshi-kotlin:1.5.0'
     moshiCodeGen = 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
-    gson = 'com.google.code.gson:gson:2.8.2'
+    gson = 'com.google.code.gson:gson:2.8.5'
     protobuf = 'com.google.protobuf:protobuf-java:3.4.0'
     jacksonDatabind = 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
     jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
