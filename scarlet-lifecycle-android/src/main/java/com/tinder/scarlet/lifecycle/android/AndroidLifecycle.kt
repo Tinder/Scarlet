@@ -43,7 +43,7 @@ object AndroidLifecycle {
 
     @JvmStatic
     @JvmOverloads
-    fun ofLifecycleServiceForeground(
+    fun ofLifecycleServiceStarted(
         application: Application,
         lifecycleOwner: LifecycleOwner,
         throttleTimeoutMillis: Long = ACTIVITY_THROTTLE_TIMEOUT_MILLIS

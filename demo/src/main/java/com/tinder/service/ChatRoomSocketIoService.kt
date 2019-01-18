@@ -40,7 +40,7 @@ class ChatRoomSocketIoService : LifecycleService() {
         super.onCreate()
 
         val config = Scarlet.Configuration(
-            lifecycle = AndroidLifecycle.ofLifecycleServiceForeground(application, this),
+            lifecycle = AndroidLifecycle.ofLifecycleServiceStarted(application, this),
             messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
@@ -106,7 +106,7 @@ class ChatRoomSocketIoService : LifecycleService() {
                 Timber.e(e)
             })
 
-        Flowable.fromPublisher(AndroidLifecycle.ofLifecycleServiceForeground(application, this))
+        Flowable.fromPublisher(AndroidLifecycle.ofLifecycleServiceStarted(application, this))
             .subscribe({
                 Timber.d("chatroom lifecycle: $it")
 
