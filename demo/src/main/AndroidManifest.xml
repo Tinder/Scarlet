@@ -11,7 +11,7 @@
   <uses-permission android:name="android.permission.STORAGE"/>
 
   <application
-    android:name="com.tinder.app.root.ScarletDemoApplication"
+    android:name=".app.root.ScarletDemoApplication"
     android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
@@ -20,7 +20,7 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:name="com.tinder.app.root.view.DemoActivity"
+      android:name=".app.root.view.DemoActivity"
       android:theme="@style/AppTheme.NoActionBar">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -28,6 +28,12 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
+    <service
+      android:name=".service.ChatRoomSocketIoService"
+      android:enabled="true"
+      android:exported="false">
+    </service>
   </application>
 
 </manifest>

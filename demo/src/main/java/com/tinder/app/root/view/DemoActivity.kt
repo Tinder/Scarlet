@@ -5,18 +5,19 @@
 package com.tinder.app.root.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.tinder.R
 import com.tinder.app.socketio.chatroom.view.ChatRoomFragment
+import com.tinder.app.socketio.chatroomservice.view.ChatRoomServiceFragment
+import com.tinder.app.sse.stockprice.view.StockPriceFragment
 import com.tinder.app.websocket.echo.view.EchoBotFragment
 import com.tinder.app.websocket.gdax.view.GdaxFragment
-import com.tinder.app.sse.stockprice.view.StockPriceFragment
 
 class DemoActivity : AppCompatActivity() {
 
@@ -57,7 +58,8 @@ class DemoActivity : AppCompatActivity() {
             "WS - Echo Bot" to { EchoBotFragment() },
             "WS - GDAX" to { GdaxFragment() },
             "SSE - Stock Price" to { StockPriceFragment() },
-            "SocketIo - Chat Room" to { ChatRoomFragment() }
+            "SocketIo - Chat Room" to { ChatRoomFragment() },
+            "SocketIo - Chat Room Service" to { ChatRoomServiceFragment() }
         )
     }
 }

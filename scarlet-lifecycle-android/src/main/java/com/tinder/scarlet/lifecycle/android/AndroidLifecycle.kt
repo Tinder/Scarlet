@@ -40,4 +40,18 @@ object AndroidLifecycle {
         )
             .combineWith(ConnectivityOnLifecycle(application))
     }
+
+    @JvmStatic
+    @JvmOverloads
+    fun ofLifecycleServiceForeground(
+        application: Application,
+        lifecycleOwner: LifecycleOwner,
+        throttleTimeoutMillis: Long = ACTIVITY_THROTTLE_TIMEOUT_MILLIS
+    ): Lifecycle {
+        return LifecycleOwnerStartedLifecycle(
+            lifecycleOwner,
+            LifecycleRegistry(throttleTimeoutMillis)
+        )
+            .combineWith(ConnectivityOnLifecycle(application))
+    }
 }
