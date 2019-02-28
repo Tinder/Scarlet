@@ -5,7 +5,6 @@ apply plugin: 'maven-publish'
 
 dependencies {
     api rootProject.ext.jacksonDatabind
-    api kotlinReflect
 
     implementation project(':scarlet-core')
     implementation rootProject.ext.kotlinStdlib
