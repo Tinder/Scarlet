@@ -5,27 +5,30 @@
 package com.tinder.scarlet.internal.statetransition
 
 import com.tinder.scarlet.Event
+import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type
 
-internal class EventStateTransitionAdapter :
+internal class StateTransitionToLifecycleStateAdapter :
     StateTransitionAdapter<Any> {
+
     override fun adapt(stateTransition: StateTransition): Any? {
-        return stateTransition.event
+        val event = stateTransition.event as? Event.OnLifecycleStateChange ?: return null
+        return event.lifecycleState
     }
 
     class Factory : StateTransitionAdapter.Factory {
         override fun create(
             type: Type,
             annotations: Array<Annotation>
-        ): StateTransitionAdapter<Any> {
+        ): StateTransitionAdapter<Any>? {
             val clazz = type.getRawType()
-            require(!Event::class.java.isAssignableFrom(clazz)) {
-                "Subclasses of Event is not supported"
+            if (clazz != LifecycleState::class.java) {
+                check(!LifecycleState::class.java.isAssignableFrom(clazz))
+                return null
             }
-            require(clazz == Event::class.java)
-            return EventStateTransitionAdapter()
+            return StateTransitionToLifecycleStateAdapter()
         }
     }
 }

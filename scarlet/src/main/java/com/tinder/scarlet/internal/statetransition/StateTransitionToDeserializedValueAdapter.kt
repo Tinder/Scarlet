@@ -11,7 +11,7 @@ import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.StateTransition
 import java.lang.reflect.Type
 
-internal class DeserializedValueStateTransitionAdapter(
+internal class StateTransitionToDeserializedValueAdapter(
     private val messageAdapter: MessageAdapter<Any>
 ) : StateTransitionAdapter<Any> {
     override fun adapt(stateTransition: StateTransition): Any? {
@@ -30,11 +30,15 @@ internal class DeserializedValueStateTransitionAdapter(
         override fun create(
             type: Type,
             annotations: Array<Annotation>
-        ): StateTransitionAdapter<Any> {
-            val messageAdapter = messageAdapterResolver.resolve(type, annotations)
-            return DeserializedValueStateTransitionAdapter(
-                messageAdapter
-            )
+        ): StateTransitionAdapter<Any>? {
+            return try {
+                val messageAdapter = messageAdapterResolver.resolve(type, annotations)
+                StateTransitionToDeserializedValueAdapter(
+                    messageAdapter
+                )
+            } catch (throwable: Throwable) {
+                null
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type
 
-internal class ProtocolSpecificEventStateTransitionAdapter(
+internal class StateTransitionToProtocolSpecificEventAdapter(
     private val protocolSpecificEventAdatper: ProtocolSpecificEventAdapter
 ) : StateTransitionAdapter<Any> {
     override fun adapt(stateTransition: StateTransition): Any? {
@@ -30,11 +30,13 @@ internal class ProtocolSpecificEventStateTransitionAdapter(
         override fun create(
             type: Type,
             annotations: Array<Annotation>
-        ): StateTransitionAdapter<Any> {
+        ): StateTransitionAdapter<Any>? {
             val clazz = type.getRawType()
-            require(ProtocolSpecificEvent::class.java.isAssignableFrom(clazz))
+            if (!ProtocolSpecificEvent::class.java.isAssignableFrom(clazz)) {
+                return null
+            }
             val protocolEventAdapter = protocolSpecificEventAdatperFactory.create(type, annotations)
-            return ProtocolSpecificEventStateTransitionAdapter(
+            return StateTransitionToProtocolSpecificEventAdapter(
                 protocolEventAdapter
             )
         }

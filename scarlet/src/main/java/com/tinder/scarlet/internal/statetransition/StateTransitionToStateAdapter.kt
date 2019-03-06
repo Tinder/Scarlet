@@ -4,24 +4,29 @@
 
 package com.tinder.scarlet.internal.statetransition
 
+import com.tinder.scarlet.State
 import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type
 
-internal class NoOpStateTransitionAdapter :
+internal class StateTransitionToStateAdapter :
     StateTransitionAdapter<Any> {
-    override fun adapt(stateTransition: StateTransition): StateTransition? {
-        return stateTransition
+
+    override fun adapt(stateTransition: StateTransition): Any? {
+        return stateTransition.toState
     }
 
     class Factory : StateTransitionAdapter.Factory {
         override fun create(
             type: Type,
             annotations: Array<Annotation>
-        ): StateTransitionAdapter<Any> {
+        ): StateTransitionAdapter<Any>? {
             val clazz = type.getRawType()
-            require(clazz == StateTransition::class.java)
-            return NoOpStateTransitionAdapter()
+            if (clazz != State::class.java) {
+                check(!State::class.java.isAssignableFrom(clazz))
+                return null
+            }
+            return StateTransitionToStateAdapter()
         }
     }
 }

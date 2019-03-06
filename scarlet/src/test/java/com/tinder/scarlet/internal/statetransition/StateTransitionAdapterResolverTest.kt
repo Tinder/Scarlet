@@ -6,7 +6,9 @@ package com.tinder.scarlet.internal.statetransition
 
 import com.nhaarman.mockito_kotlin.given
 import com.nhaarman.mockito_kotlin.mock
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
+import org.assertj.core.api.Assertions.assertThatIllegalStateException
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -29,7 +31,7 @@ class StateTransitionAdapterResolverTest {
         val resolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
-        Assertions.assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
+        assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
     }
 
     @Test
@@ -37,14 +39,14 @@ class StateTransitionAdapterResolverTest {
         // Given
         val type = Array<Int>::class.java
         val stateTransitionAdapter = mock<StateTransitionAdapter<Any>>()
-        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(null)
         given(stateTransitionAdapterFactory2.create(type, emptyArray())).willReturn(stateTransitionAdapter)
 
         // When
         val resolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
-        Assertions.assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
+        assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
     }
 
     @Test
@@ -58,21 +60,36 @@ class StateTransitionAdapterResolverTest {
         val secondResolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
-        Assertions.assertThat(secondResolvedStateTransitionAdapter).isSameAs(firstResolvedStateTransitionAdapter)
+        assertThat(secondResolvedStateTransitionAdapter).isSameAs(firstResolvedStateTransitionAdapter)
     }
 
     @Test
     fun resolve_givenTypeIsNotSupportedByAnyStateTransitionAdapterFactory_shouldThrowIllegalStateException() {
         // Given
         val type = Array<Int>::class.java
-        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
-        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(null)
+        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willReturn(null)
 
         // Then
-        Assertions.assertThatIllegalStateException()
+        assertThatIllegalStateException()
             .isThrownBy {
                 stateTransitionAdapterResolver.resolve(type, emptyArray())
             }
             .withMessageContaining("Cannot resolve state transition adapter")
+    }
+
+    @Test
+    fun resolve_givenTypeIsIllegal_shouldThrowException() {
+        // Given
+        val type = Array<Int>::class.java
+        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(null)
+        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+
+        // Then
+        assertThatIllegalArgumentException()
+            .isThrownBy {
+                stateTransitionAdapterResolver.resolve(type, emptyArray())
+            }
+            .withMessageContaining("Unsupported type")
     }
 }

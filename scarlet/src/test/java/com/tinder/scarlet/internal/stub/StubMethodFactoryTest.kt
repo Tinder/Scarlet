@@ -15,9 +15,9 @@ import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter
-import com.tinder.scarlet.internal.statetransition.DeserializationStateTransitionAdapter
-import com.tinder.scarlet.internal.statetransition.DeserializedValueStateTransitionAdapter
-import com.tinder.scarlet.internal.statetransition.NoOpStateTransitionAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializationAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializedValueAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionToStateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.utils.MessageAdapterResolver
@@ -392,11 +392,11 @@ internal class StubMethodFactoryTest {
                 @Parameterized.Parameters
                 @JvmStatic
                 fun data() = listOf(
-                    param<EventExample, NoOpStateTransitionAdapter>(),
-                    param<StringDeserializationStreamExample, DeserializationStateTransitionAdapter>(),
-                    param<ByteArrayDeserializationStreamExample, DeserializationStateTransitionAdapter>(),
-                    param<StringStreamExample, DeserializedValueStateTransitionAdapter>(),
-                    param<ByteArrayStreamExample, DeserializedValueStateTransitionAdapter>()
+                    param<EventExample, StateTransitionToStateTransitionAdapter>(),
+                    param<StringDeserializationStreamExample, StateTransitionToDeserializationAdapter>(),
+                    param<ByteArrayDeserializationStreamExample, StateTransitionToDeserializationAdapter>(),
+                    param<StringStreamExample, StateTransitionToDeserializedValueAdapter>(),
+                    param<ByteArrayStreamExample, StateTransitionToDeserializedValueAdapter>()
                 )
 
                 private inline fun <reified T, reified R> param() =

@@ -1,285 +1,148 @@
 /*
- * © 2018 Match Group, LLC.
+ * © 2019 Match Group, LLC.
  */
 
 package com.tinder.scarlet.internal.statetransition
 
-// @RunWith(MockitoJUnitRunner::class)
-// internal class StateTransitionAdapterFactoriesTest {
-//
-//    private val messageAdapterResolver = mock<MessageAdapterResolver>()
-//    private val eventMapperFactory = StateTransitionAdapterResolver(messageAdapterResolver)
-//
-//    @Test
-//    fun create_givenEvent_shouldCreateNoOp() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfEvent() }
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.NoOp::class.java)
-//    }
-//
-//    @Test
-//    fun create_givenEvenSubclass_shouldThrowIllegalArgumentException() {
-//        // Given
-//        val typeAndAnnotations = listOf(
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycle() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocket() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnStateChange() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnRetry() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleStateChange() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleStateChangeStarted() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleStateChangeStopped() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleStateChangeStoppedWithReason() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleStateChangeStoppedAndAborted() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnLifecycleTerminate() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEvent() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnConnectionOpenedAny() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnConnectionOpenedMyWebSocket() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnMessageReceived() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnConnectionClosing() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnConnectionClosed() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketEventOnConnectionFailed() },
-//            getReturnTypeAndAnnotations { streamOfEventSubclassOnWebSocketTerminate() })
-//
-//        // Then
-//        typeAndAnnotations.forEach { (type, annotations) ->
-//
-//            Assertions.assertThatIllegalArgumentException().isThrownBy {
-//                eventMapperFactory.create(type, annotations)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun create_givenLifecycleState_shouldCreateToLifecycleState() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfLifecycleState() }
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.ToLifecycleState::class.java)
-//    }
-//
-//    @Test
-//    fun create_givenLifecycleStateSubclass_shouldThrowIllegalArgumentException() {
-//        // Given
-//        val typeAndAnnotations = listOf(
-//            getReturnTypeAndAnnotations { streamOfLifecycleStateSubclassStarted() },
-//            getReturnTypeAndAnnotations { streamOfLifecycleStateSubclassStopped() })
-//
-//        // Then
-//        typeAndAnnotations.forEach { (type, annotations) ->
-//            Assertions.assertThatIllegalArgumentException().isThrownBy {
-//                eventMapperFactory.create(type, annotations)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun create_givenWebSocketEvent_shouldCreateToWebSocketEvent() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfWebSocketEvent() }
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.ToWebSocketEvent::class.java)
-//    }
-//
-//    @Test
-//    fun create_givenWebSocketEventSubclass_shouldThrowIllegalArgumentException() {
-//        // Given
-//        val typeAndAnnotations = listOf(
-//            getReturnTypeAndAnnotations { streamOfWebSocketEventSubclassOnConnectionOpened() },
-//            getReturnTypeAndAnnotations { streamOfWebSocketEventSubclassOnMessageReceived() })
-//
-//        // Then
-//        typeAndAnnotations.forEach { (type, annotations) ->
-//            Assertions.assertThatIllegalArgumentException().isThrownBy {
-//                eventMapperFactory.create(type, annotations)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun create_givenState_shouldCreateState() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfState() }
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.ToState::class.java)
-//    }
-//
-//    @Test
-//    fun create_givenStateSubclass_shouldThrowIllegalArgumentException() {
-//        // Given
-//        val typeAndAnnotations = listOf(
-//            getReturnTypeAndAnnotations { streamOfStateSubclassConnected() },
-//            getReturnTypeAndAnnotations { streamOfStateSubclassDisconnected() })
-//
-//        // Then
-//        typeAndAnnotations.forEach { (type, annotations) ->
-//            Assertions.assertThatIllegalArgumentException().isThrownBy {
-//                eventMapperFactory.create(type, annotations)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun create_givenStreamOfDeserializationOfString_shouldCreateToDeserialization() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfDeserializationOfString() }
-//        val messageAdapter = mock<MessageAdapter<Any>>()
-//        val expectedMessageType = type.getFirstParameterType().getFirstParameterType()
-//        given(messageAdapterResolver.resolve(expectedMessageType, annotations)).willReturn(messageAdapter)
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.ToDeserialization::class.java)
-//    }
-//
-//    @Test
-//    fun create_givenStreamOfDeserializationOfString_andHasBeenCached_shouldReturnTheCachedValue() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfDeserializationOfString() }
-//        val messageAdapter = mock<MessageAdapter<Any>>()
-//        val expectedMessageType = type.getFirstParameterType().getFirstParameterType()
-//        given(messageAdapterResolver.resolve(expectedMessageType, annotations)).willReturn(messageAdapter)
-//        val cachedEventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isSameAs(cachedEventMapper)
-//    }
-//
-//    @Test
-//    fun create_givenStreamOfString_shouldCreateToDeserializedValue() {
-//        // Given
-//        val (type, annotations) = getReturnTypeAndAnnotations { streamOfString() }
-//        val messageAdapter = mock<MessageAdapter<Any>>()
-//        val expectedMessageType = type.getFirstParameterType()
-//        given(messageAdapterResolver.resolve(expectedMessageType, annotations)).willReturn(messageAdapter)
-//
-//        // When
-//        val eventMapper = eventMapperFactory.create(type, annotations)
-//
-//        // Then
-//        assertThat(eventMapper).isInstanceOf(EventMapper.ToDeserializedValue::class.java)
-//    }
-//
-//    companion object {
-//
-//        private annotation class MyAnnotation
-//
-//        private interface MyWebSocket : WebSocket
-//
-//        @Suppress("UNUSED")
-//        private interface Types {
-//            @MyAnnotation
-//            fun streamOfEvent(): Stream<Event>
-//
-//            fun streamOfEventSubclassOnLifecycle(): Stream<Event.OnLifecycle>
-//
-//            fun streamOfEventSubclassOnWebSocket(): Stream<Event.OnWebSocket>
-//
-//            fun streamOfEventSubclassOnStateChange(): Stream<Event.OnStateChange<State>>
-//
-//            fun streamOfEventSubclassOnRetry(): Stream<Event.OnRetry>
-//
-//            fun streamOfEventSubclassOnLifecycleStateChange(): Stream<Event.OnLifecycle.StateChange<Lifecycle.State>>
-//
-//            fun streamOfEventSubclassOnLifecycleStateChangeStarted(): Stream<Event.OnLifecycle.StateChange<Lifecycle.State.Started>>
-//
-//            fun streamOfEventSubclassOnLifecycleStateChangeStopped(): Stream<Event.OnLifecycle.StateChange<Lifecycle.State.Stopped>>
-//
-//            fun streamOfEventSubclassOnLifecycleStateChangeStoppedWithReason():
-//                    Stream<Event.OnLifecycle.StateChange<Lifecycle.State.Stopped.WithReason>>
-//
-//            fun streamOfEventSubclassOnLifecycleStateChangeStoppedAndAborted():
-//                    Stream<Event.OnLifecycle.StateChange<Lifecycle.State.Stopped.AndAborted>>
-//
-//            fun streamOfEventSubclassOnLifecycleTerminate(): Stream<Event.OnLifecycle.Terminate>
-//
-//            fun streamOfEventSubclassOnWebSocketEvent(): Stream<Event.OnWebSocket.Event<WebSocket.Event>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnConnectionOpenedAny():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionOpened<*>>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnConnectionOpenedMyWebSocket():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionOpened<MyWebSocket>>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnMessageReceived():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnMessageReceived>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnConnectionClosing():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionClosing>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnConnectionClosed():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionClosed>>
-//
-//            fun streamOfEventSubclassOnWebSocketEventOnConnectionFailed():
-//                    Stream<Event.OnWebSocket.Event<WebSocket.Event.OnConnectionFailed>>
-//
-//            fun streamOfEventSubclassOnWebSocketTerminate(): Stream<Event.OnWebSocket.Terminate>
-//
-//            fun streamOfEventSubclassOnStateChangeConnected(): Stream<Event.OnStateChange<State.Connected>>
-//
-//            fun streamOfLifecycleState(): Stream<Lifecycle.State>
-//
-//            fun streamOfLifecycleStateSubclassStarted(): Stream<Lifecycle.State.Started>
-//
-//            fun streamOfLifecycleStateSubclassStopped(): Stream<Lifecycle.State.Stopped>
-//
-//            fun streamOfWebSocketEvent(): Stream<WebSocket.Event>
-//
-//            fun streamOfWebSocketEventSubclassOnConnectionOpened(): Stream<WebSocket.Event.OnConnectionOpened<*>>
-//
-//            fun streamOfWebSocketEventSubclassOnMessageReceived(): Stream<WebSocket.Event.OnMessageReceived>
-//
-//            fun streamOfState(): Stream<State>
-//
-//            fun streamOfStateSubclassConnected(): Stream<State.Connected>
-//
-//            fun streamOfStateSubclassDisconnected(): Stream<State.Disconnected>
-//
-//            fun streamOfDeserializationOfString(): Stream<Deserialization<String>>
-//
-//            fun streamOfString(): Stream<String>
-//        }
-//
-//        private fun getReturnTypeAndAnnotations(methodCall: Types.() -> Any) = ReturnTypeResolver().resolve(methodCall)
-//
-//        private fun Type.getFirstParameterType(): Type = (this as ParameterizedType).getParameterUpperBound(0)
-//
-//        private class ReturnTypeResolver {
-//            private lateinit var method: Method
-//
-//            private val methodRecorder = Proxy.newProxyInstance(
-//                Types::class.java.classLoader,
-//                arrayOf(Types::class.java)
-//            ) { _, method, _ ->
-//                this.method = method
-//                null
-//            } as Types
-//
-//            fun resolve(methodCall: Types.() -> Any): Pair<ParameterizedType, Array<Annotation>> {
-//                methodRecorder.methodCall()
-//                return (method.genericReturnType as ParameterizedType) to method.annotations
-//            }
-//        }
-//    }
-// }
+import com.tinder.scarlet.internal.common.Types
+import com.tinder.scarlet.internal.common.toMessageTypeAndAnnotations
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterFactoriesTest.Expectation.IGNORED
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterFactoriesTest.Expectation.ILLEGAL
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterFactoriesTest.Expectation.SUPPORTED
+import com.tinder.scarlet.internal.utils.MessageAdapterResolver
+import com.tinder.scarlet.messageadapter.builtin.BuiltInMessageAdapterFactory
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalStateException
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.mockito.junit.MockitoJUnit
+import org.mockito.junit.MockitoRule
+import org.mockito.quality.Strictness
+import java.lang.reflect.Type
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.declaredMemberFunctions
+
+@RunWith(Parameterized::class)
+internal class StateTransitionAdapterFactoriesTest(
+    private val factory: StateTransitionAdapter.Factory,
+    private val adapterClazz: Class<*>,
+    private val typeAndAnnotations: Pair<Type, Array<Annotation>>,
+    private val expectation: Expectation
+) {
+
+    @Suppress("UNUSED")
+    @get:Rule
+    val mockitoRule: MockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS)
+
+    @Test
+    fun create() {
+        // Given
+        val (type, annotations) = typeAndAnnotations
+
+        // Then
+        when (expectation) {
+            SUPPORTED -> {
+                val adapter = factory.create(type, annotations)
+                assertThat(adapter).isNotNull()
+                assertThat(adapter).isInstanceOf(adapterClazz)
+            }
+            IGNORED -> {
+                val adapter = factory.create(type, annotations)
+                assertThat(adapter).isNull()
+            }
+            ILLEGAL -> {
+                assertThatIllegalStateException()
+                    .isThrownBy {
+                        factory.create(type, annotations)
+                    }
+            }
+        }
+    }
+
+    enum class Expectation {
+        SUPPORTED,
+        IGNORED,
+        ILLEGAL
+    }
+
+    companion object {
+
+        private val messageAdapterResolver =
+            MessageAdapterResolver(listOf(BuiltInMessageAdapterFactory()))
+
+        @Parameterized.Parameters(name = "{index}: {0} should support {1} ? {2}")
+        @JvmStatic
+        fun data() = listOf(
+            param(
+                StateTransitionToStateTransitionAdapter.Factory(),
+                StateTransitionToStateTransitionAdapter::class.java,
+                listOf(Types::streamOfStateTransition)
+            ),
+            param(
+                StateTransitionToStateAdapter.Factory(),
+                StateTransitionToStateAdapter::class.java,
+                listOf(Types::streamOfState),
+                listOf(
+                    Types::streamOfStateSubclassDisconnecting,
+                    Types::streamOfStateSubclassDisconnected
+                )
+            ),
+            param(
+                StateTransitionToEventAdapter.Factory(),
+                StateTransitionToEventAdapter::class.java,
+                listOf(Types::streamOfEvent),
+                listOf(
+                    Types::streamOfEventSubclassOnProtocolEvent,
+                    Types::streamOfEventSubclassOnRetry,
+                    Types::streamOfEventSubclassOnLifecycle
+                )
+            ),
+            param(
+                StateTransitionToLifecycleStateAdapter.Factory(),
+                StateTransitionToLifecycleStateAdapter::class.java,
+                listOf(Types::streamOfLifecycleState),
+                listOf(
+                    Types::streamOfLifecycleStateSubclassStarted,
+                    Types::streamOfLifecycleStateSubclassStopped
+                )
+            ),
+            param(
+                StateTransitionToProtocolEventAdapter.Factory(),
+                StateTransitionToProtocolEventAdapter::class.java,
+                listOf(Types::streamOfProtocolEvent),
+                listOf(
+                    Types::streamOfProtocolEventSubclassOnConnectionOpened,
+                    Types::streamOfProtocolEventSubclassOnMessageReceived
+                )
+            ),
+            param(
+                StateTransitionToDeserializationAdapter.Factory(messageAdapterResolver),
+                StateTransitionToDeserializationAdapter::class.java,
+                listOf(Types::streamOfDeserializationOfString)
+            ),
+            param(
+                StateTransitionToDeserializedValueAdapter.Factory(messageAdapterResolver),
+                StateTransitionToDeserializedValueAdapter::class.java,
+                listOf(Types::streamOfString, Types::streamOfByteArray)
+            )
+        ).flatten()
+
+        private fun param(
+            factory: StateTransitionAdapter.Factory,
+            adapterClazz: Class<*>,
+            shouldSupport: List<KFunction<*>>,
+            shouldThrow: List<KFunction<*>> = emptyList()
+        ): List<Array<*>> {
+            val supportingTypes = shouldSupport.map { it.toMessageTypeAndAnnotations() }
+            val throwingTypes = shouldThrow.map { it.toMessageTypeAndAnnotations() }
+            val ignoringTypes =
+                (Types::class.declaredMemberFunctions - (shouldSupport + shouldThrow))
+                    .map { it.toMessageTypeAndAnnotations() }
+            return supportingTypes.map { arrayOf(factory, adapterClazz, it, SUPPORTED) } +
+                    throwingTypes.map { arrayOf(factory, adapterClazz, it, ILLEGAL) } +
+                    ignoringTypes.map { arrayOf(factory, adapterClazz, it, IGNORED) }
+        }
+    }
+}
