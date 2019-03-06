@@ -3,7 +3,7 @@
  */
 
 ext {
-    minSdkVersion = 28
+    minSdkVersion = 24
     minSdkVersionAndroidLifecycle = 19
     targetSdkVersion = 28
     compileSdkVersion = 28
