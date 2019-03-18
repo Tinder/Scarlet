@@ -8,7 +8,7 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.ShutdownReason
 import com.tinder.scarlet.WebSocket
 import io.reactivex.Flowable
-import io.reactivex.processors.PublishProcessor
+import io.reactivex.processors.BehaviorProcessor
 import okhttp3.Response
 import okhttp3.WebSocketListener
 import okio.ByteString
