@@ -8,8 +8,11 @@ import com.tinder.scarlet.LifecycleState
 
 internal fun List<LifecycleState>.combine(): LifecycleState {
     val shouldStop = any { it == LifecycleState.Stopped }
-    if (shouldStop) {
-        return LifecycleState.Stopped
+    val completed = any { it == LifecycleState.Completed }
+
+    return when {
+        shouldStop -> LifecycleState.Stopped
+        completed -> LifecycleState.Completed
+        else -> LifecycleState.Started
     }
-    return LifecycleState.Started
 }

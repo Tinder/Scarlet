@@ -12,8 +12,8 @@ import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
 internal class LifecycleOwnerStartedLifecycle(
-    private val lifecycleOwner: LifecycleOwner,
-    private val lifecycleRegistry: LifecycleRegistry
+        private val lifecycleOwner: LifecycleOwner,
+        private val lifecycleRegistry: LifecycleRegistry
 ) : Lifecycle by lifecycleRegistry {
 
     init {
@@ -34,6 +34,7 @@ internal class LifecycleOwnerStartedLifecycle(
         @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {
             lifecycleRegistry.onComplete()
+            lifecycleOwner.lifecycle.removeObserver(this)
         }
     }
 }
