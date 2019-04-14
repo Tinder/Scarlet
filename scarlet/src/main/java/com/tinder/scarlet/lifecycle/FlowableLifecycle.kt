@@ -25,7 +25,10 @@ internal class FlowableLifecycle(
         val flowable =
                 Flowable.combineLatest(lifecycles) { lifecycle ->
                     val state = lifecycle.map { it as LifecycleState }.combine()
-                    lifecycles.unregisterConnectivityBroadcastReceiver(state)
+                    try {
+                        lifecycles.unregisterConnectivityBroadcastReceiver(state)
+                    } catch (e: Exception) {
+                    }
                     state
                 }
         return FlowableLifecycle(flowable)
