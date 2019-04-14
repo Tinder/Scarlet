@@ -13,6 +13,7 @@ import android.net.ConnectivityManager
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import java.lang.Exception
 
 internal class ConnectivityOnLifecycle(
         private val applicationContext: Context,
@@ -50,7 +51,10 @@ internal class ConnectivityOnLifecycle(
     }
 
     fun unregisterReceiver() {
-        applicationContext.unregisterReceiver(connectivityChangeBroadcastReceiver)
+        try {
+            applicationContext.unregisterReceiver(connectivityChangeBroadcastReceiver)
+        } catch (e: Exception) {
+        }
     }
 
     private inner class ConnectivityChangeBroadcastReceiver : BroadcastReceiver() {
