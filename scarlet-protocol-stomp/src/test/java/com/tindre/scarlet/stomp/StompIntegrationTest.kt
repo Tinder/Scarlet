@@ -54,12 +54,13 @@ class StompIntegrationTest {
         connection1.client.sendText("message1")
         connection1.client.sendText("message2")
         connection1.client.sendText("message3")
+        connection1.client.sendText("message4")
         connection1.clientClosure()
 
         connection2.open()
 
         LOGGER.info("${queueTextObserver.values}")
-        queueTextObserver.awaitCount(3)
+        queueTextObserver.awaitCount(4)
     }
 
     @Test
@@ -71,6 +72,7 @@ class StompIntegrationTest {
         connection1.send(DESTINATION, "message1", "tx1", null)
         connection1.send(DESTINATION, "message2", "tx1", null)
         connection1.send(DESTINATION, "message3", "tx1", null)
+        connection1.send(DESTINATION, "message4", "tx1", null)
         connection1.commit("tx1")
         connection1.disconnect()
 
@@ -78,7 +80,7 @@ class StompIntegrationTest {
 
         val queueTextObserver = connection2.client.observeText().test()
 
-        queueTextObserver.awaitCount(3)
+        queueTextObserver.awaitCount(4)
         LOGGER.info("${queueTextObserver.values}")
     }
 
