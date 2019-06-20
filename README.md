@@ -1,7 +1,6 @@
 Scarlet
 ===
 [![CircleCI](https://circleci.com/gh/Tinder/Scarlet.svg?style=svg)](https://circleci.com/gh/Tinder/Scarlet)
-[![Release](https://jitpack.io/v/tinder/scarlet.svg)](https://jitpack.io/#tinder/scarlet)
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
@@ -76,29 +75,22 @@ TODO
 
 Download
 --------
-While we are working on Bintray support, Scarlet is available via [JitPack][jitpack].
+Scarlet is available via Maven Central.
+
+Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
 ##### Maven:
 ```xml
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-</repository>
 <dependency>
-    <groupId>com.github.tinder.scarlet</groupId>
+    <groupId>com.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
 </dependency>
 ```
 
 ##### Gradle:
 ```groovy
-repositories {
-    // ...
-    maven { url "https://jitpack.io" }
-}
-
-implementation 'com.github.tinder.scarlet:scarlet:$0.1.7'
+implementation 'com.tinder.scarlet:scarlet:0.1.8'
 ```
 
 ### Plug-in Roadmap
@@ -156,10 +148,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ~~~
 
  [gdax-websocket-feed]: https://docs.gdax.com/#websocket-feed
- [latest-jar]: https://tinder.jfrog.io/tinder/webapp/#/artifacts/browse/tree/General/libs-release-local/com/tinder/scarlet/scarlet
  [demo-app]: /demo/src/main/java/com/tinder/app
  [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
  [slides]: https://speakerdeck.com/zhxnlai/taming-websocket-with-scarlet
  [kotliners]: https://www.conferenceforkotliners.com/
  [state-machine]: https://github.com/Tinder/StateMachine
- [jitpack]: https://jitpack.io/#tinder/scarlet
+ [snap]: https://oss.sonatype.org/content/repositories/snapshots/
