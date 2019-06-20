@@ -4,16 +4,14 @@ buildscript {
     ext.kotlin_version = '1.3.0'
     ext.dokka_version = '0.9.16'
     repositories {
+        mavenCentral()
         google()
         jcenter()
     }
     dependencies {
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.8.0'
         classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.4"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
-        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
-        classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
     }
 }
 
@@ -26,14 +24,13 @@ ktlint {
 }
 
 subprojects {
-    apply plugin: 'org.kordamp.gradle.stats'
-    apply plugin: "com.jfrog.artifactory"
-    // group = 'com.tinder.scarlet' TODO use Bintray
-    group = 'com.github.tinder'
+    group = GROUP
+    version = VERSION_NAME
 
     repositories {
-        maven { url "https://jitpack.io" }
+        mavenCentral()
         google()
+        maven { url "https://jitpack.io" }
         jcenter()
     }
 }
