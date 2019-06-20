@@ -82,7 +82,7 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 ##### Maven:
 ```xml
 <dependency>
-    <groupId>com.github.tinder.scarlet</groupId>
+    <groupId>com.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
     <version>0.1.8</version>
 </dependency>
@@ -148,7 +148,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ~~~
 
  [gdax-websocket-feed]: https://docs.gdax.com/#websocket-feed
- [latest-jar]: https://tinder.jfrog.io/tinder/webapp/#/artifacts/browse/tree/General/libs-release-local/com/tinder/scarlet/scarlet
  [demo-app]: /demo/src/main/java/com/tinder/app
  [tutorial]: https://tech.gotinder.com/taming-websocket-with-scarlet/
  [slides]: https://speakerdeck.com/zhxnlai/taming-websocket-with-scarlet
