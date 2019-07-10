@@ -23,15 +23,22 @@ ktlint {
     version = '0.29.0'
 }
 
-subprojects {
+allprojects {
     group = GROUP
     version = VERSION_NAME
 
     repositories {
         mavenCentral()
         google()
-        maven { url "https://jitpack.io" }
         jcenter()
+    }
+}
+
+subprojects { project ->
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
 
