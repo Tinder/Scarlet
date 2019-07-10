@@ -6,10 +6,9 @@ jobs:
       - image: circleci/android:api-28-alpha
     environment:
         TERM: dumb
-        GRADLE_OPTS: '-Dorg.gradle.jvmargs="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" -Dorg.gradle.parallel=false -Dorg.gradle.daemon=true'
+        JAVA_TOOL_OPTIONS: "-Xmx1g"
+        GRADLE_OPTS: '-Dorg.gradle.parallel=false -Dorg.gradle.daemon=false'
         CIRCLE_TEST_REPORTS: test-reports
-    resource_class: xlarge
-    parallelism: 4
     steps:
       - checkout
       - run:
