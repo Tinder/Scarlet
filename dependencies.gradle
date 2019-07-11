@@ -53,5 +53,5 @@ ext {
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    stateMachine = "com.github.tinder:statemachine:0.1.2"
+    stateMachine = "com.tinder.statemachine:statemachine:0.2.0"
 }
