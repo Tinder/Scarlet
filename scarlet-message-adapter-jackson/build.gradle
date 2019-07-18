@@ -4,7 +4,6 @@ apply plugin: 'java-library'
 
 dependencies {
     api rootProject.ext.jacksonDatabind
-    api kotlinReflect
 
     implementation project(':scarlet-core')
     implementation rootProject.ext.kotlinStdlib
