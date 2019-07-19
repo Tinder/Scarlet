@@ -1,28 +1,27 @@
-Scarlet
-===
+# Scarlet
+
 [![CircleCI](https://circleci.com/gh/Tinder/Scarlet.svg?style=svg)](https://circleci.com/gh/Tinder/Scarlet)
 [![Release](https://jitpack.io/v/tinder/scarlet.svg)](https://jitpack.io/#tinder/scarlet)
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
-Update
----
-We are working on a new version of Scarlet that supports other persistent connection protocols: ServerSentEvent, Socket IO, STOMP, and MQTT. It can be found on the [`0.2.x`](https://github.com/Tinder/Scarlet/tree/0.2.x) branch and is available at `com.github.tinder:scarlet:0.2.1-alpha4`.
+## Update
 
+We are working on a new version of Scarlet that supports other persistent connection protocols: ServerSentEvent, Socket IO, STOMP, and MQTT. It can be found on the [`0.2.x`](https://github.com/Tinder/Scarlet/tree/0.2.x) branch.
 
-Tutorial
----
+## Tutorial
+
 - [Taming WebSocket with Scarlet][tutorial]
 - [A talk][slides] at [Conference for Kotliners][kotliners]
 
-Usage
----
+## Usage
+
 In this example, we read the realtime Bitcoin price from [Gdax WebSocket Feed][gdax-websocket-feed].
 For more information, please check out the [demo app][demo-app].
 
 Declare a WebSocket client using an interface:
 
-~~~ kotlin
+```kotlin
 interface GdaxService {
 	@Receive
 	fun observeWebSocketEvent(): Flowable<WebSocket.Event>
@@ -31,11 +30,11 @@ interface GdaxService {
 	@Receive
  	fun observeTicker(): Flowable<Ticker>
 }
-~~~
+```
 
 Use Scarlet to create an implementation:
 
-~~~ kotlin
+```kotlin
 val scarletInstance = Scarlet.Builder()
     .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed.gdax.com"))
     .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
@@ -43,12 +42,11 @@ val scarletInstance = Scarlet.Builder()
     .build()
 
 val gdaxService = scarletInstance.create<GdaxService>()
-~~~
+```
 
 Send a `Subscribe` message upon connection open and the server will start streaming tickers which contain the latest price.
 
-
-~~~ kotlin
+```kotlin
 val BITCOIN_TICKER_SUBSCRIBE_MESSAGE = Subscribe(
     productIds = listOf("BTC-USD"),
     channels = listOf("ticker")
@@ -64,21 +62,22 @@ gdaxService.observeTicker()
     .subscribe({ ticker ->
         Log.d("Bitcoin price is ${ticker.price} at ${ticker.time}")
     })
-~~~
+```
 
-###  Android
+### Android
+
 Scarlet is driven by a [StateMachine][state-machine].
 
 <img width="600 px" src="/example/scarlet-state-machine.png"/>
 
 TODO
 
+## Download
 
-Download
---------
 While we are working on Bintray support, Scarlet is available via [JitPack][jitpack].
 
 ##### Maven:
+
 ```xml
 <repository>
     <id>jitpack.io</id>
@@ -87,26 +86,30 @@ While we are working on Bintray support, Scarlet is available via [JitPack][jitp
 <dependency>
     <groupId>com.github.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>0.1.6</version>
+    <version>0.1.7</version>
 </dependency>
 ```
 
 ##### Gradle:
+
 ```groovy
 repositories {
     // ...
     maven { url "https://jitpack.io" }
 }
 
-implementation 'com.github.tinder.scarlet:scarlet:$0.1.6'
+implementation 'com.github.tinder.scarlet:scarlet:$0.1.7'
 ```
 
 ### Plug-in Roadmap
+
 `WebSocket.Factory`
+
 - [x] `OkHttpClient`
 - [x] `MockHttpServer`
 
 `MessageAdapter.Factory`
+
 - [x] `moshi`
 - [x] `gson`
 - [x] `protobuf`
@@ -114,21 +117,24 @@ implementation 'com.github.tinder.scarlet:scarlet:$0.1.6'
 - [ ] `simple-xml`
 
 `StreamAdapter.Factory`
+
 - [x] `RxJava2`
 - [x] `RxJava1`
 - [x] `Kotlin Coroutine`
 
 `Lifecycle`
+
 - [x] `AndroidLifecycle`
 
 `BackoffStrategy`
+
 - [x] `Linear`
 - [x] `Exponential`
 - [x] `ExponentialWithJitter`
 
-Copyright
----
-~~~
+## Copyright
+
+```
 Copyright (c) 2018, Match Group, LLC
 All rights reserved.
 
