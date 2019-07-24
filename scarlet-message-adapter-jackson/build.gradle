@@ -1,15 +1,9 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
+apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
-apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'maven-publish'
 
 dependencies {
     api rootProject.ext.jacksonDatabind
-    api kotlinReflect
 
     implementation project(':scarlet-core')
     implementation rootProject.ext.kotlinStdlib
@@ -20,60 +14,4 @@ dependencies {
     testImplementation rootProject.ext.kotlinReflect
     testImplementation rootProject.ext.assertJ
     testImplementation rootProject.ext.jacksonModuleKotlin
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
-    outputFormat = 'javadoc'
-    outputDirectory = javadoc.destinationDir
-
-//    impliedPlatforms = ['JVM']
-//    jdkVersion = 7
-
-    externalDocumentationLink {
-        url = new URL("https://docs.oracle.com/javase/7/docs/api/")
-    }
-}
-
-task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'com.tinder'
-            version version
-            artifactId project.getName()
-            artifact sourcesJar
-            artifact javadocJar
-            from components.java
-        }
-    }
-}
-
-artifactory {
-    contextUrl = 'https://tinder.jfrog.io/tinder'
-    publish {
-        repository {
-            repoKey = 'libs-release-local'
-            username = System.getenv("ARTIFACTORY_USER")
-            password = System.getenv("ARTIFACTORY_PASSWORD")
-            maven = true
-        }
-        defaults {
-            publications('mavenJava')
-            publishArtifacts = true
-            publishPom = true
-        }
-    }
 }

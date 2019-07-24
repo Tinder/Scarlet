@@ -1,7 +1,3 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
 ext {
     minSdkVersion = 24
     minSdkVersionAndroidLifecycle = 19
@@ -13,7 +9,7 @@ ext {
     lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     material = 'com.google.android.material:material:1.0.0'
     multiDex = 'androidx.multidex:multidex:2.0.0'
-    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.2'
     liveDateReactiveSterams = 'android.arch.lifecycle:reactivestreams:1.1.1'
 
     rxBinding = 'com.jakewharton.rxbinding3:rxbinding:3.0.0-alpha1'
@@ -68,5 +64,5 @@ ext {
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    stateMachine = "com.github.tinder:statemachine:0.1.2"
+    stateMachine = "com.tinder.statemachine:statemachine:0.2.0"
 }
