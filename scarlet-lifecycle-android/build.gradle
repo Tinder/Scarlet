@@ -1,10 +1,5 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -37,67 +32,4 @@ dependencies {
     testImplementation rootProject.ext.junit
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "sources"
-}
-
-publishing {
-    publications {
-        aar(MavenPublication) {
-            groupId 'com.tinder'
-            version version
-            artifactId project.getName()
-
-            artifact(sourcesJar)
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
-
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                // List all compile dependencies and write to POM
-                configurations.implementation.getAllDependencies().each { Dependency dep ->
-                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
-                        return // ignore invalid dependencies
-
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', dep.group)
-                    dependencyNode.appendNode('artifactId', dep.name)
-                    dependencyNode.appendNode('version', dep.version)
-
-                    if (!dep.transitive) {
-                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
-                        def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
-                        exclusionNode.appendNode('groupId', '*')
-                        exclusionNode.appendNode('artifactId', '*')
-                    } else if (!dep.properties.excludeRules.empty) {
-                        // Otherwise add specified exclude rules
-                        def exclusionsNode = dependencyNode.appendNode('exclusions')
-                        dep.properties.excludeRules.each { ExcludeRule rule ->
-                            def exclusionNode = exclusionsNode.appendNode('exclusion')
-                            exclusionNode.appendNode('groupId', rule.group ?: '*')
-                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-artifactory {
-    contextUrl = 'https://tinder.jfrog.io/tinder'
-    publish {
-        repository {
-            repoKey = 'libs-release-local'
-            username = System.getenv("ARTIFACTORY_USER")
-            password = System.getenv("ARTIFACTORY_PASSWORD")
-            maven = true
-        }
-        defaults {
-            publications('aar')
-            publishArtifacts = true
-            publishPom = true
-        }
-    }
-}
+apply plugin: 'com.vanniktech.maven.publish'
