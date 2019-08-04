@@ -27,7 +27,10 @@ class ProtobufMessageAdapter<T : MessageLite> private constructor(
             is Message.Bytes -> message.value
         }
         try {
-            return parser.parseFrom(bytesValue, registry)
+            return when (registry) {
+                null -> parser.parseFrom(bytesValue)
+                else -> parser.parseFrom(bytesValue, registry)
+            }
         } catch (e: InvalidProtocolBufferException) {
             throw RuntimeException(e) // Despite extending IOException, this is data mismatch.
         }
