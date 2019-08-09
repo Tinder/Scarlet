@@ -31,4 +31,14 @@ object AndroidLifecycle {
     ): Lifecycle =
         LifecycleOwnerResumedLifecycle(lifecycleOwner, LifecycleRegistry(throttleTimeoutMillis))
             .combineWith(ConnectivityOnLifecycle(application))
+
+    @JvmStatic
+    @JvmOverloads
+    fun ofServiceStarted(
+        application: Application,
+        lifecycleOwner: LifecycleOwner,
+        throttleTimeoutMillis: Long = ACTIVITY_THROTTLE_TIMEOUT_MILLIS
+    ): Lifecycle =
+        ServiceStartedLifecycle(lifecycleOwner, LifecycleRegistry(throttleTimeoutMillis))
+            .combineWith(ConnectivityOnLifecycle(application))
 }
