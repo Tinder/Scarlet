@@ -13,7 +13,7 @@ class MoshiAdapters {
 
     @FromJson
     fun productIdFromJson(string: String): ProductId {
-        return ProductId.values().find { it.text == string }!!
+        return ProductId.valueOf(string)
     }
 
     @ToJson
@@ -23,7 +23,7 @@ class MoshiAdapters {
 
     @FromJson
     fun subscribeTypeFromJson(string: String): Subscribe.Type {
-        return Subscribe.Type.values().find { it.text == string }!!
+        return Subscribe.Type.valueOf(string)
     }
 
     @ToJson
@@ -33,7 +33,7 @@ class MoshiAdapters {
 
     @FromJson
     fun subscribeChannelFromJson(string: String): Subscribe.Channel {
-        return Subscribe.Channel.values().find { it.text == string }!!
+        return Subscribe.Channel.valueOf(string)
     }
 
     @ToJson
