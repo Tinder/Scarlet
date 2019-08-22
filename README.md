@@ -153,4 +153,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  [slides]: https://speakerdeck.com/zhxnlai/taming-websocket-with-scarlet
  [kotliners]: https://www.conferenceforkotliners.com/
  [state-machine]: https://github.com/Tinder/StateMachine
- [snap]: https://oss.sonatype.org/content/repositories/snapshots/
+ [snap]: https://oss.sonatype.org/content/repositories/snapshots/com/tinder/scarlet/
