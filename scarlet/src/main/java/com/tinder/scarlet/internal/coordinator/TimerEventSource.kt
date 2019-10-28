@@ -34,6 +34,7 @@ internal class TimerEventSource(
     fun stop() {
         eventSourceCallback = null
         subscriber?.dispose()
+        subscriber = null
     }
 
     private inner class RetryTimerSubscriber : DisposableSubscriber<Long>() {

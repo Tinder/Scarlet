@@ -1,7 +1,3 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -51,6 +47,7 @@ dependencies {
     implementation rootProject.ext.multiDex
     implementation rootProject.ext.constraintLayout
     implementation rootProject.ext.liveDateReactiveSterams
+    implementation rootProject.ext.lifecycleExtensions
     implementation rootProject.ext.rxBinding
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.rxAndroid

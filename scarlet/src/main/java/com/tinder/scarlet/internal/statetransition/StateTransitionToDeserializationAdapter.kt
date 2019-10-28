@@ -15,9 +15,10 @@ import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-internal class DeserializationStateTransitionAdapter(
+internal class StateTransitionToDeserializationAdapter(
     private val messageAdapter: MessageAdapter<Any>
 ) : StateTransitionAdapter<Any> {
+
     override fun adapt(stateTransition: StateTransition): Any? {
         val event = stateTransition.event as? Event.OnProtocolEvent ?: return null
         val protocolEvent = event.protocolEvent as? ProtocolEvent.OnMessageReceived
@@ -34,15 +35,18 @@ internal class DeserializationStateTransitionAdapter(
     class Factory(
         private val messageAdapterResolver: MessageAdapterResolver
     ) : StateTransitionAdapter.Factory {
+
         override fun create(
             type: Type,
             annotations: Array<Annotation>
-        ): StateTransitionAdapter<Any> {
+        ): StateTransitionAdapter<Any>? {
             val clazz = type.getRawType()
-            require(clazz == Deserialization::class.java)
+            if (clazz != Deserialization::class.java) {
+                return null
+            }
             val messageType = (type as ParameterizedType).getFirstTypeArgument()
             val messageAdapter = messageAdapterResolver.resolve(messageType, annotations)
-            return DeserializationStateTransitionAdapter(
+            return StateTransitionToDeserializationAdapter(
                 messageAdapter
             )
         }

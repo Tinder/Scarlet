@@ -5,39 +5,38 @@
 package com.tinder.scarlet.internal.statetransition
 
 import com.tinder.scarlet.internal.utils.TypeAnnotationsPair
-import io.reactivex.exceptions.CompositeException
 import java.lang.reflect.Type
 
 internal class StateTransitionAdapterResolver(
     private val stateTransitionAdapterFactories: List<StateTransitionAdapter.Factory>
 ) {
 
-    private val stateTransitionAdapterCache = mutableMapOf<TypeAnnotationsPair, StateTransitionAdapter<Any>>()
+    private val stateTransitionAdapterCache =
+        mutableMapOf<TypeAnnotationsPair, StateTransitionAdapter<Any>>()
 
     fun resolve(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
         val key = TypeAnnotationsPair(type, annotations)
-        if (stateTransitionAdapterCache.contains(key)) {
-            return stateTransitionAdapterCache[key]!!
+        return stateTransitionAdapterCache.getOrPut(key) {
+            findStateTransitionAdapter(
+                type,
+                annotations
+            )
         }
-        val stateTransitionAdapter = findStateTransitionAdapter(type, annotations)
-        stateTransitionAdapterCache[key] = stateTransitionAdapter
-        return stateTransitionAdapter
     }
 
-    private fun findStateTransitionAdapter(type: Type, annotations: Array<Annotation>): StateTransitionAdapter<Any> {
-        val throwables = mutableListOf<Throwable>()
+    private fun findStateTransitionAdapter(
+        type: Type,
+        annotations: Array<Annotation>
+    ): StateTransitionAdapter<Any> {
         for (adapterFactory in stateTransitionAdapterFactories) {
-            try {
-                return adapterFactory.create(type, annotations)
-            } catch (e: Throwable) {
-                // This type is not supported by this adapter
-                throwables.add(e)
+            val adapter = adapterFactory.create(type, annotations)
+            // This type is not supported by this adapter
+            if (adapter != null) {
+                return adapter
             }
         }
-        val compositeException = CompositeException(*throwables.toTypedArray())
         throw IllegalStateException(
-            "Cannot resolve state transition adapter for type: $type, annotations: $annotations.",
-            compositeException
+            "Cannot resolve state transition adapter for type: $type, annotations: $annotations."
         )
     }
 }

@@ -75,6 +75,8 @@ class EchoBotFragment : Fragment() {
                 val numberOfMessages = chatView.getMessageView().messageList.size
                 if (numberOfMessages == 0) {
                     setMessages(chatMessages)
+                } else if (chatMessages.isEmpty()) {
+                    chatView.getMessageView().removeAll()
                 } else {
                     for (i in numberOfMessages until chatMessages.size) {
                         addMessage(chatMessages[i])

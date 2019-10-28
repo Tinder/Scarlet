@@ -38,27 +38,30 @@ internal class Session(
     }
 
     fun openSession() {
-        val session = channelDefinition ?: return
-        val openRequest = session.openRequestFactory.create(session.channel)
-        session.channel.open(openRequest)
+        val channelDefinition = checkNotNull(channelDefinition)
+        val openRequest = channelDefinition.openRequestFactory.create(channelDefinition.channel)
+        channelDefinition.channel.open(openRequest)
     }
 
     fun send(message: Message): Boolean {
-        val session = channelDefinition ?: return false
-        val messageQueue = session.messageQueue ?: return false
-        val metaData = session.sendingMessageMetaDataFactory.create(session.channel, message)
+        val channelDefinition = checkNotNull(channelDefinition)
+        val messageQueue = channelDefinition.messageQueue ?: return false
+        val metaData = channelDefinition.sendingMessageMetaDataFactory.create(
+            channelDefinition.channel,
+            message
+        )
         return messageQueue.send(message, metaData)
     }
 
     fun closeSession() {
-        val session = channelDefinition ?: return
-        val closeRequest = session.closeRequestFactory.create(session.channel)
-        session.channel.close(closeRequest)
+        val channelDefinition = checkNotNull(channelDefinition)
+        val closeRequest = channelDefinition.closeRequestFactory.create(channelDefinition.channel)
+        channelDefinition.channel.close(closeRequest)
     }
 
     fun forceCloseSession() {
-        val session = channelDefinition ?: return
-        session.channel.forceClose()
+        val channelDefinition = checkNotNull(channelDefinition)
+        channelDefinition.channel.forceClose()
     }
 
     inner class Listener : Channel.Listener,
