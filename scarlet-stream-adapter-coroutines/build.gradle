@@ -13,4 +13,5 @@ dependencies {
     testImplementation rootProject.ext.mockito
     testImplementation rootProject.ext.kotlinReflect
     testImplementation rootProject.ext.assertJ
+    testImplementation rootProject.ext.kotlinCoroutinesTest
 }
