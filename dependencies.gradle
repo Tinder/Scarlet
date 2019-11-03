@@ -32,7 +32,6 @@ ext {
     jacksonDatabind = 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
     jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
     jsonPatch = 'com.github.fge:json-patch:1.9'
-    logansquare = 'com.bluelinelabs:logansquare:1.3.6'
 
     koin = 'org.koin:koin-androidx-viewmodel:1.0.1'
 
