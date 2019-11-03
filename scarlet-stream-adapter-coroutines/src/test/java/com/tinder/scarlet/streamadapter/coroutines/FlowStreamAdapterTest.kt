@@ -9,18 +9,11 @@ import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -37,20 +30,8 @@ class FlowStreamAdapterTest {
             )
     )
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-
-    @Before
-    fun before() {
-        Dispatchers.setMain(testCoroutineDispatcher)
-    }
-
-    @After
-    fun after() {
-        testCoroutineDispatcher.cleanupTestCoroutines()
-    }
-
     @Test
-    fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
+    fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() = runBlockingTest {
         // Given
         connection.open()
         val textMessage1 = "Hello"
@@ -59,6 +40,20 @@ class FlowStreamAdapterTest {
         val bytesMessage2 = "Sup".toByteArray()
         val testTextFlow = connection.server.observeText()
         val testBytesFlow = connection.server.observeBytes()
+
+        val receivedTextItems = mutableListOf<String>()
+        val receivedByteItems = mutableListOf<ByteArray>()
+        val job1 = launch {
+            testTextFlow.collect {
+                receivedTextItems.add(it)
+            }
+
+        }
+        val job2 = launch {
+            testBytesFlow.collect {
+                receivedByteItems.add(it)
+            }
+        }
 
         // When
         connection.client.sendText(textMessage1)
@@ -78,15 +73,20 @@ class FlowStreamAdapterTest {
                 any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
 
-        testCoroutineDispatcher.runBlockingTest {
-            val receivedTestTextList = testTextFlow.take(2).toList()
-            assertThat(receivedTestTextList[0]).isEqualTo(textMessage1)
-            assertThat(receivedTestTextList[1]).isEqualTo(textMessage2)
-//
-//            val receivedTestBytesList = testBytesFlow.take(2).toList()
-//            assertThat(receivedTestBytesList[0]).isEqualTo(bytesMessage1)
-//            assertThat(receivedTestBytesList[1]).isEqualTo(bytesMessage2)
+        job1.invokeOnCompletion {
+            assertThat(receivedTextItems).isNotEmpty
+            assertThat(receivedTextItems[0]).isEqualTo(textMessage1)
+            assertThat(receivedTextItems[1]).isEqualTo(textMessage2)
         }
+
+        job2.invokeOnCompletion {
+            assertThat(receivedByteItems).isNotEmpty
+            assertThat(receivedByteItems[0]).isEqualTo(bytesMessage1)
+            assertThat(receivedByteItems[1]).isEqualTo(bytesMessage2)
+        }
+
+        job1.cancel()
+        job2.cancel()
     }
 
     internal interface Service {
