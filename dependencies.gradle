@@ -1,8 +1,8 @@
 ext {
     minSdkVersion = 24
     minSdkVersionAndroidLifecycle = 19
-    targetSdkVersion = 29
-    compileSdkVersion = 29
+    targetSdkVersion = 28
+    compileSdkVersion = 28
     buildToolsVersion = '28.0.3'
 
     appCompat = 'androidx.appcompat:appcompat:1.0.0'
