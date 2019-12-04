@@ -9,6 +9,7 @@ dependencies {
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.kotlinStdlib
+    compileOnly "org.robolectric:android-all:9-robolectric-4913185-2"
 
     testImplementation project(':scarlet')
     testImplementation project(':scarlet-websocket-mockwebserver')
