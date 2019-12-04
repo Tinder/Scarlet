@@ -10,7 +10,6 @@ import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.okhttp.request.RequestFactory
 import com.tinder.scarlet.websocket.okhttp.request.StaticUrlRequestFactory
 import okhttp3.OkHttpClient
-import java.lang.RuntimeException
 
 fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.Factory {
     return OkHttpWebSocket.Factory(OkHttpClientWebSocketConnectionEstablisher(this, requestFactory))
