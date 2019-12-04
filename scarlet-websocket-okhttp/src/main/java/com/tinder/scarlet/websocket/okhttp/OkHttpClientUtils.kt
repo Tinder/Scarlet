@@ -6,6 +6,8 @@
 
 package com.tinder.scarlet.websocket.okhttp
 
+import android.os.Build
+import android.security.NetworkSecurityPolicy
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.okhttp.request.RequestFactory
 import com.tinder.scarlet.websocket.okhttp.request.StaticUrlRequestFactory
@@ -18,7 +20,7 @@ fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.
 fun OkHttpClient.newWebSocketFactory(url: String): WebSocket.Factory {
     if (url.startsWith("ws://")) {
         try {
-            if (android.os.Build.VERSION.SDK_INT >= 23 &&
+            if (Build.VERSION.SDK_INT >= 23 &&
                     !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted()) {
                 throw RuntimeException("Android configuration does not permit cleartext traffic.")
             }
