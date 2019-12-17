@@ -19,7 +19,7 @@ fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.
 }
 
 fun OkHttpClient.newWebSocketFactory(url: String): WebSocket.Factory {
-    if (url.startsWith("ws://", ignoreCase = true)) {
+    if (url.startsWith("ws:", ignoreCase = true)) {
         try {
             if ((Build.VERSION.SDK_INT == 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)
