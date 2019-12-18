@@ -11,8 +11,8 @@ import android.security.NetworkSecurityPolicy
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.okhttp.request.RequestFactory
 import com.tinder.scarlet.websocket.okhttp.request.StaticUrlRequestFactory
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
-import java.net.URL
 import java.net.UnknownServiceException
 
 fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.Factory {
@@ -24,7 +24,7 @@ fun OkHttpClient.newWebSocketFactory(url: String): WebSocket.Factory {
         try {
             if ((Build.VERSION.SDK_INT > 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(
-                                    URL("http:${url.substring(3)}").host)) ||
+                                    HttpUrl.parse("http:${url.substring(3)}")?.host())) ||
                     (Build.VERSION.SDK_INT == 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)) {
                 throw UnknownServiceException(
