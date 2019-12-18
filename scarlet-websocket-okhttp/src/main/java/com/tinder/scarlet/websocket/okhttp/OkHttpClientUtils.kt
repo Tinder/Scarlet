@@ -24,7 +24,7 @@ fun OkHttpClient.newWebSocketFactory(url: String): WebSocket.Factory {
         try {
             if ((Build.VERSION.SDK_INT > 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(
-                                    URL(url).host)) ||
+                                    URL("http:${url.substring(3)}").host)) ||
                     (Build.VERSION.SDK_INT == 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)) {
                 throw UnknownServiceException(
