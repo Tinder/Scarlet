@@ -12,6 +12,7 @@ import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.websocket.okhttp.request.RequestFactory
 import com.tinder.scarlet.websocket.okhttp.request.StaticUrlRequestFactory
 import okhttp3.OkHttpClient
+import java.net.URL
 import java.net.UnknownServiceException
 
 fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.Factory {
@@ -21,11 +22,11 @@ fun OkHttpClient.newWebSocketFactory(requestFactory: RequestFactory): WebSocket.
 fun OkHttpClient.newWebSocketFactory(url: String): WebSocket.Factory {
     if (url.startsWith("ws:", ignoreCase = true)) {
         try {
-            if ((Build.VERSION.SDK_INT == 23 &&
-                            !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)
-                    || (Build.VERSION.SDK_INT > 23 &&
+            if ((Build.VERSION.SDK_INT > 23 &&
                             !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(
-                                    url))) {
+                                    URL(url).host)) ||
+                    (Build.VERSION.SDK_INT == 23 &&
+                            !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)) {
                 throw UnknownServiceException(
                         "CLEARTEXT communication to $url not permitted by network security policy")
             }
