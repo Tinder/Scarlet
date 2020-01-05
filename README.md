@@ -38,7 +38,7 @@ Use Scarlet to create an implementation:
 val scarletInstance = Scarlet.Builder()
     .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed.gdax.com"))
     .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
-    .addStreamAdapterFactory(RxJava2StreamAdapter.Factory())
+    .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
     .build()
 
 val gdaxService = scarletInstance.create<GdaxService>()
