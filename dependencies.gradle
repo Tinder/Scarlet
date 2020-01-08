@@ -17,16 +17,22 @@ ext {
     rxJava3 = 'io.reactivex.rxjava3:rxkotlin:3.0.0'
     rxAndroid3 = 'io.reactivex.rxjava3:rxandroid:3.0.0'
     rxKotlin3 = 'io.reactivex.rxjava3:rxkotlin:3.0.0'
-    rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
-    rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    rxKotlin = 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+
+    def rxJavaVersion = "2.2.15"
+    def rxAndroidVersion = "2.1.1"
+    def rxKotlinVersion = "2.4.0"
+    rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    rxKotlin = "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
     rxJava1 = 'io.reactivex:rxjava:1.3.4'
+
     kotlinCoroutines = 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
     kotlinCoroutinesRxInterop = 'org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.3.2'
     kotlinCoroutinesTest = 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
 
-    stetho = 'com.facebook.stetho:stetho:1.5.0'
-    stethoOkHttp = 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+    def stethoVersion = "1.5.0"
+    stetho = "com.facebook.stetho:stetho:$stethoVersion"
+    stethoOkHttp = "com.facebook.stetho:stetho-okhttp3:$stethoVersion"
 
     moshi = 'com.squareup.moshi:moshi-kotlin:1.5.0'
     moshiCodeGen = 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
@@ -44,9 +50,11 @@ ext {
     jodaTime = 'joda-time:joda-time:2.9.9'
     glide = 'com.github.bumptech.glide:glide:4.5.0'
 
-    okHttp = 'com.squareup.okhttp3:okhttp:3.11.0'
-    okHttpServerSentEvent = 'com.squareup.okhttp3:okhttp-sse:3.11.0'
-    okHttpLoggingInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.11.0'
+    def okHttpVersion = "3.12.7"
+    okHttp = "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    okHttpServerSentEvent = "com.squareup.okhttp3:okhttp-sse:$okHttpVersion"
+    okHttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
+
     okio = 'com.squareup.okio:okio:1.13.0'
     mockWebServer = 'com.squareup.okhttp3:mockwebserver:3.11.0'
     timber = 'com.jakewharton.timber:timber:4.6.0'
