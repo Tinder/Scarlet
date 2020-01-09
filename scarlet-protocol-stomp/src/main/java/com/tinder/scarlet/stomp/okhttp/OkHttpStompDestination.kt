@@ -19,18 +19,22 @@ class OkHttpStompDestination(
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
         require(parent is OkHttpStompMainChannel)
-        OkHttpStompMessageChannel(parent, destination, listener)
+        OkHttpStompMessageChannel(destination, parent, parent, listener)
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {
         DestinationOpenRequest(openRequestFactory.createDestinationOpenRequestHeader(destination))
     }
 
+    override fun createOutgoingMessageMetaDataFactory(channel: Channel): Protocol.MessageMetaData.Factory {
+        return super.createOutgoingMessageMetaDataFactory(channel)
+    }
+
     override fun createEventAdapterFactory(): ProtocolSpecificEventAdapter.Factory {
         return object : ProtocolSpecificEventAdapter.Factory {}
     }
 
-    open class SimpleRequestFactory(
+    class SimpleRequestFactory(
         private val createDestinationOpenRequestHeaderCallable: (String) -> Map<String, String>
     ) : RequestFactory {
 
@@ -38,10 +42,6 @@ class OkHttpStompDestination(
             return createDestinationOpenRequestHeaderCallable(destination)
         }
     }
-
-    data class MessageMetaData(
-        val headers: Map<String, String>
-    ) : Protocol.MessageMetaData
 
     data class DestinationOpenRequest(
         val headers: Map<String, String>

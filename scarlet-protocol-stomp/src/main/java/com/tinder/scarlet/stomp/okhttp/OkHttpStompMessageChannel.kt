@@ -4,10 +4,12 @@ import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.stomp.core.StompSubscriber
 
 class OkHttpStompMessageChannel(
-    private val mainChannel: OkHttpStompMainChannel,
     private val destination: String,
+    private val stompSubscriber: StompSubscriber,
+    private val stompSender: MessageQueue,
     private val listener: Channel.Listener
 ) : Channel, MessageQueue {
 
@@ -15,15 +17,12 @@ class OkHttpStompMessageChannel(
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val destinationOpenRequest = openRequest as OkHttpStompDestination.DestinationOpenRequest
-        mainChannel.subscribe(
-            destination,
-            destinationOpenRequest.headers
-        ) { message, headers ->
+        stompSubscriber.subscribe(destination, destinationOpenRequest.headers) { message, headers ->
             messageQueueListener?.onMessageReceived(
-                this,
-                this,
-                Message.Text(message),
-                OkHttpStompDestination.MessageMetaData(headers)
+                channel = this,
+                messageQueue = this,
+                message = message
+//                metadata = OkHttpStompClient.MessageMetaData(headers)
             )
         }
         listener.onOpened(this)
@@ -34,7 +33,7 @@ class OkHttpStompMessageChannel(
     }
 
     override fun forceClose() {
-        mainChannel.unSubscribe(destination)
+        stompSubscriber.unsubscribe(destination)
         listener.onClosed(this)
     }
 
@@ -44,16 +43,12 @@ class OkHttpStompMessageChannel(
         return this
     }
 
-    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
-        val headers = messageMetaData as? OkHttpStompDestination.MessageMetaData
-        return when (message) {
-            is Message.Text -> mainChannel.sendMessage(
-                destination,
-                message.value,
-                headers?.headers.orEmpty()
-            )
-            is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
-        }
+    override fun send(
+        message: Message,
+        messageMetaData: Protocol.MessageMetaData
+    ): Boolean = when (message) {
+        is Message.Text -> stompSender.send(message, messageMetaData)
+        is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
     }
 
 }

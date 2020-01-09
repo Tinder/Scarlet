@@ -1,22 +1,32 @@
 package com.tinder.scarlet.stomp.okhttp
 
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
+import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
+import com.tinder.scarlet.stomp.core.StompCommand
+import com.tinder.scarlet.stomp.core.StompListener
+import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.core.StompSubscriber
+import com.tinder.scarlet.stomp.support.StompHeaderAccessor
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import java.util.concurrent.ConcurrentHashMap
 
 class OkHttpStompMainChannel(
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
-) : Channel {
+) : Channel, MessageQueue, StompSubscriber {
 
+    private val topicIds = ConcurrentHashMap<String, String>()
+    private val stompListeners = ConcurrentHashMap<String, StompListener>()
     private var webSocket: WebSocket? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val openSocketRequest = openRequest as OkHttpStompClient.ClientOpenSocketRequest
-        webSocketFactory.createWebSocket(openSocketRequest.okHttpRequest, InnerWebSocketListener())
+        val clientOpenRequest = openRequest as OkHttpStompClient.ClientOpenRequest
+        webSocketFactory.createWebSocket(clientOpenRequest.okHttpRequest, InnerWebSocketListener())
     }
 
     override fun forceClose() {
@@ -27,24 +37,46 @@ class OkHttpStompMainChannel(
 
     override fun close(closeRequest: Protocol.CloseRequest) {
         TODO("Implement send disconnect message")
-        webSocket?.close(1000, "")//todo add code and reason
+
+        val clientCloseRequest = closeRequest as OkHttpStompClient.ClientCloseRequest
+        webSocket?.close(clientCloseRequest.code, clientCloseRequest.reason)
         webSocket = null
     }
 
-    fun sendMessage(destination: String, message: String, headers: Map<String, String>): Boolean {
-        TODO("Implement send message to destination")
+    override fun send(message: Message, messageMetaData: Protocol.MessageMetaData): Boolean {
+        val metaData = messageMetaData as OkHttpStompClient.MessageMetaData
+        val messageValue = message as Message.Text
+        val stompHeader = StompHeaderAccessor.ofHeaders(StompCommand.SEND)
+            .apply {
+                destination(metaData.destination)
+                contentType(metaData.contentType)
+            }
+            .createHeader()
+        val stompMessage = StompMessage(messageValue.value, stompHeader)
+        return sendStompMessage(stompMessage)
     }
 
-    fun subscribe(
+    override fun subscribe(
         destination: String,
         headers: Map<String, String>,
-        listener: (String, Map<String, String>) -> Unit
+        listener: StompListener
     ) {
-        TODO("Implement subscribe to destination")
+        val stompHeader = StompHeaderAccessor.ofHeaders(StompCommand.SUBSCRIBE, headers)
+            .apply { destination(destination) }
+            .createHeader()
+        topicIds[destination] = stompHeader.id
+        val stompMessage = StompMessage("", stompHeader)
+        sendStompMessage(stompMessage)
     }
 
-    fun unSubscribe(destination: String) {
-        TODO("Implement un subscribe from destination")
+    override fun unsubscribe(destination: String) {
+        TODO("send unsubscribe message")
+        stompListeners.remove(destination)
+    }
+
+    private fun sendStompMessage(stompMessage: StompMessage): Boolean {
+        val text = StompMessageEncoder.encode(stompMessage)
+        return webSocket?.send(text) ?: false
     }
 
     inner class InnerWebSocketListener : WebSocketListener() {
