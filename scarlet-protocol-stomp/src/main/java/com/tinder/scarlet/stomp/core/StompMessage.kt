@@ -5,7 +5,7 @@ import com.tinder.scarlet.stomp.support.StompHeaderAccessor
 class StompMessage private constructor(
     val command: StompCommand,
     val payload: String?,
-    val header: StompHeader
+    val headers: StompHeader
 ) {
 
     class Builder {
@@ -13,7 +13,7 @@ class StompMessage private constructor(
         private var payload: String? = null
         private var headers: StompHeaderAccessor = StompHeaderAccessor.of()
 
-        fun withPayload(payload: String): Builder {
+        fun withPayload(payload: String?): Builder {
             this.payload = payload
             return this
         }
@@ -40,7 +40,7 @@ class StompMessage private constructor(
 
         if (command != other.command) return false
         if (payload != other.payload) return false
-        if (header != other.header) return false
+        if (headers != other.headers) return false
 
         return true
     }
@@ -48,7 +48,7 @@ class StompMessage private constructor(
     override fun hashCode(): Int {
         var result = command.hashCode()
         result = 31 * result + (payload?.hashCode() ?: 0)
-        result = 31 * result + header.hashCode()
+        result = 31 * result + headers.hashCode()
         return result
     }
 

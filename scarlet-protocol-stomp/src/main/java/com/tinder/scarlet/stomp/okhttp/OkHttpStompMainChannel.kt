@@ -58,13 +58,13 @@ class OkHttpStompMainChannel(
         destination: String,
         headers: StompHeader?
     ): Boolean {
-        val stompHeader = StompHeaderAccessor.of(headers.orEmpty())
+        val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
             .apply { destination(destination) }
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
             .withPayload(payload)
-            .withHeaders(stompHeader)
+            .withHeaders(stompHeaders)
             .create(StompCommand.SEND)
 
         return sendStompMessage(stompMessage)
@@ -78,7 +78,7 @@ class OkHttpStompMainChannel(
         check(!topicIds.containsKey(destination)) { "Already has subscription to destination=$destination" }
         check(!subscriptions.containsKey(destination)) { "Already has subscription to destination=$destination" }
         val generateId = UUID.randomUUID().toString()
-        val stompHeader = StompHeaderAccessor.of(headers.orEmpty())
+        val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
             .apply {
                 subscriptionId(generateId)
                 destination(destination)
@@ -86,7 +86,7 @@ class OkHttpStompMainChannel(
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
-            .withHeaders(stompHeader)
+            .withHeaders(stompHeaders)
             .create(StompCommand.SUBSCRIBE)
 
         sendStompMessage(stompMessage)
@@ -108,6 +108,7 @@ class OkHttpStompMainChannel(
 
         val stompMessage = StompMessage.Builder()
             .withHeaders(stompHeader)
+            .withHeaders(stompHeaders)
             .create(StompCommand.UNSUBSCRIBE)
 
         sendStompMessage(stompMessage)
@@ -117,7 +118,7 @@ class OkHttpStompMainChannel(
     private fun handleIncome(stompMessage: StompMessage) = when (stompMessage.command) {
         StompCommand.CONNECTED -> listener.onOpened(this)
         StompCommand.MESSAGE -> {
-            val destination = stompMessage.header.destination ?: throw IllegalStateException()
+            val destination = stompMessage.headers.destination ?: throw IllegalStateException()
             val listener = subscriptions[destination]
             listener?.invoke(stompMessage)
         }
@@ -168,6 +169,7 @@ class OkHttpStompMainChannel(
 
     private fun connectMessage(host: String, login: String? = null, passcode: String? = null) {
         val stompHeader = StompHeaderAccessor.of()
+        val stompHeaders = StompHeaderAccessor.of()
             .apply {
                 host(host)
                 acceptVersion(ACCEPT_VERSION)
@@ -204,7 +206,6 @@ class OkHttpStompMainChannel(
             )
         }
     }
-
 
 }
 
