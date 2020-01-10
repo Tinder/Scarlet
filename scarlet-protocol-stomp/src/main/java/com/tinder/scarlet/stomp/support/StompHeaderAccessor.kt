@@ -18,6 +18,9 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
         putAll(headers)
     }
 
+    fun heartBeat(sendInterval: Long, receiveInterval: Long) {
+        mutableHeaders[StompHeader.HEARTBEAT] = "$sendInterval,$receiveInterval"
+    }
     fun putAll(headers: Map<String, String>) {
         mutableHeaders.putAll(headers)
     }

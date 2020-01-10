@@ -52,4 +52,10 @@ class StompHeader(
     val destination: String?
         get() = headers[DESTINATION]
 
+    val heartBeat: Pair<Long, Long>
+        get() {
+            val heartBeat = headers[HEARTBEAT] ?: return 0L to 0L
+            val (sendInterval, receiveInterval) = heartBeat.split(",")
+            return sendInterval.toLong() to receiveInterval.toLong()
+        }
 }
