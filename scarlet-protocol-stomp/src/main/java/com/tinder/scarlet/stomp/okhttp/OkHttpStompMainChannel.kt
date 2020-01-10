@@ -17,6 +17,7 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.max
 
 class OkHttpStompMainChannel(
     private val webSocketFactory: WebSocketFactory,
@@ -25,12 +26,20 @@ class OkHttpStompMainChannel(
 
     companion object {
 
+        /** STOMP recommended error of margin for receiving heartbeats.  */
+        private const val HEARTBEAT_MULTIPLIER = 3
+
         private const val ACCEPT_VERSION = "1.1,1.2"
     }
 
     private val topicIds = ConcurrentHashMap<String, String>()
     private val subscriptions = ConcurrentHashMap<String, StompListener>()
-    private var webSocket: WebSocket? = null
+
+    private var messageHandler: MessageHandler? = null
+    private var connection: Connection? = null
+
+    private var clientSendInterval: Long = 0
+    private var clientReceiveInterval: Long = 0
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val clientOpenRequest = openRequest as OkHttpStompClient.ClientOpenRequest
@@ -46,7 +55,9 @@ class OkHttpStompMainChannel(
 
         sendDisconnectMessage()
         connection?.forceClose()
+
         connection = null
+        messageHandler = null
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
@@ -56,7 +67,9 @@ class OkHttpStompMainChannel(
         sendDisconnectMessage()
 
         connection?.close()
+
         connection = null
+        messageHandler = null
     }
 
     override fun convertAndSend(
@@ -73,7 +86,7 @@ class OkHttpStompMainChannel(
             .withHeaders(stompHeaders)
             .create(StompCommand.SEND)
 
-        return sendStompMessage(stompMessage)
+        return connection?.send(stompMessage) ?: false
     }
 
     override fun subscribe(
@@ -95,7 +108,7 @@ class OkHttpStompMainChannel(
             .withHeaders(stompHeaders)
             .create(StompCommand.SUBSCRIBE)
 
-        sendStompMessage(stompMessage)
+        connection?.send(stompMessage)
 
         topicIds[destination] = generateId
         subscriptions[destination] = listener
@@ -105,56 +118,92 @@ class OkHttpStompMainChannel(
         val subscriptionId = topicIds.remove(destination)
                 ?: throw IllegalStateException("Unknown destination=$destination")
 
-        val stompHeader = StompHeaderAccessor.of()
-            .apply {
-                subscriptionId(subscriptionId)
-                destination(destination)
-            }
+        val stompHeaders = StompHeaderAccessor.of()
+            .apply { subscriptionId(subscriptionId) }
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
-            .withHeaders(stompHeader)
             .withHeaders(stompHeaders)
             .create(StompCommand.UNSUBSCRIBE)
 
-        sendStompMessage(stompMessage)
+        connection?.send(stompMessage)
         subscriptions.remove(destination)
     }
 
     private fun handleIncome(stompMessage: StompMessage) = when (stompMessage.command) {
-        StompCommand.CONNECTED -> listener.onOpened(this)
+        StompCommand.CONNECTED -> {
+            setupHeartBeat(stompMessage)
+            listener.onOpened(this)
+        }
         StompCommand.MESSAGE -> {
             val destination = stompMessage.headers.destination ?: throw IllegalStateException()
             val listener = subscriptions[destination]
             listener?.invoke(stompMessage)
         }
-        StompCommand.UNKNOWN -> Unit //heart beat
         StompCommand.ERROR -> listener.onFailed(this, true, null)
         else -> Unit //not a server message
     }
 
-    private fun sendStompMessage(stompMessage: StompMessage): Boolean {
-        val text = StompMessageEncoder.encode(stompMessage)
-        return webSocket?.send(text) ?: false
+    private fun setupHeartBeat(stompMessage: StompMessage) {
+        val (serverSendInterval, serverReceiveInterval) = stompMessage.headers.heartBeat
+
+        if (clientSendInterval > 0 && serverReceiveInterval > 0) {
+            val interval = max(clientSendInterval, serverReceiveInterval)
+            connection?.onWriteInactivity(interval) { sendHeartBeat() }
+        }
+
+        if (clientReceiveInterval > 0 && serverSendInterval > 0) {
+            val interval = max(clientReceiveInterval, serverSendInterval) * HEARTBEAT_MULTIPLIER;
+            connection?.onReadInactivity(interval) {
+                sendErrorMessage("No messages received in $interval ms.")
+                connection?.close()
+                listener.onFailed(this@OkHttpStompMainChannel, true, null)
+            }
+        }
+
+    }
+
+    private fun sendHeartBeat() {
+        val stompMessage = StompMessage.Builder()
+            .create(StompCommand.UNKNOWN)
+
+        connection?.send(stompMessage)
+    }
+
+    private fun sendErrorMessage(error: String) {
+        val headers = StompHeaderAccessor.of()
+            .apply { message(error) }
+            .createHeader()
+
+        val stompMessage = StompMessage.Builder()
+            .withHeaders(headers)
+            .create(StompCommand.ERROR)
+
+        connection?.send(stompMessage)
     }
 
     inner class InnerWebSocketListener(
         private val openRequest: OkHttpStompClient.ClientOpenRequest
     ) : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            this@OkHttpStompMainChannel.webSocket = webSocket
-            val (host, login, passcode) = openRequest
-            connectMessage(host, login, passcode)
+            val webSocketConnection = WebSocketConnection(webSocket)
+
+            this@OkHttpStompMainChannel.connection = webSocketConnection
+            this@OkHttpStompMainChannel.messageHandler = webSocketConnection
+
+            val host = openRequest.host
+            val login = openRequest.login
+            val passcode = openRequest.passcode
+
+            sendConnectMessage(host, login, passcode)
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            val stompMessage = StompMessageDecoder.decode(bytes.utf8())
-            handleIncome(stompMessage)
+            messageHandler?.handle(bytes.utf8())?.let(::handleIncome)
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            val stompMessage = StompMessageDecoder.decode(text)
-            handleIncome(stompMessage)
+            messageHandler?.handle(text)?.let(::handleIncome)
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -163,39 +212,43 @@ class OkHttpStompMainChannel(
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             listener.onClosed(this@OkHttpStompMainChannel)
-            this@OkHttpStompMainChannel.webSocket = null
+            this@OkHttpStompMainChannel.connection = null
         }
 
         override fun onFailure(webSocket: WebSocket, throwable: Throwable, response: Response?) {
             listener.onFailed(this@OkHttpStompMainChannel, true, throwable)
-            this@OkHttpStompMainChannel.webSocket = null
+            this@OkHttpStompMainChannel.connection = null
         }
 
     }
 
-    private fun connectMessage(host: String, login: String? = null, passcode: String? = null) {
-        val stompHeader = StompHeaderAccessor.of()
+    private fun sendConnectMessage(host: String, login: String? = null, passcode: String? = null) {
         val stompHeaders = StompHeaderAccessor.of()
             .apply {
                 host(host)
                 acceptVersion(ACCEPT_VERSION)
                 login?.let(::login)
                 passcode?.let(::passcode)
+
+                if (clientSendInterval > 0 && clientReceiveInterval > 0) {
+                    heartBeat(clientSendInterval, clientReceiveInterval)
+                }
+
             }
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
-            .withHeaders(stompHeader)
+            .withHeaders(stompHeaders)
             .create(StompCommand.CONNECT)
 
-        sendStompMessage(stompMessage)
+        connection?.send(stompMessage)
     }
 
-    private fun disconnectMessage() {
+    private fun sendDisconnectMessage() {
         val stompMessage = StompMessage.Builder()
             .create(StompCommand.DISCONNECT)
 
-        sendStompMessage(stompMessage)
+        connection?.send(stompMessage)
     }
 
     class Factory(
@@ -214,5 +267,3 @@ class OkHttpStompMainChannel(
     }
 
 }
-
-

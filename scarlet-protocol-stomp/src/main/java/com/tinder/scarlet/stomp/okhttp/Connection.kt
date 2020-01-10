@@ -1,14 +1,15 @@
 package com.tinder.scarlet.stomp.okhttp
 
+import com.tinder.scarlet.stomp.core.StompMessage
+
 interface Connection {
 
     /**
      * Send the given message.
      * @param message the message
-     * @return a
-     * message was successfully sent
+     * @return true if the message was enqueued.
      */
-    fun send(message: String): Boolean
+    fun send(message: StompMessage): Boolean
 
     /**
      * Register a task to invoke after a period of read inactivity.

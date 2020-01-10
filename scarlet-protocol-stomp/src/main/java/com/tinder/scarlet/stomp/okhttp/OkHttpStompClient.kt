@@ -8,42 +8,29 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocketListener
 
+typealias ClientOpenRequestHeaderFactory = (Channel) -> OkHttpStompClient.ClientOpenRequest
+
 class OkHttpStompClient(
     private val okHttpClient: OkHttpClient,
-    private val requestFactory: RequestFactory
+    private val requestFactory: ClientOpenRequestHeaderFactory
 ) : Protocol {
 
-    override fun createChannelFactory(): Channel.Factory {
-        return OkHttpStompMainChannel.Factory(
-            object : WebSocketFactory {
-                override fun createWebSocket(request: Request, listener: WebSocketListener) {
-                    okHttpClient.newWebSocket(request, listener)
-                }
+    override fun createChannelFactory() = OkHttpStompMainChannel.Factory(
+        object : WebSocketFactory {
+            override fun createWebSocket(request: Request, listener: WebSocketListener) {
+                okHttpClient.newWebSocket(request, listener)
             }
-        )
-    }
-
-    override fun createOpenRequestFactory(channel: Channel): Protocol.OpenRequest.Factory {
-        return SimpleProtocolOpenRequestFactory {
-            requestFactory.createClientOpenRequest()
         }
+    )
+
+    override fun createOpenRequestFactory(
+        channel: Channel
+    ) = SimpleProtocolOpenRequestFactory {
+        requestFactory.invoke(channel)
     }
 
     override fun createEventAdapterFactory(): ProtocolSpecificEventAdapter.Factory {
         return object : ProtocolSpecificEventAdapter.Factory {}
-    }
-
-    interface RequestFactory {
-        fun createClientOpenRequest(): ClientOpenRequest
-    }
-
-    open class SimpleRequestFactory(
-        private val createClientOpenRequestCallable: () -> ClientOpenRequest
-    ) : RequestFactory {
-
-        override fun createClientOpenRequest(): ClientOpenRequest {
-            return createClientOpenRequestCallable()
-        }
     }
 
     data class ClientOpenRequest(

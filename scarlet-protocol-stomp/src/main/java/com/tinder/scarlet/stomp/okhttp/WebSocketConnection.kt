@@ -1,5 +1,8 @@
 package com.tinder.scarlet.stomp.okhttp
 
+import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.support.StompMessageDecoder
+import com.tinder.scarlet.stomp.support.StompMessageEncoder
 import okhttp3.WebSocket
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -7,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 class WebSocketConnection(
     private val webSocket: WebSocket
-) : Connection {
+) : Connection, MessageHandler {
 
     @Volatile
     private var lastReadTime: Long = -1
@@ -24,9 +27,13 @@ class WebSocketConnection(
 
     }
 
-    override fun send(message: String): Boolean {
-        updateLastWriteTime()
-        return webSocket.send(message)
+    override fun send(message: StompMessage): Boolean {
+        val lastWriteTime = lastWriteTime
+        if (lastWriteTime != -1L) {
+            this.lastWriteTime = System.currentTimeMillis()
+        }
+        val encodedMessage = StompMessageEncoder.encode(message)
+        return webSocket.send(encodedMessage)
     }
 
     override fun onReadInactivity(duration: Long, runnable: () -> Unit) {
@@ -55,11 +62,13 @@ class WebSocketConnection(
         webSocket.close(NORMAL_CLOSURE_STATUS_CODE, NORMAL_CLOSURE_REASON)
     }
 
-    private fun updateLastWriteTime() {
-        val lastWriteTime = lastWriteTime
-        if (lastWriteTime != -1L) {
-            this.lastWriteTime = System.currentTimeMillis()
+    override fun handle(data: String): StompMessage {
+        val lastReadTime = lastReadTime
+        if (lastReadTime != -1L) {
+            this.lastReadTime = System.currentTimeMillis()
         }
+        return StompMessageDecoder.decode(data)
     }
+
 
 }

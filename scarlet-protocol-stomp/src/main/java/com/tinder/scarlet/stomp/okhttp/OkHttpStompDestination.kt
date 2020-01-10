@@ -13,8 +13,8 @@ typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> OkHtt
 
 class OkHttpStompDestination(
     private val destination: String,
-    private val openRequestFactory: DestinationOpenRequestHeaderFactory,
-    private val createMessageMetaDataCallable: MessageMetaDataFactory
+    private val openRequestFactory: DestinationOpenRequestHeaderFactory? = null,
+    private val createMessageMetaDataCallable: MessageMetaDataFactory? = null
 ) : Protocol {
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
@@ -23,24 +23,27 @@ class OkHttpStompDestination(
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {
-        openRequestFactory()
+        openRequestFactory?.invoke() ?: Protocol.OpenRequest.Empty
     }
 
-    override fun createOutgoingMessageMetaDataFactory(channel: Channel): Protocol.MessageMetaData.Factory {
-        return SimpleMessageMetaDataFactory(createMessageMetaDataCallable)
-    }
+    override fun createOutgoingMessageMetaDataFactory(
+        channel: Channel
+    ) = SimpleMessageMetaDataFactory(createMessageMetaDataCallable)
 
     override fun createEventAdapterFactory(): ProtocolSpecificEventAdapter.Factory {
         return object : ProtocolSpecificEventAdapter.Factory {}
     }
 
     class SimpleMessageMetaDataFactory(
-        private val createMessageMetaDataCallable: MessageMetaDataFactory
+        private val createMessageMetaDataCallable: MessageMetaDataFactory?
     ) : Protocol.MessageMetaData.Factory {
 
-        override fun create(channel: Channel, message: Message): Protocol.MessageMetaData {
-            return createMessageMetaDataCallable(channel, message)
-        }
+        override fun create(
+            channel: Channel,
+            message: Message
+        ) = createMessageMetaDataCallable?.invoke(channel, message)
+                ?: Protocol.MessageMetaData.Empty
+
     }
 
     data class MessageMetaData(

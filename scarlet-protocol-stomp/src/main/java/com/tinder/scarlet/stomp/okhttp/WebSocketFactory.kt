@@ -1,7 +1,6 @@
 /*
  * © 2018 Match Group, LLC.
  */
-
 package com.tinder.scarlet.stomp.okhttp
 
 import okhttp3.Request
