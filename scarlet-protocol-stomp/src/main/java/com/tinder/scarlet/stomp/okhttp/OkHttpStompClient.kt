@@ -3,8 +3,6 @@ package com.tinder.scarlet.stomp.okhttp
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolSpecificEventAdapter
-import com.tinder.scarlet.stomp.core.StompHeader
-import com.tinder.scarlet.utils.SimpleProtocolCloseRequestFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -31,29 +29,17 @@ class OkHttpStompClient(
         }
     }
 
-    override fun createCloseRequestFactory(channel: Channel): Protocol.CloseRequest.Factory {
-        return SimpleProtocolCloseRequestFactory {
-            requestFactory.createClientCloseRequest()
-        }
-    }
-
     override fun createEventAdapterFactory(): ProtocolSpecificEventAdapter.Factory {
         return object : ProtocolSpecificEventAdapter.Factory {}
     }
 
     interface RequestFactory {
-        fun createClientCloseRequest(): ClientCloseRequest
         fun createClientOpenRequest(): ClientOpenRequest
     }
 
     open class SimpleRequestFactory(
-        private val createClientCloseRequestCallable: () -> ClientCloseRequest,
         private val createClientOpenRequestCallable: () -> ClientOpenRequest
     ) : RequestFactory {
-
-        override fun createClientCloseRequest(): ClientCloseRequest {
-            return createClientCloseRequestCallable()
-        }
 
         override fun createClientOpenRequest(): ClientOpenRequest {
             return createClientOpenRequestCallable()
@@ -62,14 +48,11 @@ class OkHttpStompClient(
 
     data class ClientOpenRequest(
         val host: String,
+        val okHttpRequest: Request,
+        val heartbeatSendInterval: Long = 0,
+        val heartbeatReceiveInterval: Long = 0,
         val login: String? = null,
-        val passcode: String? = null,
-        val okHttpRequest: Request
+        val passcode: String? = null
     ) : Protocol.OpenRequest
-
-    data class ClientCloseRequest(
-        val code: Int,
-        val reason: String
-    ) : Protocol.CloseRequest
 
 }
