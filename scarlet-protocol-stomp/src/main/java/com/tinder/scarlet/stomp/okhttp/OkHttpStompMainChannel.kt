@@ -41,16 +41,22 @@ class OkHttpStompMainChannel(
     }
 
     override fun forceClose() {
-        disconnectMessage()
-        webSocket?.cancel()
-        webSocket = null
+        topicIds.clear()
+        subscriptions.clear()
+
+        sendDisconnectMessage()
+        connection?.forceClose()
+        connection = null
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
-        disconnectMessage()
-        val clientCloseRequest = closeRequest as OkHttpStompClient.ClientCloseRequest
-        webSocket?.close(clientCloseRequest.code, clientCloseRequest.reason)
-        webSocket = null
+        topicIds.clear()
+        subscriptions.clear()
+
+        sendDisconnectMessage()
+
+        connection?.close()
+        connection = null
     }
 
     override fun convertAndSend(
