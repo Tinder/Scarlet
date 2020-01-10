@@ -1,21 +1,21 @@
 package com.tinder.scarlet.stomp.okhttp
 
 import com.tinder.scarlet.Channel
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolSpecificEventAdapter
+import com.tinder.scarlet.stomp.core.StompHeader
 import com.tinder.scarlet.utils.SimpleChannelFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 
+typealias DestinationOpenRequestHeaderFactory = () -> OkHttpStompDestination.DestinationOpenRequest
+typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> OkHttpStompDestination.MessageMetaData
+
 class OkHttpStompDestination(
     private val destination: String,
-    private val openRequestFactory: RequestFactory
+    private val openRequestFactory: DestinationOpenRequestHeaderFactory,
+    private val createMessageMetaDataCallable: MessageMetaDataFactory
 ) : Protocol {
-
-    interface RequestFactory {
-
-        fun createDestinationOpenRequestHeader(destination: String): Map<String, String>
-
-    }
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
         require(parent is OkHttpStompMainChannel)
@@ -23,28 +23,32 @@ class OkHttpStompDestination(
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {
-        DestinationOpenRequest(openRequestFactory.createDestinationOpenRequestHeader(destination))
+        openRequestFactory()
     }
 
     override fun createOutgoingMessageMetaDataFactory(channel: Channel): Protocol.MessageMetaData.Factory {
-        return super.createOutgoingMessageMetaDataFactory(channel)
+        return SimpleMessageMetaDataFactory(createMessageMetaDataCallable)
     }
 
     override fun createEventAdapterFactory(): ProtocolSpecificEventAdapter.Factory {
         return object : ProtocolSpecificEventAdapter.Factory {}
     }
 
-    class SimpleRequestFactory(
-        private val createDestinationOpenRequestHeaderCallable: (String) -> Map<String, String>
-    ) : RequestFactory {
+    class SimpleMessageMetaDataFactory(
+        private val createMessageMetaDataCallable: MessageMetaDataFactory
+    ) : Protocol.MessageMetaData.Factory {
 
-        override fun createDestinationOpenRequestHeader(destination: String): Map<String, String> {
-            return createDestinationOpenRequestHeaderCallable(destination)
+        override fun create(channel: Channel, message: Message): Protocol.MessageMetaData {
+            return createMessageMetaDataCallable(channel, message)
         }
     }
 
+    data class MessageMetaData(
+        val headers: StompHeader
+    ) : Protocol.MessageMetaData
+
     data class DestinationOpenRequest(
-        val headers: Map<String, String>
+        val headers: StompHeader
     ) : Protocol.OpenRequest
 
 }

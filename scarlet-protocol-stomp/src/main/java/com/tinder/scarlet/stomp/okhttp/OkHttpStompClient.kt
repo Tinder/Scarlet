@@ -72,9 +72,4 @@ class OkHttpStompClient(
         val reason: String
     ) : Protocol.CloseRequest
 
-    data class MessageMetaData(
-        val contentType: String,
-        val destination: String
-    ) : Protocol.MessageMetaData
-
 }
