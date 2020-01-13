@@ -56,10 +56,12 @@ class WebSocketConnection(
 
     override fun forceClose() {
         webSocket.cancel()
+        executor.shutdown()
     }
 
     override fun close() {
         webSocket.close(NORMAL_CLOSURE_STATUS_CODE, NORMAL_CLOSURE_REASON)
+        executor.shutdown()
     }
 
     override fun handle(data: String): StompMessage {
