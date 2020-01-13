@@ -8,10 +8,13 @@ import com.tinder.scarlet.stomp.core.StompHeader
 import com.tinder.scarlet.utils.SimpleChannelFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 
-typealias DestinationOpenRequestHeaderFactory = () -> OkHttpStompDestination.DestinationOpenRequest
-typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> OkHttpStompDestination.MessageMetaData
+typealias DestinationOpenRequestHeaderFactory = () -> StompDestination.DestinationOpenRequest
+typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> StompDestination.MessageMetaData
 
-class OkHttpStompDestination(
+/**
+ *
+ */
+class StompDestination(
     private val destination: String,
     private val openRequestFactory: DestinationOpenRequestHeaderFactory? = null,
     private val createMessageMetaDataCallable: MessageMetaDataFactory? = null
@@ -19,7 +22,7 @@ class OkHttpStompDestination(
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
         require(parent is OkHttpStompMainChannel)
-        OkHttpStompMessageChannel(destination, parent, parent, listener)
+        StompMessageChannel(destination, parent, parent, listener)
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {

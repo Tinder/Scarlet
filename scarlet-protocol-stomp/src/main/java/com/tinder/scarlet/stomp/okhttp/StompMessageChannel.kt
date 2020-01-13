@@ -7,7 +7,7 @@ import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.stomp.core.StompSender
 import com.tinder.scarlet.stomp.core.StompSubscriber
 
-class OkHttpStompMessageChannel(
+class StompMessageChannel(
     private val destination: String,
     private val stompSubscriber: StompSubscriber,
     private val stompSender: StompSender,
@@ -17,14 +17,14 @@ class OkHttpStompMessageChannel(
     private var messageQueueListener: MessageQueue.Listener? = null
 
     override fun open(openRequest: Protocol.OpenRequest) {
-        val destinationOpenRequest = openRequest as OkHttpStompDestination.DestinationOpenRequest
+        val destinationOpenRequest = openRequest as StompDestination.DestinationOpenRequest
         val stompHeaders = destinationOpenRequest.headers
         stompSubscriber.subscribe(destination, stompHeaders) { message ->
             messageQueueListener?.onMessageReceived(
                 channel = this,
                 messageQueue = this,
-                message = Message.Text(message.payload.orEmpty()),
-                metadata = OkHttpStompDestination.MessageMetaData(message.headers)
+                message = Message.Text(message.payload.toString(Charsets.UTF_8)),
+                metadata = StompDestination.MessageMetaData(message.headers)
             )
         }
         listener.onOpened(this)
@@ -50,10 +50,13 @@ class OkHttpStompMessageChannel(
         messageMetaData: Protocol.MessageMetaData
     ): Boolean = when (message) {
         is Message.Text -> {
-            val metaData = messageMetaData as? OkHttpStompDestination.MessageMetaData
+            val metaData = messageMetaData as? StompDestination.MessageMetaData
             stompSender.convertAndSend(message.value, destination, metaData?.headers)
         }
-        is Message.Bytes -> throw IllegalArgumentException("Bytes are not supported")
+        is Message.Bytes -> {
+            val metaData = messageMetaData as? StompDestination.MessageMetaData
+            stompSender.convertAndSend(message.value, destination, metaData?.headers)
+        }
     }
 
 }
