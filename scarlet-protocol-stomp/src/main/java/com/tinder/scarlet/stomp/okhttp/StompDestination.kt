@@ -21,7 +21,7 @@ class StompDestination(
 ) : Protocol {
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
-        require(parent is OkHttpStompMainChannel)
+        require(parent is StompMainChannel)
         StompMessageChannel(destination, parent, parent, listener)
     }
 

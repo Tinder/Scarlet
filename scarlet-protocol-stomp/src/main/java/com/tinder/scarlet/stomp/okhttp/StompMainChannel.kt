@@ -17,7 +17,8 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
-class OkHttpStompMainChannel(
+class StompMainChannel(
+    private val configuration: Configuration,
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
 ) : Channel, StompSender, StompSubscriber {
@@ -36,14 +37,8 @@ class OkHttpStompMainChannel(
     private var messageHandler: MessageHandler? = null
     private var connection: Connection? = null
 
-    private var clientSendInterval: Long = 0
-    private var clientReceiveInterval: Long = 0
-
     override fun open(openRequest: Protocol.OpenRequest) {
         val clientOpenRequest = openRequest as OkHttpStompClient.ClientOpenRequest
-
-        this.clientSendInterval = clientOpenRequest.heartbeatSendInterval
-        this.clientReceiveInterval = clientOpenRequest.heartbeatReceiveInterval
 
         webSocketFactory.createWebSocket(
             clientOpenRequest.okHttpRequest,
@@ -67,7 +62,6 @@ class OkHttpStompMainChannel(
         subscriptions.clear()
 
         sendDisconnectMessage()
-
         connection?.close()
 
         connection = null
@@ -149,6 +143,9 @@ class OkHttpStompMainChannel(
     private fun setupHeartBeat(stompMessage: StompMessage) {
         val (serverSendInterval, serverReceiveInterval) = stompMessage.headers.heartBeat
 
+        val clientSendInterval = configuration.heartbeatSendInterval
+        val clientReceiveInterval = configuration.heartbeatReceiveInterval
+
         if (clientSendInterval > 0 && serverReceiveInterval > 0) {
             val interval = max(clientSendInterval, serverReceiveInterval)
             connection?.onWriteInactivity(interval) { sendHeartBeat() }
@@ -159,7 +156,7 @@ class OkHttpStompMainChannel(
             connection?.onReadInactivity(interval) {
                 sendErrorMessage("No messages received in $interval ms.")
                 connection?.close()
-                listener.onFailed(this@OkHttpStompMainChannel, true, null)
+                listener.onFailed(this@StompMainChannel, true, null)
             }
         }
 
@@ -190,10 +187,10 @@ class OkHttpStompMainChannel(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             val webSocketConnection = WebSocketConnection(webSocket)
 
-            this@OkHttpStompMainChannel.connection = webSocketConnection
-            this@OkHttpStompMainChannel.messageHandler = webSocketConnection
+            this@StompMainChannel.connection = webSocketConnection
+            this@StompMainChannel.messageHandler = webSocketConnection
 
-            val host = openRequest.host
+            val host = configuration.host
             val login = openRequest.login
             val passcode = openRequest.passcode
 
@@ -209,38 +206,39 @@ class OkHttpStompMainChannel(
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosing(this@OkHttpStompMainChannel)
+            listener.onClosing(this@StompMainChannel)
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosed(this@OkHttpStompMainChannel)
-            this@OkHttpStompMainChannel.connection = null
+            listener.onClosed(this@StompMainChannel)
+            this@StompMainChannel.connection = null
         }
 
         override fun onFailure(webSocket: WebSocket, throwable: Throwable, response: Response?) {
-            listener.onFailed(this@OkHttpStompMainChannel, true, throwable)
-            this@OkHttpStompMainChannel.connection = null
+            listener.onFailed(this@StompMainChannel, true, throwable)
+            this@StompMainChannel.connection = null
         }
 
     }
 
     private fun sendConnectMessage(host: String, login: String? = null, passcode: String? = null) {
-        val stompHeaders = StompHeaderAccessor.of()
+        val stompHeaderAccessor = StompHeaderAccessor.of()
             .apply {
                 host(host)
                 acceptVersion(ACCEPT_VERSION)
                 login?.let(::login)
                 passcode?.let(::passcode)
-
-                if (clientSendInterval > 0 && clientReceiveInterval > 0) {
-                    heartBeat(clientSendInterval, clientReceiveInterval)
-                }
-
             }
-            .createHeader()
+
+        val clientSendInterval = configuration.heartbeatSendInterval
+        val clientReceiveInterval = configuration.heartbeatReceiveInterval
+
+        if (clientSendInterval > 0 && clientReceiveInterval > 0) {
+            stompHeaderAccessor.heartBeat(clientSendInterval, clientReceiveInterval)
+        }
 
         val stompMessage = StompMessage.Builder()
-            .withHeaders(stompHeaders)
+            .withHeaders(stompHeaderAccessor.createHeader())
             .create(StompCommand.CONNECT)
 
         connection?.send(stompMessage)
@@ -253,7 +251,14 @@ class OkHttpStompMainChannel(
         connection?.send(stompMessage)
     }
 
+    data class Configuration(
+        val host: String,
+        val heartbeatSendInterval: Long = 0,
+        val heartbeatReceiveInterval: Long = 0
+    )
+
     class Factory(
+        private val configuration: Configuration,
         private val webSocketFactory: WebSocketFactory
     ) : Channel.Factory {
 
@@ -261,7 +266,8 @@ class OkHttpStompMainChannel(
             listener: Channel.Listener,
             parent: Channel?
         ): Channel? {
-            return OkHttpStompMainChannel(
+            return StompMainChannel(
+                configuration,
                 webSocketFactory,
                 listener
             )

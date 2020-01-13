@@ -8,14 +8,16 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocketListener
 
-typealias ClientOpenRequestHeaderFactory = (Channel) -> OkHttpStompClient.ClientOpenRequest
+typealias ClientOpenRequestHeaderFactory = (channel: Channel) -> OkHttpStompClient.ClientOpenRequest
 
 class OkHttpStompClient(
+    private val configuration: StompMainChannel.Configuration,
     private val okHttpClient: OkHttpClient,
     private val requestFactory: ClientOpenRequestHeaderFactory
 ) : Protocol {
 
-    override fun createChannelFactory() = OkHttpStompMainChannel.Factory(
+    override fun createChannelFactory() = StompMainChannel.Factory(
+        configuration,
         object : WebSocketFactory {
             override fun createWebSocket(request: Request, listener: WebSocketListener) {
                 okHttpClient.newWebSocket(request, listener)
@@ -34,10 +36,7 @@ class OkHttpStompClient(
     }
 
     data class ClientOpenRequest(
-        val host: String,
         val okHttpRequest: Request,
-        val heartbeatSendInterval: Long = 0,
-        val heartbeatReceiveInterval: Long = 0,
         val login: String? = null,
         val passcode: String? = null
     ) : Protocol.OpenRequest
