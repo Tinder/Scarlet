@@ -9,8 +9,6 @@ import com.tinder.scarlet.stomp.core.StompMessage
 import com.tinder.scarlet.stomp.core.StompSender
 import com.tinder.scarlet.stomp.core.StompSubscriber
 import com.tinder.scarlet.stomp.support.StompHeaderAccessor
-import com.tinder.scarlet.stomp.support.StompMessageDecoder
-import com.tinder.scarlet.stomp.support.StompMessageEncoder
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -43,6 +41,10 @@ class OkHttpStompMainChannel(
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val clientOpenRequest = openRequest as OkHttpStompClient.ClientOpenRequest
+
+        this.clientSendInterval = clientOpenRequest.heartbeatSendInterval
+        this.clientReceiveInterval = clientOpenRequest.heartbeatReceiveInterval
+
         webSocketFactory.createWebSocket(
             clientOpenRequest.okHttpRequest,
             InnerWebSocketListener(clientOpenRequest)
@@ -135,11 +137,11 @@ class OkHttpStompMainChannel(
             setupHeartBeat(stompMessage)
             listener.onOpened(this)
         }
-        StompCommand.MESSAGE -> {
-            val destination = stompMessage.headers.destination ?: throw IllegalStateException()
-            val listener = subscriptions[destination]
-            listener?.invoke(stompMessage)
-        }
+        StompCommand.MESSAGE -> stompMessage.headers.destination
+            ?.let { destination ->
+                val listener = subscriptions[destination]
+                listener?.invoke(stompMessage)
+            }
         StompCommand.ERROR -> listener.onFailed(this, true, null)
         else -> Unit //not a server message
     }
