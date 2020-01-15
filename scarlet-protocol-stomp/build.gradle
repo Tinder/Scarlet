@@ -8,6 +8,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':scarlet-core')
+    implementation files('libs/gozirra-client-0.4.1.jar')
 
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava
