@@ -1,12 +1,13 @@
 package com.tinder.scarlet.stomp.okhttp
 
-import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.core.Connection
+import com.tinder.scarlet.stomp.core.models.StompMessage
 import com.tinder.scarlet.stomp.support.StompMessageDecoder
 import com.tinder.scarlet.stomp.support.StompMessageEncoder
 import okhttp3.WebSocket
+import okio.ByteString
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-
 
 class WebSocketConnection(
     private val webSocket: WebSocket
@@ -20,23 +21,26 @@ class WebSocketConnection(
 
     private val executor = Executors.newSingleThreadScheduledExecutor()
 
+    private val messageEncoder = StompMessageEncoder()
+    private val messageDecoder = StompMessageDecoder()
+
     companion object {
 
         private const val NORMAL_CLOSURE_STATUS_CODE = 1000
         private const val NORMAL_CLOSURE_REASON = "Normal closure"
-
     }
 
-    override fun send(message: StompMessage): Boolean {
+    override fun sendMessage(message: StompMessage): Boolean {
         val lastWriteTime = lastWriteTime
         if (lastWriteTime != -1L) {
             this.lastWriteTime = System.currentTimeMillis()
         }
-        val encodedMessage = StompMessageEncoder.encode(message)
-        return webSocket.send(encodedMessage)
+        val encodedMessage = messageEncoder.encode(message)
+        val byteString = ByteString.of(encodedMessage, 0, encodedMessage.size)
+        return webSocket.send(byteString)
     }
 
-    override fun onReadInactivity(duration: Long, runnable: () -> Unit) {
+    override fun onReceiveInactivity(duration: Long, runnable: () -> Unit) {
         lastReadTime = System.currentTimeMillis()
         executor.scheduleWithFixedDelay({
             if (System.currentTimeMillis() - lastReadTime > duration) {
@@ -64,13 +68,11 @@ class WebSocketConnection(
         executor.shutdown()
     }
 
-    override fun handle(data: String): StompMessage {
+    override fun handle(data: ByteArray): StompMessage {
         val lastReadTime = lastReadTime
         if (lastReadTime != -1L) {
             this.lastReadTime = System.currentTimeMillis()
         }
-        return StompMessageDecoder.decode(data)
+        return messageDecoder.decode(data)
     }
-
-
 }

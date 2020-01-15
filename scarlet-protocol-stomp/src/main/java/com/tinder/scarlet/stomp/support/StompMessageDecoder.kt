@@ -1,7 +1,7 @@
 package com.tinder.scarlet.stomp.support
 
-import com.tinder.scarlet.stomp.core.StompCommand
-import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.core.models.StompCommand
+import com.tinder.scarlet.stomp.core.models.StompMessage
 import com.tinder.scarlet.stomp.support.StompMessageEncoder.TERMINATE_MESSAGE_SYMBOL
 import java.io.StringReader
 import java.util.Scanner

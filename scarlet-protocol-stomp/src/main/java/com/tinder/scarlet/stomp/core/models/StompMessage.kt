@@ -1,20 +1,28 @@
-package com.tinder.scarlet.stomp.core
+package com.tinder.scarlet.stomp.core.models
 
 import com.tinder.scarlet.stomp.support.StompHeaderAccessor
 
+/**
+ *
+ */
 class StompMessage private constructor(
     val command: StompCommand,
-    val payload: String?,
+    val payload: ByteArray,
     val headers: StompHeader
 ) {
 
     class Builder {
 
-        private var payload: String? = null
+        private var payload: ByteArray = ByteArray(0)
         private var headers: StompHeaderAccessor = StompHeaderAccessor.of()
 
-        fun withPayload(payload: String?): Builder {
-            this.payload = payload
+        fun withPayload(payload: ByteArray): Builder {
+            this.payload = payload.copyOf()
+            return this
+        }
+
+        fun withPayload(payload: String): Builder {
+            this.payload = payload.toByteArray()
             return this
         }
 
@@ -26,10 +34,13 @@ class StompMessage private constructor(
         fun create(command: StompCommand): StompMessage {
             val createHeader = headers.createHeader()
             if (command.isDestinationRequired) check(!createHeader.destination.isNullOrEmpty()) { "Command $command required destination" }
-            if (!command.isBodyAllowed) check(payload.isNullOrEmpty()) { "Command $command doesn't support body" }
-            return StompMessage(command, payload, createHeader)
+            if (!command.isBodyAllowed) check(payload.isEmpty()) { "Command $command doesn't support body" }
+            return StompMessage(
+                command = command,
+                payload = payload,
+                headers = createHeader
+            )
         }
-
     }
 
     override fun equals(other: Any?): Boolean {
@@ -39,7 +50,7 @@ class StompMessage private constructor(
         other as StompMessage
 
         if (command != other.command) return false
-        if (payload != other.payload) return false
+        if (!payload.contentEquals(other.payload)) return false
         if (headers != other.headers) return false
 
         return true
@@ -47,9 +58,8 @@ class StompMessage private constructor(
 
     override fun hashCode(): Int {
         var result = command.hashCode()
-        result = 31 * result + (payload?.hashCode() ?: 0)
+        result = 31 * result + payload.contentHashCode()
         result = 31 * result + headers.hashCode()
         return result
     }
-
 }

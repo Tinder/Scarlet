@@ -1,15 +1,15 @@
-package com.tinder.scarlet.stomp.okhttp
+package com.tinder.scarlet.stomp.core
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolSpecificEventAdapter
-import com.tinder.scarlet.stomp.core.StompHeader
+import com.tinder.scarlet.stomp.core.models.StompHeader
 import com.tinder.scarlet.utils.SimpleChannelFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 
-typealias DestinationOpenRequestHeaderFactory = () -> StompDestination.DestinationOpenRequest
-typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> StompDestination.MessageMetaData
+private typealias DestinationOpenRequestHeaderFactory = (channel: Channel) -> StompDestination.DestinationOpenRequest
+private typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> StompDestination.MessageMetaData
 
 /**
  *
@@ -26,7 +26,7 @@ class StompDestination(
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {
-        openRequestFactory?.invoke() ?: Protocol.OpenRequest.Empty
+        openRequestFactory?.invoke(channel) ?: Protocol.OpenRequest.Empty
     }
 
     override fun createOutgoingMessageMetaDataFactory(
@@ -46,7 +46,6 @@ class StompDestination(
             message: Message
         ) = createMessageMetaDataCallable?.invoke(channel, message)
                 ?: Protocol.MessageMetaData.Empty
-
     }
 
     data class MessageMetaData(
@@ -56,5 +55,4 @@ class StompDestination(
     data class DestinationOpenRequest(
         val headers: StompHeader
     ) : Protocol.OpenRequest
-
 }

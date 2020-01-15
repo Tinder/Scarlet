@@ -1,13 +1,14 @@
-package com.tinder.scarlet.stomp.okhttp
+package com.tinder.scarlet.stomp.core
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Protocol
-import com.tinder.scarlet.stomp.core.StompCommand
-import com.tinder.scarlet.stomp.core.StompHeader
-import com.tinder.scarlet.stomp.core.StompListener
-import com.tinder.scarlet.stomp.core.StompMessage
-import com.tinder.scarlet.stomp.core.StompSender
-import com.tinder.scarlet.stomp.core.StompSubscriber
+import com.tinder.scarlet.stomp.core.models.StompCommand
+import com.tinder.scarlet.stomp.core.models.StompHeader
+import com.tinder.scarlet.stomp.core.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.MessageHandler
+import com.tinder.scarlet.stomp.okhttp.OkHttpStompClient
+import com.tinder.scarlet.stomp.okhttp.WebSocketConnection
+import com.tinder.scarlet.stomp.okhttp.WebSocketFactory
 import com.tinder.scarlet.stomp.support.StompHeaderAccessor
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -17,6 +18,9 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
+/**
+ *
+ */
 class StompMainChannel(
     private val configuration: Configuration,
     private val webSocketFactory: WebSocketFactory,
@@ -69,6 +73,23 @@ class StompMainChannel(
     }
 
     override fun convertAndSend(
+        payload: ByteArray,
+        destination: String,
+        headers: StompHeader?
+    ): Boolean {
+        val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
+            .apply { destination(destination) }
+            .createHeader()
+
+        val stompMessage = StompMessage.Builder()
+            .withPayload(payload)
+            .withHeaders(stompHeaders)
+            .create(StompCommand.SEND)
+
+        return connection?.sendMessage(stompMessage) ?: false
+    }
+
+    override fun convertAndSend(
         payload: String,
         destination: String,
         headers: StompHeader?
@@ -82,7 +103,7 @@ class StompMainChannel(
             .withHeaders(stompHeaders)
             .create(StompCommand.SEND)
 
-        return connection?.send(stompMessage) ?: false
+        return connection?.sendMessage(stompMessage) ?: false
     }
 
     override fun subscribe(
@@ -104,7 +125,7 @@ class StompMainChannel(
             .withHeaders(stompHeaders)
             .create(StompCommand.SUBSCRIBE)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
 
         topicIds[destination] = generateId
         subscriptions[destination] = listener
@@ -122,7 +143,7 @@ class StompMainChannel(
             .withHeaders(stompHeaders)
             .create(StompCommand.UNSUBSCRIBE)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
         subscriptions.remove(destination)
     }
 
@@ -137,7 +158,7 @@ class StompMainChannel(
                 listener?.invoke(stompMessage)
             }
         StompCommand.ERROR -> listener.onFailed(this, true, null)
-        else -> Unit //not a server message
+        else -> Unit // not a server message
     }
 
     private fun setupHeartBeat(stompMessage: StompMessage) {
@@ -148,25 +169,24 @@ class StompMainChannel(
 
         if (clientSendInterval > 0 && serverReceiveInterval > 0) {
             val interval = max(clientSendInterval, serverReceiveInterval)
-            connection?.onWriteInactivity(interval) { sendHeartBeat() }
+            connection?.onWriteInactivity(interval, ::sendHeartBeat)
         }
 
         if (clientReceiveInterval > 0 && serverSendInterval > 0) {
-            val interval = max(clientReceiveInterval, serverSendInterval) * HEARTBEAT_MULTIPLIER;
-            connection?.onReadInactivity(interval) {
+            val interval = max(clientReceiveInterval, serverSendInterval) * HEARTBEAT_MULTIPLIER
+            connection?.onReceiveInactivity(interval) {
                 sendErrorMessage("No messages received in $interval ms.")
                 connection?.close()
                 listener.onFailed(this@StompMainChannel, true, null)
             }
         }
-
     }
 
     private fun sendHeartBeat() {
         val stompMessage = StompMessage.Builder()
             .create(StompCommand.UNKNOWN)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
     }
 
     private fun sendErrorMessage(error: String) {
@@ -178,7 +198,7 @@ class StompMainChannel(
             .withHeaders(headers)
             .create(StompCommand.ERROR)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
     }
 
     inner class InnerWebSocketListener(
@@ -198,11 +218,11 @@ class StompMainChannel(
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            messageHandler?.handle(bytes.utf8())?.let(::handleIncome)
+            messageHandler?.handle(bytes.toByteArray())?.let(::handleIncome)
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            messageHandler?.handle(text)?.let(::handleIncome)
+            messageHandler?.handle(text.toByteArray(Charsets.UTF_8))?.let(::handleIncome)
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -218,7 +238,6 @@ class StompMainChannel(
             listener.onFailed(this@StompMainChannel, true, throwable)
             this@StompMainChannel.connection = null
         }
-
     }
 
     private fun sendConnectMessage(host: String, login: String? = null, passcode: String? = null) {
@@ -241,14 +260,14 @@ class StompMainChannel(
             .withHeaders(stompHeaderAccessor.createHeader())
             .create(StompCommand.CONNECT)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
     }
 
     private fun sendDisconnectMessage() {
         val stompMessage = StompMessage.Builder()
             .create(StompCommand.DISCONNECT)
 
-        connection?.send(stompMessage)
+        connection?.sendMessage(stompMessage)
     }
 
     data class Configuration(
@@ -273,5 +292,4 @@ class StompMainChannel(
             )
         }
     }
-
 }

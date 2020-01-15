@@ -1,19 +1,18 @@
 package com.tinder.scarlet.stomp.support
 
-import com.tinder.scarlet.stomp.core.StompHeader
+import com.tinder.scarlet.stomp.core.models.StompHeader
 
 class StompHeaderAccessor private constructor(headers: Map<String, String>) {
 
     companion object {
 
+        /**
+         * Custom header for the server to notify anything.
+         */
         private const val STOMP_MESSAGE_HEADER = "message"
 
-        fun of(
-            headers: Map<String, String> = emptyMap()
-        ): StompHeaderAccessor {
-            return StompHeaderAccessor(headers)
-        }
-
+        fun of(headers: Map<String, String> = emptyMap()): StompHeaderAccessor =
+            StompHeaderAccessor(headers)
     }
 
     private val mutableHeaders = mutableMapOf<String, String>().apply {
@@ -48,6 +47,10 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
         mutableHeaders[StompHeader.CONTENT_TYPE] = contentType
     }
 
+    fun contentLength(length: Int) {
+        mutableHeaders[StompHeader.CONTENT_LENGTH] = length.toString()
+    }
+
     fun host(host: String) {
         mutableHeaders[StompHeader.HOST] = host
     }
@@ -65,5 +68,4 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
     }
 
     fun createHeader() = StompHeader(mutableHeaders)
-
 }

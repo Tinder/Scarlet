@@ -1,75 +1,87 @@
 package com.tinder.scarlet.stomp.support
 
-import com.tinder.scarlet.stomp.core.StompCommand
-import com.tinder.scarlet.stomp.core.StompHeader
-import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.core.models.StompCommand
+import com.tinder.scarlet.stomp.core.models.StompHeader
+import com.tinder.scarlet.stomp.core.models.StompMessage
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
 
+class StompMessageEncoder {
 
-object StompMessageEncoder {
+    companion object {
 
-    private const val LF = '\n'
-    private const val COLON = ':'
+        private const val LF = '\n'.toInt()
+        private const val COLON = ':'.toInt()
 
-    private const val HEARTBEAT_PAYLOAD = "\n"
-    const val TERMINATE_MESSAGE_SYMBOL = '\u0000'
-
-    fun encode(stompMessage: StompMessage): String {
-        val stringBuilder = StringBuilder()
-
-        val command = stompMessage.command
-        if (command == StompCommand.UNKNOWN) {
-            stringBuilder.append(HEARTBEAT_PAYLOAD)
-        } else {
-            val headers = writeHeaders(command, stompMessage.headers, stompMessage.payload.orEmpty())
-            stringBuilder
-                .append(command.toString())
-                .append(LF)
-                .append(headers)
-                .append(LF)
-                .apply { stompMessage.payload?.let(::append) }
-                .append(TERMINATE_MESSAGE_SYMBOL)
-        }
-
-        return stringBuilder.toString()
+        private const val HEARTBEAT_PAYLOAD = "\n"
+        private const val START_HEADERS_SIZE = 64
     }
 
-    private fun writeHeaders(
-        command: StompCommand,
-        headers: Map<String, String>,
-        payload: String
-    ): String {
-        if (headers.isEmpty()) {
-            return ""
+    fun encode(stompMessage: StompMessage): ByteArray {
+        val arraySize = START_HEADERS_SIZE + stompMessage.payload.size
+        val arrayOutputStream = ByteArrayOutputStream(arraySize)
+
+        DataOutputStream(arrayOutputStream).use { dataOutputStream ->
+
+            val command = stompMessage.command
+            if (command != StompCommand.UNKNOWN) {
+                writeMessage(dataOutputStream, command, stompMessage)
+            } else {
+                dataOutputStream.writeChars(HEARTBEAT_PAYLOAD)
+            }
         }
+
+        return arrayOutputStream.toByteArray()
+    }
+
+    private fun writeMessage(
+        dataOutputStream: DataOutputStream,
+        command: StompCommand,
+        stompMessage: StompMessage
+    ) = with(dataOutputStream) {
+        write(command.toString().toByteArray(Charsets.UTF_8))
+        write(LF)
+        writeHeaders(stompMessage, dataOutputStream)
+        write(LF)
+        write(stompMessage.payload)
+        writeByte(0)
+    }
+
+    private fun writeHeaders(stompMessage: StompMessage, outputStream: DataOutputStream) {
+        if (stompMessage.headers.isEmpty()) return
+
+        val command = stompMessage.command
+        val headers = stompMessage.headers
         val shouldEscape = command != StompCommand.CONNECT && command != StompCommand.CONNECTED
 
-        val stringBuilder = StringBuilder()
         headers.forEach { (key, value) ->
-            if (command.isBodyAllowed && key == StompHeader.CONTENT_LENGTH) {
-                return@forEach
-            }
+            if (command.isBodyAllowed && key == StompHeader.CONTENT_LENGTH) return@forEach
 
             val headerKey = encode(key, shouldEscape)
             val headerValue = encode(value, shouldEscape)
 
-            stringBuilder
-                .append(headerKey)
-                .append(COLON)
-                .append(headerValue)
-                .append(LF)
+            with(outputStream) {
+                write(headerKey)
+                write(COLON)
+                write(headerValue)
+                write(LF)
+            }
         }
+
         if (command.isBodyAllowed) {
-            val contentLength = payload.length
-            stringBuilder.append(StompHeader.CONTENT_LENGTH)
-                .append(COLON)
-                .append(contentLength)
-                .append(LF)
+            val contentLength = stompMessage.payload.size
+            with(outputStream) {
+                write(StompHeader.CONTENT_LENGTH.toByteArray(Charsets.UTF_8))
+                write(COLON)
+                write(contentLength.toString().toByteArray(Charsets.UTF_8))
+                write(LF)
+            }
         }
-        return stringBuilder.toString()
     }
 
-    private fun encode(input: String, escape: Boolean): String {
-        return if (escape) escape(input) else input
+    private fun encode(input: String, escape: Boolean): ByteArray {
+        val outputString = if (escape) escape(input) else input
+        return outputString.toByteArray(Charsets.UTF_8)
     }
 
     /**
@@ -77,42 +89,16 @@ object StompMessageEncoder {
      * <a href="https://stomp.github.io/stomp-specification-1.2.html#Value_Encoding">"Value Encoding"</a>.
      */
     private fun escape(inString: String): String {
-        var sb: StringBuilder? = null
-        inString.forEachIndexed { index, symbol ->
+        val stringBuilder = StringBuilder(inString.length)
+        inString.forEach { symbol ->
             when (symbol) {
-                '\\' -> {
-                    sb = getStringBuilder(sb, inString, index)
-                    sb?.append("\\\\")
-                }
-                ':' -> {
-                    sb = getStringBuilder(sb, inString, index)
-                    sb?.append("\\c")
-                }
-                '\n' -> {
-                    sb = getStringBuilder(sb, inString, index)
-                    sb?.append("\\n")
-                }
-                '\r' -> {
-                    sb = getStringBuilder(sb, inString, index)
-                    sb?.append("\\r")
-                }
-                else -> sb?.append(symbol)
+                '\\' -> stringBuilder.append("\\\\")
+                ':' -> stringBuilder.append("\\c")
+                '\n' -> stringBuilder.append("\\n")
+                '\r' -> stringBuilder.append("\\r")
+                else -> stringBuilder.append(symbol)
             }
         }
-        return sb?.toString() ?: inString
+        return stringBuilder.toString()
     }
-
-    private fun getStringBuilder(
-        stringBuilder: StringBuilder?,
-        inString: String,
-        index: Int
-    ): StringBuilder {
-        var sb: StringBuilder? = stringBuilder
-        if (sb == null) {
-            sb = java.lang.StringBuilder(inString.length)
-            sb.append(inString.substring(0, index))
-        }
-        return sb
-    }
-
 }

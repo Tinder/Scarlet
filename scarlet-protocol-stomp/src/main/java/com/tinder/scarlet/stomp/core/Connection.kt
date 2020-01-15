@@ -1,6 +1,6 @@
-package com.tinder.scarlet.stomp.okhttp
+package com.tinder.scarlet.stomp.core
 
-import com.tinder.scarlet.stomp.core.StompMessage
+import com.tinder.scarlet.stomp.core.models.StompMessage
 
 interface Connection {
 
@@ -9,14 +9,14 @@ interface Connection {
      * @param message the message
      * @return true if the message was enqueued.
      */
-    fun send(message: StompMessage): Boolean
+    fun sendMessage(message: StompMessage): Boolean
 
     /**
      * Register a task to invoke after a period of read inactivity.
      * @param runnable the task to invoke
      * @param duration the amount of inactive time in milliseconds
      */
-    fun onReadInactivity(duration: Long, runnable: () -> Unit)
+    fun onReceiveInactivity(duration: Long, runnable: () -> Unit)
 
     /**
      * Register a task to invoke after a period of write inactivity.
@@ -34,5 +34,4 @@ interface Connection {
      * Close the connection.
      */
     fun close()
-
 }

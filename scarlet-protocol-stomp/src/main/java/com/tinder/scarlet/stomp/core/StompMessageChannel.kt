@@ -1,11 +1,9 @@
-package com.tinder.scarlet.stomp.okhttp
+package com.tinder.scarlet.stomp.core
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
-import com.tinder.scarlet.stomp.core.StompSender
-import com.tinder.scarlet.stomp.core.StompSubscriber
 
 class StompMessageChannel(
     private val destination: String,
@@ -58,5 +56,4 @@ class StompMessageChannel(
             stompSender.convertAndSend(message.value, destination, metaData?.headers)
         }
     }
-
 }
