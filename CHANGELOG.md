@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-## Version 0.10.0
+## Version 0.1.10
 _2020-01-17_
 
 * Update protobuf-Java to 3.11.0.
