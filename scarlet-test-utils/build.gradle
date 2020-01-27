@@ -4,7 +4,7 @@ apply plugin: 'java-library'
 
 dependencies {
     compileOnly project(':scarlet')
-    api rootProject.ext.assertJ
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.kotlinStdlib
+    api libs.assertJ
+    implementation libs.rxJava
+    implementation libs.kotlinStdlib
 }

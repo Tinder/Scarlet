@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion libs.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersionAndroidLifecycle
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion libs.minSdkVersionAndroidLifecycle
+        targetSdkVersion libs.targetSdkVersion
         versionCode 1
         versionName "${version}"
 
@@ -23,12 +23,12 @@ android {
 
 dependencies {
     implementation project(':scarlet')
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxKotlin
-    implementation rootProject.ext.appCompat
-    implementation rootProject.ext.kotlinStdlib
+    implementation libs.rxJava
+    implementation libs.rxKotlin
+    implementation libs.appCompat
+    implementation libs.kotlinStdlib
 
-    testImplementation rootProject.ext.junit
+    testImplementation libs.junit
 }
 
 apply plugin: 'com.vanniktech.maven.publish'
