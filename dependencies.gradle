@@ -72,8 +72,12 @@ ext.libs = [
     moshiCodeGen: "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshiCodeGen",
     gson: "com.google.code.gson:gson:$versions.gson",
     protobuf: "com.google.protobuf:protobuf-java:$versions.protobuf",
-    jacksonDatabind: "com.fasterxml.jackson.core:jackson-databind:$versions.jacksonDatabind",
-    jacksonModuleKotlin: "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.jacksonModuleKotlin",
+
+    jackson: [
+        databind: "com.fasterxml.jackson.core:jackson-databind:$versions.jacksonDatabind",
+        moduleKotlin: "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.jacksonModuleKotlin",
+    ],
+
     jsonPatch: "com.github.fge:json-patch:$versions.jsonPatch",
 
     dagger: "com.google.dagger:dagger:$versions.dagger",

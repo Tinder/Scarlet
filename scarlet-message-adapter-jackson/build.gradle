@@ -3,7 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api libs.jacksonDatabind
+    api libs.jackson.databind
 
     implementation project(':scarlet-core')
     implementation libs.kotlin.stdlib
@@ -15,5 +15,5 @@ dependencies {
     testImplementation libs.mockito
     testImplementation libs.kotlin.reflect
     testImplementation libs.assertJ
-    testImplementation libs.jacksonModuleKotlin
+    testImplementation libs.jackson.moduleKotlin
 }
