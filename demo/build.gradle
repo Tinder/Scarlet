@@ -51,7 +51,7 @@ dependencies {
     implementation libs.dagger
     kapt libs.daggerCompiler
     compileOnly libs.jsr250Annotations
-    implementation libs.kotlinStdlib
+    implementation libs.kotlin.stdlib
     implementation libs.mpAndroidChart
     implementation libs.chatMessageView
     implementation libs.filePicker

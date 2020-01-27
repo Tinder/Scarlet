@@ -5,5 +5,5 @@ apply plugin: 'java-library'
 dependencies {
     api libs.mockWebServer
     api project(':scarlet-websocket-okhttp')
-    implementation libs.kotlinStdlib
+    implementation libs.kotlin.stdlib
 }

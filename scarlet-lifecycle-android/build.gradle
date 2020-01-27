@@ -26,7 +26,7 @@ dependencies {
     implementation libs.rxJava
     implementation libs.rxKotlin
     implementation libs.appCompat
-    implementation libs.kotlinStdlib
+    implementation libs.kotlin.stdlib
 
     testImplementation libs.junit
 }

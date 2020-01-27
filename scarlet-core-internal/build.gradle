@@ -6,11 +6,11 @@ dependencies {
     api project(':scarlet-core')
 
     implementation libs.rxJava
-    implementation libs.kotlinStdlib
+    implementation libs.kotlin.stdlib
 
     testImplementation project(':scarlet-test-utils')
     testImplementation libs.junit
     testImplementation libs.mockito
-    testImplementation libs.kotlinReflect
+    testImplementation libs.kotlin.reflect
     testImplementation libs.assertJ
 }

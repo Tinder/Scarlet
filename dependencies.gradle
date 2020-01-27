@@ -97,8 +97,10 @@ ext.libs = [
     mockito: "com.nhaarman:mockito-kotlin-kt1.1:$versions.mockito",
     assertJ: "org.assertj:assertj-core:$versions.assertJ",
 
-    kotlinStdlib: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
-    kotlinReflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
+    kotlin: [
+        stdlib: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
+        reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    ],
 
     stateMachine: "com.tinder.statemachine:statemachine:$versions.stateMachine"
 ]

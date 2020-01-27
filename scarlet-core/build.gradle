@@ -4,7 +4,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api libs.reactiveStreams
-    implementation libs.kotlinStdlib
+    implementation libs.kotlin.stdlib
 
     testImplementation libs.junit
     testImplementation libs.assertJ
