@@ -3,9 +3,9 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api rootProject.ext.reactiveStreams
-    implementation rootProject.ext.kotlinStdlib
+    api libs.reactiveStreams
+    implementation libs.kotlin.stdlib
 
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.assertJ
+    testImplementation libs.junit
+    testImplementation libs.assertJ
 }

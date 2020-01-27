@@ -3,7 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api rootProject.ext.mockWebServer
+    api libs.mockWebServer
     api project(':scarlet-websocket-okhttp')
-    implementation rootProject.ext.kotlinStdlib
+    implementation libs.kotlin.stdlib
 }

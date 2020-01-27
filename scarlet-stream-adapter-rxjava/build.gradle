@@ -3,16 +3,16 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api rootProject.ext.rxJava1
+    api libs.rxJava1
 
     implementation project(':scarlet-core')
-    implementation rootProject.ext.kotlinStdlib
+    implementation libs.kotlin.stdlib
 
     testImplementation project(':scarlet')
     testImplementation project(':scarlet-websocket-mockwebserver')
     testImplementation project(':scarlet-test-utils')
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.mockito
-    testImplementation rootProject.ext.kotlinReflect
-    testImplementation rootProject.ext.assertJ
+    testImplementation libs.junit
+    testImplementation libs.mockito
+    testImplementation libs.kotlin.reflect
+    testImplementation libs.assertJ
 }

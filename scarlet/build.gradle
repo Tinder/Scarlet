@@ -8,15 +8,15 @@ dependencies {
     implementation project(':scarlet-core-internal')
     implementation project(':scarlet-message-adapter-builtin')
     implementation project(':scarlet-stream-adapter-builtin')
-    implementation rootProject.ext.stateMachine
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxKotlin
-    implementation rootProject.ext.kotlinStdlib
+    implementation libs.stateMachine
+    implementation libs.rxJava
+    implementation libs.rxKotlin
+    implementation libs.kotlin.stdlib
 
     testImplementation project(':scarlet-test-utils')
     testImplementation project(':scarlet-stream-adapter-rxjava2')
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.mockito
-    testImplementation rootProject.ext.kotlinReflect
-    testImplementation rootProject.ext.assertJ
+    testImplementation libs.junit
+    testImplementation libs.mockito
+    testImplementation libs.kotlin.reflect
+    testImplementation libs.assertJ
 }
