@@ -7,12 +7,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion libs.compileSdkVersion
-    buildToolsVersion libs.buildToolsVersion
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
         applicationId "com.tinder.scarlet"
-        minSdkVersion libs.minSdkVersion
-        targetSdkVersion libs.targetSdkVersion
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
