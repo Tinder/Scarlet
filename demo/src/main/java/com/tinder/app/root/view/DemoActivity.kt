@@ -40,7 +40,7 @@ class DemoActivity : AppCompatActivity() {
 
     private class ViewPagerAdapter constructor(fm: FragmentManager, private val pageCount: Int) :
         FragmentStatePagerAdapter(fm) {
-        override fun getItem(position: Int): Fragment? {
+        override fun getItem(position: Int): Fragment {
             val (_, createFragment) = TAB_ITEMS[position]
             return createFragment()
         }
