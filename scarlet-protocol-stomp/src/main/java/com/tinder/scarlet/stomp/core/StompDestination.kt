@@ -12,7 +12,15 @@ private typealias DestinationOpenRequestHeaderFactory = (channel: Channel) -> St
 private typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> StompDestination.MessageMetaData
 
 /**
+ * Scarlet protocol implementation for create channel (OkHttpStompMessageChannel) for subscribe to
+ * queue by destination.
+ * @see StompMessageChannel
  *
+ * MessageMetaDataFactory is optional factory for create custom header for each message which will be sent
+ * by this StompMessageChannel.
+ *
+ * DestinationOpenRequestHeaderFactory is optional factory for create open request header which will be sent
+ * with subscribe message.
  */
 class StompDestination(
     private val destination: String,

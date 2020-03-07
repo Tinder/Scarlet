@@ -3,7 +3,8 @@ package com.tinder.scarlet.stomp.core.models
 import com.tinder.scarlet.stomp.support.StompHeaderAccessor
 
 /**
- *
+ * Stomp message representation with headers, payload and command.
+ * @see StompCommand
  */
 class StompMessage private constructor(
     val command: StompCommand,

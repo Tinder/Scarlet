@@ -11,6 +11,10 @@ import okhttp3.WebSocketListener
 
 private typealias ClientOpenRequestHeaderFactory = (channel: Channel) -> OkHttpStompClient.ClientOpenRequest
 
+/**
+ * Scarlet protocol implementation for create StompMainChannel
+ * @see StompMainChannel
+ */
 class OkHttpStompClient(
     private val configuration: StompMainChannel.Configuration,
     private val okHttpClient: OkHttpClient,

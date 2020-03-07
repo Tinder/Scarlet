@@ -1,5 +1,8 @@
 package com.tinder.scarlet.stomp.core.models
 
+/**
+ * Represents a STOMP command.
+ */
 enum class StompCommand(
     val isBodyAllowed: Boolean = false,
     val isDestinationRequired: Boolean = false

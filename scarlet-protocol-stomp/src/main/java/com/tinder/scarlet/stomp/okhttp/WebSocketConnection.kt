@@ -9,6 +9,9 @@ import okio.ByteString
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+/**
+ * Okhttp websocket based implementation of {@link Connection}.
+ */
 class WebSocketConnection(
     private val webSocket: WebSocket
 ) : Connection, MessageHandler {
@@ -30,6 +33,9 @@ class WebSocketConnection(
         private const val NORMAL_CLOSURE_REASON = "Normal closure"
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun sendMessage(message: StompMessage): Boolean {
         val lastWriteTime = lastWriteTime
         if (lastWriteTime != -1L) {
@@ -40,6 +46,9 @@ class WebSocketConnection(
         return webSocket.send(byteString)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun onReceiveInactivity(duration: Long, runnable: () -> Unit) {
         lastReadTime = System.currentTimeMillis()
         executor.scheduleWithFixedDelay({
@@ -49,6 +58,9 @@ class WebSocketConnection(
         }, 0, duration / 2, TimeUnit.MILLISECONDS)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun onWriteInactivity(duration: Long, runnable: () -> Unit) {
         lastWriteTime = System.currentTimeMillis()
         executor.scheduleWithFixedDelay({
@@ -58,16 +70,25 @@ class WebSocketConnection(
         }, 0, duration / 2, TimeUnit.MILLISECONDS)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun forceClose() {
         webSocket.cancel()
         executor.shutdown()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun close() {
         webSocket.close(NORMAL_CLOSURE_STATUS_CODE, NORMAL_CLOSURE_REASON)
         executor.shutdown()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun handle(data: ByteArray): StompMessage {
         val lastReadTime = lastReadTime
         if (lastReadTime != -1L) {

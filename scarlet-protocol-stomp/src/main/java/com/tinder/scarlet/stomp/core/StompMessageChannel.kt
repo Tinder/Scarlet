@@ -5,6 +5,9 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageQueue
 import com.tinder.scarlet.Protocol
 
+/**
+ * This channel is responsible for a specific subscription and its life cycle.
+ */
 class StompMessageChannel(
     private val destination: String,
     private val stompSubscriber: StompSubscriber,
@@ -49,7 +52,7 @@ class StompMessageChannel(
     ): Boolean = when (message) {
         is Message.Text -> {
             val metaData = messageMetaData as? StompDestination.MessageMetaData
-            stompSender.convertAndSend(message.value, destination, metaData?.headers)
+            stompSender.convertAndSend(message.value.toByteArray(), destination, metaData?.headers)
         }
         is Message.Bytes -> {
             val metaData = messageMetaData as? StompDestination.MessageMetaData

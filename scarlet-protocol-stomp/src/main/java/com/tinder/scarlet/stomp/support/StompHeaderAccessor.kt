@@ -2,6 +2,12 @@ package com.tinder.scarlet.stomp.support
 
 import com.tinder.scarlet.stomp.core.models.StompHeader
 
+/**
+ * A base for classes providing strongly typed getters and setters as well as
+ * behavior around specific categories of headers (e.g. STOMP headers).
+ * Supports creating new headers, modifying existing headers,
+ * or copying and modifying existing headers.
+ */
 class StompHeaderAccessor private constructor(headers: Map<String, String>) {
 
     companion object {

@@ -6,6 +6,9 @@ import com.tinder.scarlet.stomp.core.models.StompMessage
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 
+/**
+ * An encoder for STOMP frames.
+ */
 class StompMessageEncoder {
 
     companion object {
@@ -17,6 +20,11 @@ class StompMessageEncoder {
         private const val START_HEADERS_SIZE = 64
     }
 
+    /**
+     * Encodes the given STOMP {@code stompMessage} into a byte array.
+     * @param stompMessage the message to encode
+     * @return the encoded message
+     */
     fun encode(stompMessage: StompMessage): ByteArray {
         val arraySize = START_HEADERS_SIZE + stompMessage.payload.size
         val arrayOutputStream = ByteArrayOutputStream(arraySize)

@@ -19,7 +19,8 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
 /**
- *
+ * The main channel, which is responsible for connecting and disconnecting to the stomp server.
+ * And also for sending messages and the logic of subscriptions.
  */
 class StompMainChannel(
     private val configuration: Configuration,
@@ -74,23 +75,6 @@ class StompMainChannel(
 
     override fun convertAndSend(
         payload: ByteArray,
-        destination: String,
-        headers: StompHeader?
-    ): Boolean {
-        val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
-            .apply { destination(destination) }
-            .createHeader()
-
-        val stompMessage = StompMessage.Builder()
-            .withPayload(payload)
-            .withHeaders(stompHeaders)
-            .create(StompCommand.SEND)
-
-        return connection?.sendMessage(stompMessage) ?: false
-    }
-
-    override fun convertAndSend(
-        payload: String,
         destination: String,
         headers: StompHeader?
     ): Boolean {
