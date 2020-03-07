@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tindre.scarlet.stomp
+package com.tinder.scarlet.stomp
 
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.Stream
@@ -64,8 +64,14 @@ class StompIntegrationTest {
     @Test
     fun test2() {
         val connection1 = StompConnection()
-        connection1.open(HOST, PORT)
-        connection1.connect(LOGIN, PASSWORD)
+        connection1.open(
+            HOST,
+            PORT
+        )
+        connection1.connect(
+            LOGIN,
+            PASSWORD
+        )
         connection1.begin("tx1")
         connection1.send(DESTINATION, "message1", "tx1", null)
         connection1.send(DESTINATION, "message2", "tx1", null)
