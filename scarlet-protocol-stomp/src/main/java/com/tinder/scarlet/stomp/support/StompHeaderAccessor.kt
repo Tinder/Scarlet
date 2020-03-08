@@ -29,6 +29,16 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
         mutableHeaders[key] = value
     }
 
+    var contentLength: Int?
+        get() = try {
+            mutableHeaders[StompHeader.CONTENT_LENGTH]?.toInt()
+        } catch (ex: NumberFormatException) {
+            null
+        }
+        set(value) {
+            mutableHeaders[StompHeader.CONTENT_LENGTH] = value.toString()
+        }
+
     fun heartBeat(sendInterval: Long, receiveInterval: Long) {
         mutableHeaders[StompHeader.HEARTBEAT] = "$sendInterval,$receiveInterval"
     }
@@ -51,10 +61,6 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
 
     fun contentType(contentType: String) {
         mutableHeaders[StompHeader.CONTENT_TYPE] = contentType
-    }
-
-    fun contentLength(length: Int) {
-        mutableHeaders[StompHeader.CONTENT_LENGTH] = length.toString()
     }
 
     fun host(host: String) {
