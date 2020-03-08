@@ -14,7 +14,6 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
-import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
@@ -24,6 +23,7 @@ import kotlin.math.max
  */
 class StompMainChannel(
     private val configuration: Configuration,
+    private val idGenerator: IdGenerator,
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
 ) : Channel, StompSender, StompSubscriber {
@@ -79,7 +79,7 @@ class StompMainChannel(
         headers: StompHeader?
     ): Boolean {
         val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
-            .apply { destination(destination) }
+            .apply { this.destination = destination }
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
@@ -97,11 +97,11 @@ class StompMainChannel(
     ) {
         check(!topicIds.containsKey(destination)) { "Already has subscription to destination=$destination" }
         check(!subscriptions.containsKey(destination)) { "Already has subscription to destination=$destination" }
-        val generateId = UUID.randomUUID().toString()
+        val generateId = idGenerator.generateId()
         val stompHeaders = StompHeaderAccessor.of(headers.orEmpty())
             .apply {
-                subscriptionId(generateId)
-                destination(destination)
+                this.subscriptionId = generateId
+                this.destination = destination
             }
             .createHeader()
 
@@ -120,7 +120,7 @@ class StompMainChannel(
                 ?: throw IllegalStateException("Unknown destination=$destination")
 
         val stompHeaders = StompHeaderAccessor.of()
-            .apply { subscriptionId(subscriptionId) }
+            .apply { this.subscriptionId = subscriptionId }
             .createHeader()
 
         val stompMessage = StompMessage.Builder()
@@ -168,7 +168,7 @@ class StompMainChannel(
 
     private fun sendHeartBeat() {
         val stompMessage = StompMessage.Builder()
-            .create(StompCommand.UNKNOWN)
+            .create(StompCommand.HEARTBEAT)
 
         connection?.sendMessage(stompMessage)
     }
@@ -227,10 +227,10 @@ class StompMainChannel(
     private fun sendConnectMessage(host: String, login: String? = null, passcode: String? = null) {
         val stompHeaderAccessor = StompHeaderAccessor.of()
             .apply {
-                host(host)
-                acceptVersion(ACCEPT_VERSION)
-                login?.let(::login)
-                passcode?.let(::passcode)
+                this.host = host
+                this.acceptVersion = ACCEPT_VERSION
+                this.login = login
+                this.passcode = passcode
             }
 
         val clientSendInterval = configuration.heartbeatSendInterval
@@ -261,6 +261,7 @@ class StompMainChannel(
     )
 
     class Factory(
+        private val idGenerator: IdGenerator,
         private val configuration: Configuration,
         private val webSocketFactory: WebSocketFactory
     ) : Channel.Factory {
@@ -270,9 +271,10 @@ class StompMainChannel(
             parent: Channel?
         ): Channel? {
             return StompMainChannel(
-                configuration,
-                webSocketFactory,
-                listener
+                configuration = configuration,
+                idGenerator = idGenerator,
+                webSocketFactory = webSocketFactory,
+                listener = listener
             )
         }
     }

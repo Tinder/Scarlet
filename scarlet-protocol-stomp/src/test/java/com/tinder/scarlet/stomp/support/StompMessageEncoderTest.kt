@@ -22,8 +22,8 @@ class StompMessageEncoderTest {
     @Test
     fun `encode frame with headers`() {
         val headers = StompHeaderAccessor.of().apply {
-            acceptVersion("1.2")
-            host("github.org")
+            acceptVersion = "1.2"
+            host = "github.org"
         }.createHeader()
 
         val frame = StompMessage.Builder()
@@ -59,7 +59,7 @@ class StompMessageEncoderTest {
     fun `encode frame with headers body`() {
         val headers = StompHeaderAccessor.of().apply {
             putAll(mapOf("a" to "alpha"))
-            destination("destination")
+            destination = "destination"
         }.createHeader()
 
         val frame = StompMessage.Builder()
@@ -76,8 +76,8 @@ class StompMessageEncoderTest {
     @Test
     fun `encode frame with content length present`() {
         val headers = StompHeaderAccessor.of().apply {
-            contentLength(22)
-            destination("destination")
+            contentLength = 22
+            destination = "destination"
         }.createHeader()
 
         val frame = StompMessage.Builder()

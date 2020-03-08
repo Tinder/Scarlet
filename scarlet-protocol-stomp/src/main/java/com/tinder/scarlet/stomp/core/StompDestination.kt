@@ -8,8 +8,8 @@ import com.tinder.scarlet.stomp.core.models.StompHeader
 import com.tinder.scarlet.utils.SimpleChannelFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 
-private typealias DestinationOpenRequestHeaderFactory = (channel: Channel) -> StompDestination.DestinationOpenRequest
-private typealias MessageMetaDataFactory = (channel: Channel, message: Message) -> StompDestination.MessageMetaData
+private typealias DestinationOpenRequestHeaderFactory = (Channel) -> StompDestination.DestinationOpenRequest
+private typealias MessageMetaDataFactory = (Channel, Message) -> StompDestination.MessageMetaData
 
 /**
  * Scarlet protocol implementation for create channel (OkHttpStompMessageChannel) for subscribe to

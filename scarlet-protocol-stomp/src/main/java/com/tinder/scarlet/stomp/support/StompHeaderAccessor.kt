@@ -47,33 +47,61 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
         mutableHeaders.putAll(headers)
     }
 
-    fun subscriptionId(subscriptionId: String) {
-        mutableHeaders[StompHeader.ID] = subscriptionId
-    }
+    var subscriptionId: String?
+        get() = mutableHeaders[StompHeader.ID]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.ID] = value
+            }
+        }
 
-    fun destination(destination: String) {
-        mutableHeaders[StompHeader.DESTINATION] = destination
-    }
+    var destination: String?
+        get() = mutableHeaders[StompHeader.DESTINATION]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.DESTINATION] = value
+            }
+        }
 
-    fun acceptVersion(acceptVersion: String) {
-        mutableHeaders[StompHeader.ACCEPT_VERSION] = acceptVersion
-    }
+    var acceptVersion: String?
+        get() = mutableHeaders[StompHeader.ACCEPT_VERSION]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.ACCEPT_VERSION] = value
+            }
+        }
 
-    fun contentType(contentType: String) {
-        mutableHeaders[StompHeader.CONTENT_TYPE] = contentType
-    }
+    var contentType: String?
+        get() = mutableHeaders[StompHeader.CONTENT_TYPE]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.CONTENT_TYPE] = value
+            }
+        }
 
-    fun host(host: String) {
-        mutableHeaders[StompHeader.HOST] = host
-    }
+    var host: String?
+        get() = mutableHeaders[StompHeader.HOST]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.HOST] = value
+            }
+        }
 
-    fun login(login: String) {
-        mutableHeaders[StompHeader.LOGIN] = login
-    }
+    var login: String?
+        get() = mutableHeaders[StompHeader.LOGIN]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.LOGIN] = value
+            }
+        }
 
-    fun passcode(passcode: String) {
-        mutableHeaders[StompHeader.PASSCODE] = passcode
-    }
+    var passcode: String?
+        get() = mutableHeaders[StompHeader.PASSCODE]
+        set(value) {
+            if (value != null) {
+                mutableHeaders[StompHeader.PASSCODE] = value
+            }
+        }
 
     fun message(message: String) {
         mutableHeaders[STOMP_MESSAGE_HEADER] = message

@@ -32,7 +32,7 @@ class StompMessageEncoder {
         DataOutputStream(arrayOutputStream).use { dataOutputStream ->
 
             val command = stompMessage.command
-            if (command != StompCommand.UNKNOWN) {
+            if (command != StompCommand.HEARTBEAT) {
                 writeMessage(dataOutputStream, command, stompMessage)
             } else {
                 dataOutputStream.writeChars(HEARTBEAT_PAYLOAD)

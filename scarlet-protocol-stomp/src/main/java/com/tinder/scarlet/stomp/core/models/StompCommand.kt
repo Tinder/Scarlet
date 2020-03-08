@@ -20,5 +20,5 @@ enum class StompCommand(
     ERROR(isBodyAllowed = true),
 
     // heartbeat
-    UNKNOWN
+    HEARTBEAT
 }
