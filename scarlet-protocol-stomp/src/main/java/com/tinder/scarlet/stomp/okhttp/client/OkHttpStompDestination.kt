@@ -1,20 +1,23 @@
-package com.tinder.scarlet.stomp.core
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.client
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolSpecificEventAdapter
-import com.tinder.scarlet.stomp.core.models.StompHeader
+import com.tinder.scarlet.stomp.okhttp.models.StompHeader
 import com.tinder.scarlet.utils.SimpleChannelFactory
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 
-private typealias DestinationOpenRequestHeaderFactory = (Channel) -> StompDestination.DestinationOpenRequest
-private typealias MessageMetaDataFactory = (Channel, Message) -> StompDestination.MessageMetaData
+private typealias DestinationOpenRequestHeaderFactory = (Channel) -> OkHttpStompDestination.DestinationOpenRequest
+private typealias MessageMetaDataFactory = (Channel, Message) -> OkHttpStompDestination.MessageMetaData
 
 /**
  * Scarlet protocol implementation for create channel (OkHttpStompMessageChannel) for subscribe to
  * queue by destination.
- * @see StompMessageChannel
+ * @see OkHttpStompMessageChannel
  *
  * MessageMetaDataFactory is optional factory for create custom header for each message which will be sent
  * by this StompMessageChannel.
@@ -22,15 +25,15 @@ private typealias MessageMetaDataFactory = (Channel, Message) -> StompDestinatio
  * DestinationOpenRequestHeaderFactory is optional factory for create open request header which will be sent
  * with subscribe message.
  */
-class StompDestination(
+class OkHttpStompDestination(
     private val destination: String,
     private val openRequestFactory: DestinationOpenRequestHeaderFactory? = null,
     private val createMessageMetaDataCallable: MessageMetaDataFactory? = null
 ) : Protocol {
 
     override fun createChannelFactory() = SimpleChannelFactory { listener, parent ->
-        require(parent is StompMainChannel)
-        StompMessageChannel(destination, parent, parent, listener)
+        require(parent is OkHttpStompMainChannel)
+        OkHttpStompMessageChannel(destination, parent, parent, listener)
     }
 
     override fun createOpenRequestFactory(channel: Channel) = SimpleProtocolOpenRequestFactory {

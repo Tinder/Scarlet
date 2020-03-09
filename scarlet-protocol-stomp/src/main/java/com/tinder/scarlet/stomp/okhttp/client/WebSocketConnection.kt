@@ -1,11 +1,14 @@
-package com.tinder.scarlet.stomp.okhttp
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.client
 
-import com.tinder.scarlet.stomp.core.Connection
-import com.tinder.scarlet.stomp.core.models.StompMessage
-import com.tinder.scarlet.stomp.support.StompMessageDecoder
-import com.tinder.scarlet.stomp.support.StompMessageEncoder
+import com.tinder.scarlet.stomp.okhttp.core.Connection
+import com.tinder.scarlet.stomp.okhttp.core.MessageHandler
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.support.StompMessageDecoder
+import com.tinder.scarlet.stomp.okhttp.support.StompMessageEncoder
 import okhttp3.WebSocket
-import okio.ByteString
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -42,8 +45,7 @@ class WebSocketConnection(
             this.lastWriteTime = System.currentTimeMillis()
         }
         val encodedMessage = messageEncoder.encode(message)
-        val byteString = ByteString.of(encodedMessage, 0, encodedMessage.size)
-        return webSocket.send(byteString)
+        return webSocket.send(String(encodedMessage))
     }
 
     /**
@@ -89,7 +91,7 @@ class WebSocketConnection(
     /**
      * {@inheritDoc}
      */
-    override fun handle(data: ByteArray): StompMessage {
+    override fun handle(data: ByteArray): StompMessage? {
         val lastReadTime = lastReadTime
         if (lastReadTime != -1L) {
             this.lastReadTime = System.currentTimeMillis()

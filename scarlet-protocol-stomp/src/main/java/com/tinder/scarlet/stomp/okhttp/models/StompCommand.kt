@@ -1,4 +1,7 @@
-package com.tinder.scarlet.stomp.core.models
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.models
 
 /**
  * Represents a STOMP command.

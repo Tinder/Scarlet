@@ -2,7 +2,7 @@
  * © 2018 Match Group, LLC.
  */
 
-package com.tinder.scarlet.stomp.core.models
+package com.tinder.scarlet.stomp.okhttp.models
 
 /**
  * Represents STOMP frame headers.

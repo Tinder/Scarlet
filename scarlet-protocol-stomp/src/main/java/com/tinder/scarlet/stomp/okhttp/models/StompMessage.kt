@@ -1,6 +1,9 @@
-package com.tinder.scarlet.stomp.core.models
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.models
 
-import com.tinder.scarlet.stomp.support.StompHeaderAccessor
+import com.tinder.scarlet.stomp.okhttp.support.StompHeaderAccessor
 
 /**
  * Stomp message representation with headers, payload and command.

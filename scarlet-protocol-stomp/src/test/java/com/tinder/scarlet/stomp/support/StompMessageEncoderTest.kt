@@ -1,9 +1,14 @@
+/*
+ * © 2018 Match Group, LLC.
+ */
 package com.tinder.scarlet.stomp.support
 
-import com.tinder.scarlet.stomp.core.models.StompCommand
-import com.tinder.scarlet.stomp.core.models.StompMessage
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import com.tinder.scarlet.stomp.okhttp.models.StompCommand
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.support.StompHeaderAccessor
+import com.tinder.scarlet.stomp.okhttp.support.StompMessageEncoder
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class StompMessageEncoderTest {

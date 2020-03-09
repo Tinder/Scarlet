@@ -1,7 +1,10 @@
-package com.tinder.scarlet.stomp.core
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.core
 
-import com.tinder.scarlet.stomp.core.models.StompHeader
-import com.tinder.scarlet.stomp.core.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.models.StompHeader
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
 
 typealias StompListener = (StompMessage) -> Unit
 

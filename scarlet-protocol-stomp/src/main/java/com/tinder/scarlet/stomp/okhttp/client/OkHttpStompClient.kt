@@ -1,10 +1,14 @@
-package com.tinder.scarlet.stomp.okhttp
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.client
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Protocol
 import com.tinder.scarlet.ProtocolSpecificEventAdapter
-import com.tinder.scarlet.stomp.core.IdGenerator
-import com.tinder.scarlet.stomp.core.StompMainChannel
+import com.tinder.scarlet.stomp.okhttp.core.IdGenerator
+import com.tinder.scarlet.stomp.okhttp.core.WebSocketFactory
+import com.tinder.scarlet.stomp.okhttp.generator.UuidGenerator
 import com.tinder.scarlet.utils.SimpleProtocolOpenRequestFactory
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,16 +16,16 @@ import okhttp3.WebSocketListener
 
 /**
  * Scarlet protocol implementation for create StompMainChannel
- * @see StompMainChannel
+ * @see OkHttpStompMainChannel
  */
 class OkHttpStompClient(
-    private val configuration: StompMainChannel.Configuration,
+    private val configuration: OkHttpStompMainChannel.Configuration,
     private val okHttpClient: OkHttpClient,
     private val requestFactory: (Channel) -> ClientOpenRequest,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator = UuidGenerator()
 ) : Protocol {
 
-    override fun createChannelFactory() = StompMainChannel.Factory(
+    override fun createChannelFactory() = OkHttpStompMainChannel.Factory(
         idGenerator = idGenerator,
         configuration = configuration,
         webSocketFactory = object : WebSocketFactory {

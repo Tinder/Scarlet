@@ -1,15 +1,21 @@
-package com.tinder.scarlet.stomp.core
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.client
 
 import com.tinder.scarlet.Channel
 import com.tinder.scarlet.Protocol
-import com.tinder.scarlet.stomp.core.models.StompCommand
-import com.tinder.scarlet.stomp.core.models.StompHeader
-import com.tinder.scarlet.stomp.core.models.StompMessage
-import com.tinder.scarlet.stomp.okhttp.MessageHandler
-import com.tinder.scarlet.stomp.okhttp.OkHttpStompClient
-import com.tinder.scarlet.stomp.okhttp.WebSocketConnection
-import com.tinder.scarlet.stomp.okhttp.WebSocketFactory
-import com.tinder.scarlet.stomp.support.StompHeaderAccessor
+import com.tinder.scarlet.stomp.okhttp.core.Connection
+import com.tinder.scarlet.stomp.okhttp.core.IdGenerator
+import com.tinder.scarlet.stomp.okhttp.core.MessageHandler
+import com.tinder.scarlet.stomp.okhttp.core.StompListener
+import com.tinder.scarlet.stomp.okhttp.core.StompSender
+import com.tinder.scarlet.stomp.okhttp.core.StompSubscriber
+import com.tinder.scarlet.stomp.okhttp.core.WebSocketFactory
+import com.tinder.scarlet.stomp.okhttp.models.StompCommand
+import com.tinder.scarlet.stomp.okhttp.models.StompHeader
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.support.StompHeaderAccessor
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -21,12 +27,13 @@ import kotlin.math.max
  * The main channel, which is responsible for connecting and disconnecting to the stomp server.
  * And also for sending messages and the logic of subscriptions.
  */
-class StompMainChannel(
+class OkHttpStompMainChannel(
     private val configuration: Configuration,
     private val idGenerator: IdGenerator,
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
-) : Channel, StompSender, StompSubscriber {
+) : Channel, StompSender,
+    StompSubscriber {
 
     companion object {
 
@@ -116,8 +123,7 @@ class StompMainChannel(
     }
 
     override fun unsubscribe(destination: String) {
-        val subscriptionId = topicIds.remove(destination)
-                ?: throw IllegalStateException("Unknown destination=$destination")
+        val subscriptionId = topicIds.remove(destination) ?: return
 
         val stompHeaders = StompHeaderAccessor.of()
             .apply { this.subscriptionId = subscriptionId }
@@ -161,7 +167,7 @@ class StompMainChannel(
             connection?.onReceiveInactivity(interval) {
                 sendErrorMessage("No messages received in $interval ms.")
                 connection?.close()
-                listener.onFailed(this@StompMainChannel, true, null)
+                listener.onFailed(this@OkHttpStompMainChannel, true, null)
             }
         }
     }
@@ -191,8 +197,8 @@ class StompMainChannel(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             val webSocketConnection = WebSocketConnection(webSocket)
 
-            this@StompMainChannel.connection = webSocketConnection
-            this@StompMainChannel.messageHandler = webSocketConnection
+            this@OkHttpStompMainChannel.connection = webSocketConnection
+            this@OkHttpStompMainChannel.messageHandler = webSocketConnection
 
             val host = configuration.host
             val login = openRequest.login
@@ -210,17 +216,17 @@ class StompMainChannel(
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosing(this@StompMainChannel)
+            listener.onClosing(this@OkHttpStompMainChannel)
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosed(this@StompMainChannel)
-            this@StompMainChannel.connection = null
+            listener.onClosed(this@OkHttpStompMainChannel)
+            this@OkHttpStompMainChannel.connection = null
         }
 
         override fun onFailure(webSocket: WebSocket, throwable: Throwable, response: Response?) {
-            listener.onFailed(this@StompMainChannel, true, throwable)
-            this@StompMainChannel.connection = null
+            listener.onFailed(this@OkHttpStompMainChannel, true, throwable)
+            this@OkHttpStompMainChannel.connection = null
         }
     }
 
@@ -228,7 +234,8 @@ class StompMainChannel(
         val stompHeaderAccessor = StompHeaderAccessor.of()
             .apply {
                 this.host = host
-                this.acceptVersion = ACCEPT_VERSION
+                this.acceptVersion =
+                    ACCEPT_VERSION
                 this.login = login
                 this.passcode = passcode
             }
@@ -237,7 +244,7 @@ class StompMainChannel(
         val clientReceiveInterval = configuration.heartbeatReceiveInterval
 
         if (clientSendInterval > 0 && clientReceiveInterval > 0) {
-            stompHeaderAccessor.heartBeat(clientSendInterval, clientReceiveInterval)
+            stompHeaderAccessor.heartBeat = clientSendInterval to clientReceiveInterval
         }
 
         val stompMessage = StompMessage.Builder()
@@ -270,7 +277,7 @@ class StompMainChannel(
             listener: Channel.Listener,
             parent: Channel?
         ): Channel? {
-            return StompMainChannel(
+            return OkHttpStompMainChannel(
                 configuration = configuration,
                 idGenerator = idGenerator,
                 webSocketFactory = webSocketFactory,

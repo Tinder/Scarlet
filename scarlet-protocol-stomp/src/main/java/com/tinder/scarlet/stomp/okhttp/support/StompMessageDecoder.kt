@@ -1,7 +1,10 @@
-package com.tinder.scarlet.stomp.support
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.support
 
-import com.tinder.scarlet.stomp.core.models.StompCommand
-import com.tinder.scarlet.stomp.core.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.models.StompCommand
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
@@ -10,40 +13,36 @@ import java.nio.ByteBuffer
  */
 class StompMessageDecoder {
 
-    fun decode(data: ByteArray): StompMessage {
-        val byteBuffer = ByteBuffer.wrap(data)
+    /**
+     * Decodes the given byte array into a StompMessage.
+     * @param array the array to decode
+     */
+    fun decode(array: ByteArray): StompMessage? {
+        val byteBuffer = ByteBuffer.wrap(array)
         return decode(byteBuffer)
     }
 
-    private fun decode(byteBuffer: ByteBuffer): StompMessage {
+    private fun decode(byteBuffer: ByteBuffer): StompMessage? {
         skipLeadingEol(byteBuffer)
-        val command = readCommand(byteBuffer)
+        val stompCommand = readCommand(byteBuffer) ?: return null
 
-        return if (command.isNotEmpty()) {
-
-            val stompCommand = StompCommand.valueOf(command)
+        return if (stompCommand != StompCommand.HEARTBEAT) {
             val headerAccessor = StompHeaderAccessor.of()
 
-            val payload: ByteArray? = null
-            if (byteBuffer.isNotEmpty()) {
+            val payload = if (byteBuffer.isNotEmpty()) {
                 readHeaders(byteBuffer, headerAccessor)
-                val payload = readPayload(byteBuffer, headerAccessor)
-
-                if (payload != null) {
-                    if (payload.isNotEmpty()) {
-                        if (!stompCommand.isBodyAllowed) {
-                            throw IllegalStateException(stompCommand.toString() + " shouldn't have a payload: length=" + payload.size + ", headers=" + headerAccessor)
-                        }
-                    }
-                } else {
-                    byteBuffer.reset()
-                }
+                readPayloadOrNull(byteBuffer, headerAccessor) ?: return null
+            } else {
+                ByteArray(0)
             }
+
             StompMessage.Builder()
-                .withPayload(payload ?: ByteArray(0))
+                .withHeaders(headerAccessor.createHeader())
+                .withPayload(payload)
                 .create(stompCommand)
         } else {
-            StompMessage.Builder().create(StompCommand.UNKNOWN)
+            StompMessage.Builder()
+                .create(StompCommand.HEARTBEAT)
         }
     }
 
@@ -53,31 +52,40 @@ class StompMessageDecoder {
         }
     }
 
-    private fun readPayload(
+    private fun readPayloadOrNull(
         byteBuffer: ByteBuffer,
         headerAccessor: StompHeaderAccessor
     ): ByteArray? {
         val contentLength = headerAccessor.contentLength
-        if (contentLength != null && contentLength >= 0) {
-            return if (byteBuffer.remaining() > contentLength) {
-                val payload = ByteArray(contentLength)
-                byteBuffer[payload]
-                check(
-                    byteBuffer.get().toInt() == 0
-                ) { "Frame must be terminated with a null octet" }
-                payload
-            } else {
-                null
-            }
+        return if (contentLength != null && contentLength >= 0) {
+            readPayloadWithContentLength(byteBuffer, contentLength)
         } else {
-            val payload = ByteArrayOutputStream(256)
-            while (byteBuffer.remaining() > 0) {
-                val b = byteBuffer.get()
-                if (b.toInt() == 0) {
-                    return payload.toByteArray()
-                } else {
-                    payload.write(b.toInt())
-                }
+            readPayloadWithoutContentLength(byteBuffer)
+        }
+    }
+
+    private fun readPayloadWithContentLength(
+        byteBuffer: ByteBuffer,
+        contentLength: Int
+    ) = byteBuffer
+        .takeIf { buffer -> buffer.remaining() > contentLength }
+        ?.let { buffer ->
+            val payload = ByteArray(contentLength)
+            buffer.get(payload)
+
+            val lastSymbolIsNullOctet = byteBuffer.get().toInt() == 0
+            check(lastSymbolIsNullOctet) { "Frame must be terminated with a null octet" }
+            payload
+        }
+
+    private fun readPayloadWithoutContentLength(byteBuffer: ByteBuffer): ByteArray? {
+        val payload = ByteArrayOutputStream(256)
+        while (byteBuffer.isNotEmpty()) {
+            val byte = byteBuffer.get()
+            if (byte.toInt() != 0) {
+                payload.write(byte.toInt())
+            } else {
+                return payload.toByteArray()
             }
         }
         return null
@@ -87,6 +95,7 @@ class StompMessageDecoder {
         while (true) {
             val headerStream = ByteArrayOutputStream(256)
             var headerComplete = false
+
             while (byteBuffer.hasRemaining()) {
                 if (tryConsumeEndOfLine(byteBuffer)) {
                     headerComplete = true
@@ -94,15 +103,18 @@ class StompMessageDecoder {
                 }
                 headerStream.write(byteBuffer.get().toInt())
             }
+
             if (headerStream.size() > 0 && headerComplete) {
-                val header = String(headerStream.toByteArray(), Charsets.UTF_8)
+                val header = headerStream.toByteArray().toString(Charsets.UTF_8)
                 val colonIndex = header.indexOf(':')
-                if (colonIndex <= 0) {
-                    if (byteBuffer.isNotEmpty()) throw IllegalStateException("Illegal header: '$header'. A header must be of the form <name>:[<value>].")
-                } else {
+
+                if (colonIndex > 0) {
                     val headerName = unescape(header.substring(0, colonIndex))
                     val headerValue = unescape(header.substring(colonIndex + 1))
+
                     headerAccessor[headerName] = headerValue
+                } else {
+                    check(byteBuffer.isEmpty()) { "Illegal header: '$header'. A header must be of the form <name>:[<value>]." }
                 }
             } else {
                 break
@@ -110,12 +122,21 @@ class StompMessageDecoder {
         }
     }
 
-    private fun readCommand(byteBuffer: ByteBuffer): String {
+    private fun readCommand(byteBuffer: ByteBuffer): StompCommand? {
         val command = ByteArrayOutputStream(256)
         while (byteBuffer.isNotEmpty() && !tryConsumeEndOfLine(byteBuffer)) {
             command.write(byteBuffer.get().toInt())
         }
-        return String(command.toByteArray(), Charsets.UTF_8)
+        val commandString = command.toByteArray().toString(Charsets.UTF_8)
+        return try {
+            if (commandString.isNotEmpty()) {
+                StompCommand.valueOf(commandString)
+            } else {
+                StompCommand.HEARTBEAT
+            }
+        } catch (ex: Exception) {
+            null
+        }
     }
 
     /**
@@ -168,4 +189,6 @@ class StompMessageDecoder {
     }
 
     private fun ByteBuffer.isNotEmpty(): Boolean = remaining() > 0
+
+    private fun ByteBuffer.isEmpty(): Boolean = remaining() == 0
 }

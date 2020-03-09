@@ -1,8 +1,11 @@
-package com.tinder.scarlet.stomp.support
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.support
 
-import com.tinder.scarlet.stomp.core.models.StompCommand
-import com.tinder.scarlet.stomp.core.models.StompHeader
-import com.tinder.scarlet.stomp.core.models.StompMessage
+import com.tinder.scarlet.stomp.okhttp.models.StompCommand
+import com.tinder.scarlet.stomp.okhttp.models.StompHeader
+import com.tinder.scarlet.stomp.okhttp.models.StompMessage
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 

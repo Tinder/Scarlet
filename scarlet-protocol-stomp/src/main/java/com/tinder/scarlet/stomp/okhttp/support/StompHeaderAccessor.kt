@@ -1,6 +1,9 @@
-package com.tinder.scarlet.stomp.support
+/*
+ * © 2018 Match Group, LLC.
+ */
+package com.tinder.scarlet.stomp.okhttp.support
 
-import com.tinder.scarlet.stomp.core.models.StompHeader
+import com.tinder.scarlet.stomp.okhttp.models.StompHeader
 
 /**
  * A base for classes providing strongly typed getters and setters as well as
@@ -29,6 +32,14 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
         mutableHeaders[key] = value
     }
 
+    fun putAll(headers: Map<String, String>) {
+        mutableHeaders.putAll(headers)
+    }
+
+    fun message(message: String) {
+        mutableHeaders[STOMP_MESSAGE_HEADER] = message
+    }
+
     var contentLength: Int?
         get() = try {
             mutableHeaders[StompHeader.CONTENT_LENGTH]?.toInt()
@@ -39,13 +50,21 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
             mutableHeaders[StompHeader.CONTENT_LENGTH] = value.toString()
         }
 
-    fun heartBeat(sendInterval: Long, receiveInterval: Long) {
-        mutableHeaders[StompHeader.HEARTBEAT] = "$sendInterval,$receiveInterval"
-    }
+    var heartBeat: Pair<Long, Long>?
+        get() = mutableHeaders[StompHeader.HEARTBEAT]
+            ?.split(",")
+            ?.let { (sendIntervalStr, receiveIntervalStr) ->
+                val sendInterval = sendIntervalStr.toLongOrNull() ?: 0
+                val receiveInterval = receiveIntervalStr.toLongOrNull() ?: 0
 
-    fun putAll(headers: Map<String, String>) {
-        mutableHeaders.putAll(headers)
-    }
+                sendInterval to receiveInterval
+            }
+        set(value) {
+            if (value != null) {
+                val (sendInterval, receiveInterval) = value
+                mutableHeaders[StompHeader.HEARTBEAT] = "$sendInterval,$receiveInterval"
+            }
+        }
 
     var subscriptionId: String?
         get() = mutableHeaders[StompHeader.ID]
@@ -102,10 +121,6 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
                 mutableHeaders[StompHeader.PASSCODE] = value
             }
         }
-
-    fun message(message: String) {
-        mutableHeaders[STOMP_MESSAGE_HEADER] = message
-    }
 
     fun createHeader() = StompHeader(mutableHeaders)
 }
