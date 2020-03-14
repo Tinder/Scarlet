@@ -20,6 +20,9 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
          */
         private const val STOMP_MESSAGE_HEADER = "message"
 
+        fun of(vararg headers: Pair<String, String>): StompHeaderAccessor =
+            StompHeaderAccessor(mapOf(*headers))
+
         fun of(headers: Map<String, String> = emptyMap()): StompHeaderAccessor =
             StompHeaderAccessor(headers)
     }
@@ -52,7 +55,7 @@ class StompHeaderAccessor private constructor(headers: Map<String, String>) {
 
     var heartBeat: Pair<Long, Long>?
         get() = mutableHeaders[StompHeader.HEARTBEAT]
-            ?.split(",")
+            ?.split(',')
             ?.let { (sendIntervalStr, receiveIntervalStr) ->
                 val sendInterval = sendIntervalStr.toLongOrNull() ?: 0
                 val receiveInterval = receiveIntervalStr.toLongOrNull() ?: 0

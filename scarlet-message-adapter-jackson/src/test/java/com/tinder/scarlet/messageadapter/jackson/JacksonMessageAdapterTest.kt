@@ -58,7 +58,7 @@ internal class JacksonMessageAdapterTest {
             any<WebSocketEvent.OnConnectionOpened>(),
             any<WebSocketEvent.OnMessageReceived>().containingText(expectedString)
         )
-        serverAnImplementationObserver.awaitCount(1)
+        serverAnImplementationObserver.awaitCountAndCheck(1)
         assertThat(serverAnImplementationObserver.values).containsExactly(data)
     }
 
@@ -79,7 +79,7 @@ internal class JacksonMessageAdapterTest {
             any<WebSocketEvent.OnConnectionOpened>(),
             any<WebSocketEvent.OnMessageReceived>().containingText(expectedString)
         )
-        serverAnImplementationObserver.awaitCount(1)
+        serverAnImplementationObserver.awaitCountAndCheck(1)
         assertThat(serverAnImplementationObserver.values).containsExactly(data)
     }
 

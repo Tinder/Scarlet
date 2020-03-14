@@ -30,9 +30,7 @@ class OkHttpStompMessageChannel(
                 channel = this,
                 messageQueue = this,
                 message = Message.Text(message.payload.toString(Charsets.UTF_8)),
-                metadata = OkHttpStompDestination.MessageMetaData(
-                    message.headers
-                )
+                metadata = OkHttpStompDestination.MessageMetaData(message.headers)
             )
         }
         listener.onOpened(this)

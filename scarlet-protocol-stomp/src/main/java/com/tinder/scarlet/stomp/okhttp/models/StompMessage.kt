@@ -66,4 +66,14 @@ class StompMessage private constructor(
         result = 31 * result + headers.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "StompMessage(" +
+                "command=$command, " +
+                "payload=${payload.toString(Charsets.UTF_8)}, " +
+                "headers=$headers" +
+                ")"
+    }
+
+
 }

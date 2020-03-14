@@ -45,8 +45,7 @@ class StompMessageEncoderTest {
 
     @Test
     fun `encode frame with headers that should be escaped`() {
-        val headers = StompHeaderAccessor.of()
-            .apply { putAll(mapOf("a:\r\n\\b" to "alpha:bravo\r\n\\")) }
+        val headers = StompHeaderAccessor.of("a:\r\n\\b" to "alpha:bravo\r\n\\")
             .createHeader()
 
         val frame = StompMessage.Builder()
@@ -62,8 +61,7 @@ class StompMessageEncoderTest {
 
     @Test
     fun `encode frame with headers body`() {
-        val headers = StompHeaderAccessor.of().apply {
-            putAll(mapOf("a" to "alpha"))
+        val headers = StompHeaderAccessor.of(("a" to "alpha")).apply {
             destination = "destination"
         }.createHeader()
 

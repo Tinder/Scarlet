@@ -25,14 +25,20 @@ class TestStreamObserver<out T : Any>(stream: Stream<T>) {
     val completions: Long
         get() = testSubscriber.completions()
 
-    fun awaitCount(exactly: Int) {
+    fun awaitCountAndCheck(exactly: Int) {
         testSubscriber.assertNoErrors()
         testSubscriber.awaitCount(exactly)
         assertThat(values).describedAs("values: $values").hasSize(exactly)
     }
 
+    fun awaitCountAtLeast(atLeast: Int) {
+        testSubscriber.assertNoErrors()
+        testSubscriber.awaitCount(atLeast)
+        assertThat(values).isNotEmpty
+    }
+
     fun awaitValues(vararg valueAsserts: ValueAssert<Any>) {
-        awaitCount(valueAsserts.size)
+        awaitCountAndCheck(valueAsserts.size)
         testSubscriber.assertNoErrors()
         valueAsserts.zip(values).forEachIndexed { index, (valueAssert, value) ->
             try {

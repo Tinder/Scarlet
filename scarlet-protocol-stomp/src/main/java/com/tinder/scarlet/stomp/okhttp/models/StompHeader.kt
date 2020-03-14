@@ -102,7 +102,11 @@ class StompHeader(
     val heartBeat: Pair<Long, Long>
         get() {
             val heartBeat = headers[HEARTBEAT] ?: return 0L to 0L
-            val (sendInterval, receiveInterval) = heartBeat.split(",")
+            val (sendInterval, receiveInterval) = heartBeat.split(',')
             return sendInterval.toLong() to receiveInterval.toLong()
         }
+
+    override fun toString(): String {
+        return "StompHeader(headers=$headers)"
+    }
 }

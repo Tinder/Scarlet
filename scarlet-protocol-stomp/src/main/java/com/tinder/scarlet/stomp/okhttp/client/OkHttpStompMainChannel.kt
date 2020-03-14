@@ -32,8 +32,7 @@ class OkHttpStompMainChannel(
     private val idGenerator: IdGenerator,
     private val webSocketFactory: WebSocketFactory,
     private val listener: Channel.Listener
-) : Channel, StompSender,
-    StompSubscriber {
+) : Channel, StompSender, StompSubscriber {
 
     companion object {
 
@@ -59,10 +58,7 @@ class OkHttpStompMainChannel(
     }
 
     override fun forceClose() {
-        topicIds.clear()
-        subscriptions.clear()
-
-        sendDisconnectMessage()
+        disconnect()
         connection?.forceClose()
 
         connection = null
@@ -70,10 +66,7 @@ class OkHttpStompMainChannel(
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
-        topicIds.clear()
-        subscriptions.clear()
-
-        sendDisconnectMessage()
+        disconnect()
         connection?.close()
 
         connection = null
@@ -147,7 +140,11 @@ class OkHttpStompMainChannel(
                 val listener = subscriptions[destination]
                 listener?.invoke(stompMessage)
             }
-        StompCommand.ERROR -> listener.onFailed(this, true, null)
+        StompCommand.ERROR -> listener.onFailed(
+            this,
+            configuration.shouldRetryAfterError,
+            null
+        )
         else -> Unit // not a server message
     }
 
@@ -191,9 +188,10 @@ class OkHttpStompMainChannel(
         connection?.sendMessage(stompMessage)
     }
 
-    inner class InnerWebSocketListener(
+    private inner class InnerWebSocketListener(
         private val openRequest: OkHttpStompClient.ClientOpenRequest
     ) : WebSocketListener() {
+
         override fun onOpen(webSocket: WebSocket, response: Response) {
             val webSocketConnection = WebSocketConnection(webSocket)
 
@@ -225,7 +223,11 @@ class OkHttpStompMainChannel(
         }
 
         override fun onFailure(webSocket: WebSocket, throwable: Throwable, response: Response?) {
-            listener.onFailed(this@OkHttpStompMainChannel, true, throwable)
+            listener.onFailed(
+                this@OkHttpStompMainChannel,
+                configuration.shouldRetryAfterError,
+                throwable
+            )
             this@OkHttpStompMainChannel.connection = null
         }
     }
@@ -234,17 +236,13 @@ class OkHttpStompMainChannel(
         val stompHeaderAccessor = StompHeaderAccessor.of()
             .apply {
                 this.host = host
-                this.acceptVersion =
-                    ACCEPT_VERSION
+                this.acceptVersion = ACCEPT_VERSION
                 this.login = login
                 this.passcode = passcode
             }
 
-        val clientSendInterval = configuration.heartbeatSendInterval
-        val clientReceiveInterval = configuration.heartbeatReceiveInterval
-
-        if (clientSendInterval > 0 && clientReceiveInterval > 0) {
-            stompHeaderAccessor.heartBeat = clientSendInterval to clientReceiveInterval
+        if (configuration.shouldSendHeartBeat) {
+            stompHeaderAccessor.heartBeat = configuration.headerBeatPair
         }
 
         val stompMessage = StompMessage.Builder()
@@ -252,6 +250,15 @@ class OkHttpStompMainChannel(
             .create(StompCommand.CONNECT)
 
         connection?.sendMessage(stompMessage)
+    }
+
+    private fun disconnect() {
+        subscriptions.keys.forEach(::unsubscribe)
+
+        topicIds.clear()
+        subscriptions.clear()
+
+        sendDisconnectMessage()
     }
 
     private fun sendDisconnectMessage() {
@@ -263,9 +270,17 @@ class OkHttpStompMainChannel(
 
     data class Configuration(
         val host: String,
+        val shouldRetryAfterError: Boolean = true,
         val heartbeatSendInterval: Long = 0,
         val heartbeatReceiveInterval: Long = 0
-    )
+    ) {
+
+        val shouldSendHeartBeat: Boolean
+            get() = heartbeatSendInterval > 0 && heartbeatReceiveInterval > 0
+
+        val headerBeatPair: Pair<Long, Long>
+            get() = heartbeatSendInterval to heartbeatReceiveInterval
+    }
 
     class Factory(
         private val idGenerator: IdGenerator,
