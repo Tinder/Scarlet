@@ -25,5 +25,8 @@ dependencies {
     testImplementation rootProject.ext.activeMqJUnit
     testImplementation rootProject.ext.activeMqBroker
     testImplementation rootProject.ext.activeMqStomp
+    testImplementation rootProject.ext.activeHttp
     testImplementation rootProject.ext.slf4jSimple
+
+    testImplementation "javax.servlet:javax.servlet-api:4.0.1"
 }
