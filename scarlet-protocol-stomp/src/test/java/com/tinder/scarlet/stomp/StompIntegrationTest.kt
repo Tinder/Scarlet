@@ -10,6 +10,7 @@ import com.tinder.scarlet.testutils.rule.GozirraStompConnection
 import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
+import org.apache.activemq.command.ActiveMQDestination
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
 import org.apache.activemq.transport.stomp.StompConnection
 import org.junit.Rule
@@ -20,6 +21,8 @@ class StompIntegrationTest {
     @get:Rule
     val broker = object : EmbeddedActiveMQBroker() {
         override fun configure() {
+            val destination = ActiveMQDestination.createDestination(SERVER_DESTINATION, 0)
+            brokerService.destinations = arrayOf(destination)
             brokerService.addConnector(BROKER_URL)
         }
     }
@@ -31,7 +34,7 @@ class StompIntegrationTest {
             PORT,
             LOGIN,
             PASSWORD,
-            DESTINATION
+            CLIENT_DESTINATION
         )
     )
     @get:Rule
@@ -42,7 +45,7 @@ class StompIntegrationTest {
             PORT,
             LOGIN,
             PASSWORD,
-            DESTINATION
+            CLIENT_DESTINATION
         )
     )
 
@@ -58,7 +61,7 @@ class StompIntegrationTest {
         connection2.open()
 
         LOGGER.info("${queueTextObserver.values}")
-        queueTextObserver.awaitCountAtLeast(1) // because broker has a bug and it loses messages sometimes
+        queueTextObserver.awaitCountAndCheck(2)
     }
 
     @Test
@@ -73,8 +76,8 @@ class StompIntegrationTest {
             PASSWORD
         )
         connection1.begin("tx1")
-        connection1.send(DESTINATION, "message1", "tx1", null)
-        connection1.send(DESTINATION, "message2", "tx1", null)
+        connection1.send(CLIENT_DESTINATION, "message1", "tx1", null)
+        connection1.send(CLIENT_DESTINATION, "message2", "tx1", null)
         connection1.commit("tx1")
         connection1.disconnect()
 
@@ -95,7 +98,8 @@ class StompIntegrationTest {
         private const val LOGIN = "system"
         private const val PASSWORD = "manager"
         private const val BROKER_URL = "stomp://$HOST:$PORT"
-        private const val DESTINATION = "/queue/test"
+        private const val SERVER_DESTINATION = "queue://test"
+        private const val CLIENT_DESTINATION = "/queue/test"
 
         interface StompQueueTestService {
             @Receive

@@ -6,6 +6,8 @@ import com.tinder.scarlet.testutils.rule.OkHttpStompWebSocketConnection
 import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
+import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy.SLEEP_100MS
+import org.apache.activemq.command.ActiveMQDestination
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
 import org.junit.Rule
 import org.junit.Test
@@ -16,6 +18,8 @@ class OkHttpStompIntegrationTest {
     @get:Rule
     val broker = object : EmbeddedActiveMQBroker() {
         override fun configure() {
+            val destination = ActiveMQDestination.createDestination(SERVER_DESTINATION, 0)
+            brokerService.destinations = arrayOf(destination)
             brokerService.addConnector(BROKER_URL)
         }
     }
@@ -28,7 +32,7 @@ class OkHttpStompIntegrationTest {
             port = PORT,
             password = PASSWORD,
             host = HOST,
-            destination = DESTINATION
+            destination = CLIENT_DESTINATION
         )
     )
 
@@ -40,7 +44,7 @@ class OkHttpStompIntegrationTest {
             port = PORT,
             password = PASSWORD,
             host = HOST,
-            destination = DESTINATION
+            destination = CLIENT_DESTINATION
         )
     )
 
@@ -51,13 +55,13 @@ class OkHttpStompIntegrationTest {
         firstConnection.open()
         secondConnection.open()
 
-        firstConnection.client.sendText("message1")
-        firstConnection.client.sendText("message2")
+        for (index in 0 until 9) {
+            firstConnection.client.sendText("message $index")
+        }
         firstConnection.clientClosure()
 
         LOGGER.info("${queueTextObserver.values}")
-        queueTextObserver.awaitCountAtLeast(1)// because broker has a bug and it loses messages sometimes
-
+        queueTextObserver.awaitCountAndCheck(9, SLEEP_100MS)
         secondConnection.clientClosure()
     }
 
@@ -65,11 +69,12 @@ class OkHttpStompIntegrationTest {
         private val LOGGER = Logger.getLogger(OkHttpStompIntegrationTest::class.java.name)
 
         private const val HOST = "localhost"
-        private const val PORT = 34343
+        private const val PORT = 61613
         private const val LOGIN = "system"
         private const val PASSWORD = "manager"
         private const val BROKER_URL = "ws://$HOST:$PORT"
-        private const val DESTINATION = "/queue/test"
+        private const val SERVER_DESTINATION = "topic://queue_test"
+        private const val CLIENT_DESTINATION = "/topic/test"
 
         interface StompOkHttpQueueTestService {
             @Receive

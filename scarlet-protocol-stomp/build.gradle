@@ -12,6 +12,7 @@ dependencies {
 
     implementation project(':scarlet-core-internal')
     implementation rootProject.ext.rxJava
+    implementation rootProject.ext.okio
     implementation rootProject.ext.kotlinStdlib
 
     api rootProject.ext.okHttp

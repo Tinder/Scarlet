@@ -10,13 +10,15 @@ import com.tinder.scarlet.stomp.okhttp.support.StompMessageDecoder
 import com.tinder.scarlet.stomp.okhttp.support.StompMessageEncoder
 import okhttp3.WebSocket
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 /**
  * Okhttp websocket based implementation of {@link Connection}.
  */
 class WebSocketConnection(
-    private val webSocket: WebSocket
+    private val webSocket: WebSocket,
+    private val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 ) : Connection, MessageHandler {
 
     @Volatile
@@ -24,8 +26,6 @@ class WebSocketConnection(
 
     @Volatile
     private var lastWriteTime: Long = -1
-
-    private val executor = Executors.newSingleThreadScheduledExecutor()
 
     private val messageEncoder = StompMessageEncoder()
     private val messageDecoder = StompMessageDecoder()
@@ -42,34 +42,36 @@ class WebSocketConnection(
     override fun sendMessage(message: StompMessage): Boolean {
         val lastWriteTime = lastWriteTime
         if (lastWriteTime != -1L) {
-            this.lastWriteTime = System.currentTimeMillis()
+            this.lastWriteTime = System.nanoTime()
         }
-        val encodedMessage = messageEncoder.encode(message)
-        return webSocket.send(String(encodedMessage))
+        val encodedMessage = messageEncoder.encode(message).toString(Charsets.UTF_8)
+        return webSocket.send(encodedMessage)
     }
 
     /**
      * {@inheritDoc}
      */
     override fun onReceiveInactivity(duration: Long, runnable: () -> Unit) {
-        lastReadTime = System.currentTimeMillis()
+        check(duration > 0) { "Duration must be more than 0" }
+        lastReadTime = System.nanoTime()
         executor.scheduleWithFixedDelay({
-            if (System.currentTimeMillis() - lastReadTime > duration) {
+            if ((System.nanoTime() - lastReadTime) > TimeUnit.MILLISECONDS.toNanos(duration)) {
                 runnable.invoke()
             }
-        }, 0, duration / 2, TimeUnit.MILLISECONDS)
+        }, 0, duration / 2L, TimeUnit.MILLISECONDS)
     }
 
     /**
      * {@inheritDoc}
      */
     override fun onWriteInactivity(duration: Long, runnable: () -> Unit) {
-        lastWriteTime = System.currentTimeMillis()
+        check(duration > 0) { "Duration must be more than 0" }
+        lastWriteTime = System.nanoTime()
         executor.scheduleWithFixedDelay({
-            if (System.currentTimeMillis() - lastWriteTime > duration) {
+            if ((System.nanoTime() - lastWriteTime) > TimeUnit.MILLISECONDS.toNanos(duration)) {
                 runnable.invoke()
             }
-        }, 0, duration / 2, TimeUnit.MILLISECONDS)
+        }, 0, duration / 2L, TimeUnit.MILLISECONDS)
     }
 
     /**
@@ -94,7 +96,7 @@ class WebSocketConnection(
     override fun handle(data: ByteArray): StompMessage? {
         val lastReadTime = lastReadTime
         if (lastReadTime != -1L) {
-            this.lastReadTime = System.currentTimeMillis()
+            this.lastReadTime = System.nanoTime()
         }
         return messageDecoder.decode(data)
     }

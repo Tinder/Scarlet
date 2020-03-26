@@ -55,7 +55,7 @@ ext {
     okHttpServerSentEvent = "com.squareup.okhttp3:okhttp-sse:$okHttpVersion"
     okHttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
 
-    okio = 'com.squareup.okio:okio:1.13.0'
+    okio = 'com.squareup.okio:okio:2.5.0'
     mockWebServer = 'com.squareup.okhttp3:mockwebserver:3.11.0'
     timber = 'com.jakewharton.timber:timber:4.6.0'
     okSse = 'com.github.heremaps:oksse:0.9.0'

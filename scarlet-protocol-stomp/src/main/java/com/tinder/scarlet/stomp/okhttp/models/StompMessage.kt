@@ -74,6 +74,4 @@ class StompMessage private constructor(
                 "headers=$headers" +
                 ")"
     }
-
-
 }

@@ -46,7 +46,7 @@ class OkHttpStompMessageChannel(
     }
 
     override fun createMessageQueue(listener: MessageQueue.Listener): MessageQueue {
-        require(messageQueueListener == null)
+        require(messageQueueListener == null) { "message queue was already created" }
         messageQueueListener = listener
         return this
     }

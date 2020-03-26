@@ -5,8 +5,10 @@ package com.tinder.scarlet.stomp.okhttp.support
 
 import com.tinder.scarlet.stomp.okhttp.models.StompCommand
 import com.tinder.scarlet.stomp.okhttp.models.StompMessage
+import okio.BufferedSource
+import okio.buffer
+import okio.source
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 
 /**
  * An decoder for STOMP frames.
@@ -18,18 +20,18 @@ class StompMessageDecoder {
      * @param array the array to decode
      */
     fun decode(array: ByteArray): StompMessage? {
-        val byteBuffer = ByteBuffer.wrap(array)
-        return decode(byteBuffer)
+        val buffer = array.inputStream().source().buffer()
+        return decode(buffer)
     }
 
-    private fun decode(byteBuffer: ByteBuffer): StompMessage? {
+    fun decode(byteBuffer: BufferedSource): StompMessage? {
         skipLeadingEol(byteBuffer)
         val stompCommand = readCommand(byteBuffer) ?: return null
 
         return if (stompCommand != StompCommand.HEARTBEAT) {
             val headerAccessor = StompHeaderAccessor.of()
 
-            val payload = if (byteBuffer.isNotEmpty()) {
+            val payload = if (!byteBuffer.exhausted()) {
                 readHeaders(byteBuffer, headerAccessor)
                 readPayloadOrNull(byteBuffer, headerAccessor) ?: return null
             } else {
@@ -46,44 +48,46 @@ class StompMessageDecoder {
         }
     }
 
-    private fun skipLeadingEol(byteBuffer: ByteBuffer) {
+    private fun skipLeadingEol(byteBuffer: BufferedSource) {
         while (true) {
             if (!tryConsumeEndOfLine(byteBuffer)) break
         }
     }
 
     private fun readPayloadOrNull(
-        byteBuffer: ByteBuffer,
+        bufferedSource: BufferedSource,
         headerAccessor: StompHeaderAccessor
     ): ByteArray? {
         val contentLength = headerAccessor.contentLength
         return if (contentLength != null && contentLength >= 0) {
-            readPayloadWithContentLength(byteBuffer, contentLength)
+            readPayloadWithContentLength(bufferedSource, contentLength)
         } else {
-            readPayloadWithoutContentLength(byteBuffer)
+            readPayloadWithoutContentLength(bufferedSource)
         }
     }
 
     private fun readPayloadWithContentLength(
-        byteBuffer: ByteBuffer,
+        bufferedSource: BufferedSource,
         contentLength: Int
-    ) = byteBuffer
-        .takeIf { buffer -> buffer.remaining() > contentLength }
-        ?.let { buffer ->
-            val payload = ByteArray(contentLength)
-            buffer.get(payload)
+    ): ByteArray? {
+        if (bufferedSource.exhausted()) return null
 
-            val lastSymbolIsNullOctet = byteBuffer.get().toInt() == 0
-            check(lastSymbolIsNullOctet) { "Frame must be terminated with a null octet" }
-            payload
-        }
+        val payload = ByteArray(contentLength)
+        bufferedSource.read(payload)
 
-    private fun readPayloadWithoutContentLength(byteBuffer: ByteBuffer): ByteArray? {
+        if (bufferedSource.exhausted()) return null
+        val lastSymbolIsNullOctet = bufferedSource.readUtf8CodePoint() == 0
+        check(lastSymbolIsNullOctet) { "Frame must be terminated with a null octet" }
+
+        return payload
+    }
+
+    private fun readPayloadWithoutContentLength(buffer: BufferedSource): ByteArray? {
         val payload = ByteArrayOutputStream(256)
-        while (byteBuffer.isNotEmpty()) {
-            val byte = byteBuffer.get()
-            if (byte.toInt() != 0) {
-                payload.write(byte.toInt())
+        while (!buffer.exhausted()) {
+            val codePoint = buffer.readUtf8CodePoint()
+            if (codePoint != 0) {
+                payload.write(codePoint)
             } else {
                 return payload.toByteArray()
             }
@@ -91,17 +95,17 @@ class StompMessageDecoder {
         return null
     }
 
-    private fun readHeaders(byteBuffer: ByteBuffer, headerAccessor: StompHeaderAccessor) {
+    private fun readHeaders(byteBuffer: BufferedSource, headerAccessor: StompHeaderAccessor) {
         while (true) {
             val headerStream = ByteArrayOutputStream(256)
             var headerComplete = false
 
-            while (byteBuffer.hasRemaining()) {
+            while (!byteBuffer.exhausted()) {
                 if (tryConsumeEndOfLine(byteBuffer)) {
                     headerComplete = true
                     break
                 }
-                headerStream.write(byteBuffer.get().toInt())
+                headerStream.write(byteBuffer.readUtf8CodePoint())
             }
 
             if (headerStream.size() > 0 && headerComplete) {
@@ -114,7 +118,7 @@ class StompMessageDecoder {
 
                     headerAccessor[headerName] = headerValue
                 } else {
-                    check(byteBuffer.isEmpty()) { "Illegal header: '$header'. A header must be of the form <name>:[<value>]." }
+                    check(byteBuffer.exhausted()) { "Illegal header: '$header'. A header must be of the form <name>:[<value>]." }
                 }
             } else {
                 break
@@ -122,10 +126,10 @@ class StompMessageDecoder {
         }
     }
 
-    private fun readCommand(byteBuffer: ByteBuffer): StompCommand? {
+    private fun readCommand(byteBuffer: BufferedSource): StompCommand? {
         val command = ByteArrayOutputStream(256)
-        while (byteBuffer.isNotEmpty() && !tryConsumeEndOfLine(byteBuffer)) {
-            command.write(byteBuffer.get().toInt())
+        while (!byteBuffer.exhausted() && !tryConsumeEndOfLine(byteBuffer)) {
+            command.write(byteBuffer.readUtf8CodePoint())
         }
         val commandString = command.toByteArray().toString(Charsets.UTF_8)
         return try {
@@ -143,18 +147,24 @@ class StompMessageDecoder {
      * Try to read an EOL incrementing the buffer position if successful.
      * @return whether an EOL was consumed
      */
-    private fun tryConsumeEndOfLine(byteBuffer: ByteBuffer): Boolean = byteBuffer
-        .takeIf { buffer -> buffer.isNotEmpty() }
-        ?.let { buffer ->
-            when (byteBuffer.get()) {
-                '\n'.toByte() -> true
-                '\r'.toByte() -> checkSequence(byteBuffer)
-                else -> {
-                    buffer.position(buffer.position() - 1)
-                    false
-                }
+    private fun tryConsumeEndOfLine(bufferedSource: BufferedSource): Boolean {
+        if (bufferedSource.exhausted()) return false
+        val peekSource = bufferedSource.peek()
+
+        return when (peekSource.readUtf8CodePoint().toChar()) {
+            '\n' -> {
+                bufferedSource.skip(1)
+                true
             }
-        } ?: false
+            '\r' -> {
+                val nextChartIsNewLine = peekSource.readUtf8CodePoint().toChar() == '\n'
+                check(!peekSource.exhausted() && nextChartIsNewLine) { "'\\r' must be followed by '\\n'" }
+                bufferedSource.skip(2)
+                true
+            }
+            else -> false
+        }
+    }
 
     /**
      * See STOMP Spec 1.2:
@@ -181,14 +191,4 @@ class StompMessageDecoder {
         stringBuilder.append(inString.substring(pos))
         return stringBuilder.toString()
     }
-
-    private fun checkSequence(byteBuffer: ByteBuffer): Boolean {
-        val nextChartIsNewLine = byteBuffer.get() == '\n'.toByte()
-        check(byteBuffer.remaining() > 0 && nextChartIsNewLine) { "'\\r' must be followed by '\\n'" }
-        return true
-    }
-
-    private fun ByteBuffer.isNotEmpty(): Boolean = remaining() > 0
-
-    private fun ByteBuffer.isEmpty(): Boolean = remaining() == 0
 }
