@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.core.Observable
 import java.lang.reflect.Type
 
 /**
- * A [stream adapter factory][StreamAdapter.Factory] that uses RxJava2.
+ * A [stream adapter factory][StreamAdapter.Factory] that uses RxJava3.
  */
 class RxJava3StreamAdapterFactory : StreamAdapter.Factory {
 
