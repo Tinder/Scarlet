@@ -1,0 +1,16 @@
+apply plugin: 'com.vanniktech.maven.publish'
+apply plugin: 'kotlin'
+apply plugin: 'java-library'
+
+dependencies {
+    api rootProject.ext.rxJava3
+
+    implementation project(':scarlet-core')
+    implementation rootProject.ext.kotlinStdlib
+
+    testImplementation project(':scarlet-test-utils')
+    testImplementation rootProject.ext.junit
+    testImplementation rootProject.ext.mockito
+    testImplementation rootProject.ext.kotlinReflect
+    testImplementation rootProject.ext.assertJ
+}
