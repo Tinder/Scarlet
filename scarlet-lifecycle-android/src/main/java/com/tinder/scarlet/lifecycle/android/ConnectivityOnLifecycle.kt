@@ -4,6 +4,7 @@
 
 package com.tinder.scarlet.lifecycle.android
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,11 +13,14 @@ import android.net.ConnectivityManager
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import java.lang.Exception
 
 internal class ConnectivityOnLifecycle(
-    applicationContext: Context,
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry()
+        private val applicationContext: Context,
+        private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry()
 ) : Lifecycle by lifecycleRegistry {
+
+    private val connectivityChangeBroadcastReceiver = ConnectivityChangeBroadcastReceiver()
 
     init {
         emitCurrentConnectivity(applicationContext)
@@ -25,16 +29,16 @@ internal class ConnectivityOnLifecycle(
 
     private fun emitCurrentConnectivity(applicationContext: Context) {
         val connectivityManager =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         lifecycleRegistry.onNext(toLifecycleState(connectivityManager.isConnected()))
     }
 
     private fun subscribeToConnectivityChange(applicationContext: Context) {
-        val intentFilter = IntentFilter()
-            .apply { addAction(ConnectivityManager.CONNECTIVITY_ACTION) }
-        applicationContext.registerReceiver(ConnectivityChangeBroadcastReceiver(), intentFilter)
+        val intentFilter = IntentFilter().apply { addAction(ConnectivityManager.CONNECTIVITY_ACTION) }
+        applicationContext.registerReceiver(connectivityChangeBroadcastReceiver, intentFilter)
     }
 
+    @SuppressLint("MissingPermission")
     private fun ConnectivityManager.isConnected(): Boolean {
         val activeNetworkInfo = activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting
@@ -46,6 +50,13 @@ internal class ConnectivityOnLifecycle(
         LifecycleState.Stopped
     }
 
+    fun unregisterReceiver() {
+        try {
+            applicationContext.unregisterReceiver(connectivityChangeBroadcastReceiver)
+        } catch (e: Exception) {
+        }
+    }
+
     private inner class ConnectivityChangeBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras ?: return
@@ -54,3 +65,4 @@ internal class ConnectivityOnLifecycle(
         }
     }
 }
+

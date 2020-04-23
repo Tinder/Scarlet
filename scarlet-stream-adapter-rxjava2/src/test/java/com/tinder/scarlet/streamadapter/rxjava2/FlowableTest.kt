@@ -38,8 +38,8 @@ internal class FlowableTest {
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
         // Given
         connection.open()
-        val textMessage1 = "Hello"
-        val textMessage2 = "Hi"
+        val textMessage1 = "Hello!"
+        val textMessage2 = "Hi!"
         val bytesMessage1 = "Yo".toByteArray()
         val bytesMessage2 = "Sup".toByteArray()
         val testTextSubscriber = connection.server.observeText().test()

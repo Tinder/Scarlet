@@ -12,28 +12,27 @@ import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
 internal class LifecycleOwnerStartedLifecycle(
-    private val lifecycleOwner: LifecycleOwner,
-    private val lifecycleRegistry: LifecycleRegistry
-) : Lifecycle by lifecycleRegistry {
+        private val lifecycleOwner: LifecycleOwner,
+        private val lifecycleRegistry: LifecycleRegistry
+) : LifecycleObserver, Lifecycle by lifecycleRegistry {
 
     init {
-        lifecycleOwner.lifecycle.addObserver(ALifecycleObserver())
+        lifecycleOwner.lifecycle.addObserver(this)
     }
 
-    private inner class ALifecycleObserver : LifecycleObserver {
-        @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_STOP)
-        fun onPause() {
-            lifecycleRegistry.onNext(LifecycleState.Stopped)
-        }
+    @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_STOP)
+    fun onPause() {
+        lifecycleRegistry.onNext(LifecycleState.Stopped)
+    }
 
-        @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_START)
-        fun onResume() {
-            lifecycleRegistry.onNext(LifecycleState.Started)
-        }
+    @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_START)
+    fun onResume() {
+        lifecycleRegistry.onNext(LifecycleState.Started)
+    }
 
-        @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
-        fun onDestroy() {
-            lifecycleRegistry.onComplete()
-        }
+    @OnLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
+    fun onDestroy() {
+        lifecycleRegistry.onComplete()
+        lifecycleOwner.lifecycle.removeObserver(this)
     }
 }
