@@ -21,7 +21,7 @@ If you open a command window you can use:
 ```
 ngrok http 8080
 ```
-Now you have access to our computer from the web. You will use the http address given but, you will have to switch protocol (you just need to change http:// with wss://). \
+Now you have access to your computer from the web. You will use the http address given but, you will have to switch protocol (you just need to change http:// with wss://). \
 Your server is good to go :)
 ## Setup Android app
 Before starting our app remember to change the BASE_URL (with: wss://your_ngrok_http.ngrok.io) in network.MyWebSocketAPI file. \
