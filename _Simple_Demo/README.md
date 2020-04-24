@@ -10,7 +10,7 @@ To follow this guide you need to know:
 - Create a ngrok account and install the program on your computer (https://dashboard.ngrok.com/signup)
 ## Description
 This is a really simple app: we create a connection with our own server and we send and receive messages after having established a connection.
-![](/img/Global_understanding.png)
+![](/_Simple_Demo/img/Global_understanding.PNG)
 ## Setup server
 In \_Simple\_Demo folder you find simple_server. \
 Using nodejs you can launch the script server.js: 
