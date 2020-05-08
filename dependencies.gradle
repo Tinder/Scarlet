@@ -53,7 +53,7 @@ ext.versions = [
 ]
 
 ext.libs = [
-    android = "org.robolectric:android-all:$versions.android",
+    android: "org.robolectric:android-all:$versions.android",
 
     appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
     material: "com.google.android.material:material:$versions.material",
