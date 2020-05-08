@@ -5,7 +5,7 @@ ext.versions = [
     compileSdkVersion: 28,
     buildToolsVersion: "28.0.3",
 
-    android = 'org.robolectric:android-all:9-robolectric-4913185-2',
+    android: '9-robolectric-4913185-2',
 
     appCompat: '1.0.0',
     material: '1.0.0',
@@ -53,6 +53,8 @@ ext.versions = [
 ]
 
 ext.libs = [
+    android = "org.robolectric:android-all:$versions.android",
+
     appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
     material: "com.google.android.material:material:$versions.material",
     multiDex: "androidx.multidex:multidex:$versions.multiDex",
