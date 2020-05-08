@@ -9,7 +9,7 @@ dependencies {
     implementation project(':scarlet-core-internal')
     implementation libs.rxJava
     implementation libs.kotlin.stdlib
-    compileOnly rootProject.ext.android
+    compileOnly libs.android
 
     testImplementation project(':scarlet')
     testImplementation project(':scarlet-websocket-mockwebserver')
