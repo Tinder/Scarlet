@@ -7,12 +7,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
         applicationId "com.tinder.scarlet"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -36,26 +36,26 @@ dependencies {
     implementation project(':scarlet-message-adapter-protobuf')
     implementation project(':scarlet-stream-adapter-rxjava2')
 
-    implementation rootProject.ext.appCompat
-    implementation rootProject.ext.material
-    implementation rootProject.ext.multiDex
-    implementation rootProject.ext.constraintLayout
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxAndroid
-    implementation rootProject.ext.rxKotlin
-    implementation rootProject.ext.okHttpLoggingInterceptor
-    implementation rootProject.ext.stetho
-    implementation rootProject.ext.stethoOkHttp
-    implementation rootProject.ext.timber
-    implementation rootProject.ext.jodaTime
-    implementation rootProject.ext.dagger
-    kapt rootProject.ext.daggerCompiler
-    compileOnly rootProject.ext.jsr250Annotations
-    implementation rootProject.ext.kotlinStdlib
-    implementation rootProject.ext.mpAndroidChart
-    implementation rootProject.ext.chatMessageView
-    implementation rootProject.ext.filePicker
-    implementation rootProject.ext.glide
+    implementation libs.appCompat
+    implementation libs.material
+    implementation libs.multiDex
+    implementation libs.constraintLayout
+    implementation libs.rxJava
+    implementation libs.rxAndroid
+    implementation libs.rxKotlin
+    implementation libs.okHttpLoggingInterceptor
+    implementation libs.stetho
+    implementation libs.stethoOkHttp
+    implementation libs.timber
+    implementation libs.jodaTime
+    implementation libs.dagger
+    kapt libs.daggerCompiler
+    compileOnly libs.jsr250Annotations
+    implementation libs.kotlin.stdlib
+    implementation libs.mpAndroidChart
+    implementation libs.chatMessageView
+    implementation libs.filePicker
+    implementation libs.glide
 
-    testImplementation rootProject.ext.junit
+    testImplementation libs.junit
 }

@@ -4,11 +4,11 @@ apply plugin: 'java-library'
 
 dependencies {
     implementation project(':scarlet-core')
-    implementation rootProject.ext.kotlinStdlib
+    implementation libs.kotlin.stdlib
 
     testImplementation project(':scarlet-test-utils')
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.mockito
-    testImplementation rootProject.ext.kotlinReflect
-    testImplementation rootProject.ext.assertJ
+    testImplementation libs.junit
+    testImplementation libs.mockito
+    testImplementation libs.kotlin.reflect
+    testImplementation libs.assertJ
 }
