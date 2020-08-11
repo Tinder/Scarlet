@@ -9,20 +9,15 @@ import com.tinder.scarlet.ws.Send
 import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy.SLEEP_100MS
 import org.apache.activemq.command.ActiveMQDestination
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.logging.Logger
 
 class OkHttpStompIntegrationTest {
 
-    @get:Rule
-    val broker = object : EmbeddedActiveMQBroker() {
-        override fun configure() {
-            val destination = ActiveMQDestination.createDestination(SERVER_DESTINATION, 0)
-            brokerService.destinations = arrayOf(destination)
-            brokerService.addConnector(BROKER_URL)
-        }
-    }
+    private var broker: TestEmbeddedActiveMQBroker = TestEmbeddedActiveMQBroker()
 
     @get:Rule
     val firstConnection = OkHttpStompWebSocketConnection.create<StompOkHttpQueueTestService>(
@@ -48,6 +43,16 @@ class OkHttpStompIntegrationTest {
         )
     )
 
+    @Before
+    fun setUp() {
+        startServer()
+    }
+
+    @After
+    fun tearDown() {
+        stopServer()
+    }
+
     @Test
     fun `correct receive and send messages`() {
         val queueTextObserver = secondConnection.client.observeText().test()
@@ -63,6 +68,54 @@ class OkHttpStompIntegrationTest {
         LOGGER.info("${queueTextObserver.values}")
         queueTextObserver.awaitCountAndCheck(9, SLEEP_100MS)
         secondConnection.clientClosure()
+    }
+
+    @Test
+    fun `reconnect test`() {
+        val queueTextObserver = secondConnection.client.observeText().test()
+
+        firstConnection.open()
+        secondConnection.open()
+
+        restartServer()
+
+        firstConnection.clientProtocolEventObserver.awaitCountAndCheck(3) // Open -> Close -> Open
+        secondConnection.clientProtocolEventObserver.awaitCountAndCheck(3) // Open -> Close -> Open
+
+        for (index in 0 until 9) {
+            firstConnection.client.sendText("message $index")
+        }
+
+        firstConnection.clientClosure()
+
+        LOGGER.info("${queueTextObserver.values}")
+        queueTextObserver.awaitCountAndCheck(9, SLEEP_100MS)
+        secondConnection.clientClosure()
+    }
+
+    private fun startServer() {
+        broker = TestEmbeddedActiveMQBroker()
+        broker.start()
+    }
+
+    private fun stopServer() {
+        broker.stop()
+    }
+
+    private fun restartServer() {
+        broker.stop()
+        broker = TestEmbeddedActiveMQBroker()
+        broker.start()
+    }
+
+    private class TestEmbeddedActiveMQBroker : EmbeddedActiveMQBroker() {
+
+        override fun configure() {
+            val destination = ActiveMQDestination.createDestination(SERVER_DESTINATION, 0)
+            brokerService.destinations = arrayOf(destination)
+            brokerService.addConnector(BROKER_URL)
+            brokerService.isPersistent = false
+        }
     }
 
     companion object {

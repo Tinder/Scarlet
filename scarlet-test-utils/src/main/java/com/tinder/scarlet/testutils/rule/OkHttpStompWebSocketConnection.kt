@@ -72,14 +72,6 @@ class OkHttpStompWebSocketConnection<SERVICE : Any>(
         lateinit var clientProtocolEventObserver: TestStreamObserver<ProtocolEvent>
 
         override fun before() {
-            createClientAndServer()
-        }
-
-        override fun after() {
-            clientLifecycleRegistry.onNext(LifecycleState.Completed)
-        }
-
-        private fun createClientAndServer() {
             client = createClient()
             clientProtocolEventObserver = client.observeProtocolEvent().test()
             client.observeProtocolEvent().start(object : Stream.Observer<ProtocolEvent> {
@@ -99,6 +91,10 @@ class OkHttpStompWebSocketConnection<SERVICE : Any>(
                     LOGGER.info("client stomp completed")
                 }
             })
+        }
+
+        override fun after() {
+            clientLifecycleRegistry.onNext(LifecycleState.Completed)
         }
 
         private fun createClient(): SERVICE {

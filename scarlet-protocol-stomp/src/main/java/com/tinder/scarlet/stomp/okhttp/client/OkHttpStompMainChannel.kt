@@ -214,7 +214,12 @@ class OkHttpStompMainChannel(
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            listener.onClosing(this@OkHttpStompMainChannel)
+            if (WebSocketCode.isUnexpectedClose(code)) {
+                listener.onFailed(this@OkHttpStompMainChannel, true, null)
+                this@OkHttpStompMainChannel.connection = null
+            } else {
+                listener.onClosing(this@OkHttpStompMainChannel)
+            }
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {

@@ -30,12 +30,6 @@ class WebSocketConnection(
     private val messageEncoder = StompMessageEncoder()
     private val messageDecoder = StompMessageDecoder()
 
-    companion object {
-
-        private const val NORMAL_CLOSURE_STATUS_CODE = 1000
-        private const val NORMAL_CLOSURE_REASON = "Normal closure"
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -86,7 +80,7 @@ class WebSocketConnection(
      * {@inheritDoc}
      */
     override fun close() {
-        webSocket.close(NORMAL_CLOSURE_STATUS_CODE, NORMAL_CLOSURE_REASON)
+        webSocket.close(WebSocketCode.CLOSE_NORMAL.code, WebSocketCode.CLOSE_NORMAL.reason)
         executor.shutdown()
     }
 
