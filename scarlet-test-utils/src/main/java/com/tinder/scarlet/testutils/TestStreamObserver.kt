@@ -5,6 +5,7 @@
 package com.tinder.scarlet.testutils
 
 import com.tinder.scarlet.Stream
+import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy
 import io.reactivex.processors.PublishProcessor
 import org.assertj.core.api.Assertions.assertThat
 
@@ -25,14 +26,14 @@ class TestStreamObserver<out T : Any>(stream: Stream<T>) {
     val completions: Long
         get() = testSubscriber.completions()
 
-    fun awaitCount(exactly: Int) {
+    fun awaitCountAndCheck(exactly: Int, waitStrategy: Runnable = TestWaitStrategy.SLEEP_10MS) {
         testSubscriber.assertNoErrors()
-        testSubscriber.awaitCount(exactly)
+        testSubscriber.awaitCount(exactly, waitStrategy)
         assertThat(values).describedAs("values: $values").hasSize(exactly)
     }
 
     fun awaitValues(vararg valueAsserts: ValueAssert<Any>) {
-        awaitCount(valueAsserts.size)
+        awaitCountAndCheck(valueAsserts.size)
         testSubscriber.assertNoErrors()
         valueAsserts.zip(values).forEachIndexed { index, (valueAssert, value) ->
             try {
