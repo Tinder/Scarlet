@@ -34,9 +34,15 @@ internal class TypeUtilsTest {
             fun data() = listOf(
                 param(type = getReturnType { string() }, expectedRawType = String::class.java),
                 param(type = getReturnType { listOfString() }, expectedRawType = List::class.java),
-                param(type = getReturnType { arrayOfString() }, expectedRawType = Array<String>::class.java),
+                param(
+                    type = getReturnType { arrayOfString() },
+                    expectedRawType = Array<String>::class.java
+                ),
                 param(type = getReturnType { generic() }, expectedRawType = Any::class.java),
-                param(type = getReturnType { genericWithUpperBound() }, expectedRawType = Any::class.java)
+                param(
+                    type = getReturnType { genericWithUpperBound() },
+                    expectedRawType = Any::class.java
+                )
             )
 
             private fun param(type: Type, expectedRawType: Type) = arrayOf(type, expectedRawType)
@@ -60,11 +66,23 @@ internal class TypeUtilsTest {
             fun data() = listOf(
                 param(type = getReturnType { string() }, expectedHasUnresolvableType = false),
                 param(type = getReturnType { listOfString() }, expectedHasUnresolvableType = false),
-                param(type = getReturnType { arrayOfString() }, expectedHasUnresolvableType = false),
+                param(
+                    type = getReturnType { arrayOfString() },
+                    expectedHasUnresolvableType = false
+                ),
                 param(type = getReturnType { generic() }, expectedHasUnresolvableType = true),
-                param(type = getReturnType { genericWithUpperBound() }, expectedHasUnresolvableType = true),
-                param(type = getReturnType { arrayOfGeneric<Any>() }, expectedHasUnresolvableType = true),
-                param(type = getReturnType { listOfGeneric<Any>() }, expectedHasUnresolvableType = true)
+                param(
+                    type = getReturnType { genericWithUpperBound() },
+                    expectedHasUnresolvableType = true
+                ),
+                param(
+                    type = getReturnType { arrayOfGeneric<Any>() },
+                    expectedHasUnresolvableType = true
+                ),
+                param(
+                    type = getReturnType { listOfGeneric<Any>() },
+                    expectedHasUnresolvableType = true
+                )
             )
 
             private fun param(type: Type, expectedHasUnresolvableType: Boolean) =
@@ -80,7 +98,8 @@ internal class TypeUtilsTest {
 
         @Test
         fun test() {
-            val parameterUpperBound = (0 until type.actualTypeArguments.size).map { type.getParameterUpperBound(it) }
+            val parameterUpperBound =
+                (0 until type.actualTypeArguments.size).map { type.getParameterUpperBound(it) }
             assertThat(parameterUpperBound).containsExactly(*expectedParameterUpperBounds)
         }
 

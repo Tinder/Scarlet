@@ -13,9 +13,21 @@ interface Channel : MessageQueue.Factory {
     fun forceClose()
 
     interface Listener {
-        fun onOpened(channel: Channel, response: Protocol.OpenResponse = Protocol.OpenResponse.Empty)
-        fun onClosing(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
-        fun onClosed(channel: Channel, response: Protocol.CloseResponse = Protocol.CloseResponse.Empty)
+        fun onOpened(
+            channel: Channel,
+            response: Protocol.OpenResponse = Protocol.OpenResponse.Empty
+        )
+
+        fun onClosing(
+            channel: Channel,
+            response: Protocol.CloseResponse = Protocol.CloseResponse.Empty
+        )
+
+        fun onClosed(
+            channel: Channel,
+            response: Protocol.CloseResponse = Protocol.CloseResponse.Empty
+        )
+
         fun onFailed(channel: Channel, shouldRetry: Boolean, throwable: Throwable?)
     }
 

@@ -14,10 +14,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
 import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -186,6 +186,7 @@ internal class MoshiMessageAdapterTest {
         private val config = MoshiMessageAdapter.Factory.Config(
             lenient = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },
@@ -227,6 +228,7 @@ internal class MoshiMessageAdapterTest {
             lenient = true,
             serializeNull = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },
@@ -258,8 +260,10 @@ internal class MoshiMessageAdapterTest {
                 any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithNullValues)
             )
             serverAnImplementationObserver.awaitValues(
-                any { org.assertj.core.api.Assertions.assertThat(this)
-                    .isEqualTo(com.tinder.scarlet.messageadapter.moshi.AnImplementation(null)) }
+                any {
+                    org.assertj.core.api.Assertions.assertThat(this)
+                        .isEqualTo(com.tinder.scarlet.messageadapter.moshi.AnImplementation(null))
+                }
             )
         }
     }
@@ -270,6 +274,7 @@ internal class MoshiMessageAdapterTest {
             serializeNull = true,
             failOnUnknown = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },

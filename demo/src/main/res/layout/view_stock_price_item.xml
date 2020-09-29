@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ © 2018 Match Group, LLC.
   -->
 
@@ -13,9 +12,9 @@
         android:id="@+id/stockName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xxl"
         android:layout_marginTop="@dimen/space_l"
         android:layout_marginEnd="@dimen/space_xs"
-        android:layout_marginStart="@dimen/space_xxl"
         android:ellipsize="end"
         app:layout_constraintEnd_toStartOf="@+id/stockPrice"
         app:layout_constraintStart_toStartOf="parent"

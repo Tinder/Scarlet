@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven { url 'http://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 android {
@@ -27,6 +28,7 @@ android {
         exclude 'META-INF/rxjava.properties'
         exclude 'META-INF/ASL-2.0.txt'
         exclude 'META-INF/LGPL-3.0.txt'
+        exclude 'META-INF/*'
     }
 }
 

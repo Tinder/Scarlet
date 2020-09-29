@@ -18,7 +18,8 @@ internal class MessageAdapterResolverTest {
 
     private val messageAdapterFactory1 = mock<MessageAdapter.Factory>()
     private val messageAdapterFactory2 = mock<MessageAdapter.Factory>()
-    private val messageAdapterResolver = MessageAdapterResolver(listOf(messageAdapterFactory1, messageAdapterFactory2))
+    private val messageAdapterResolver =
+        MessageAdapterResolver(listOf(messageAdapterFactory1, messageAdapterFactory2))
 
     @Test
     fun resolve_givenTypeIsSupportedByTheFirstMessageAdapterFactory_shouldReturnMessageAdapter() {
@@ -39,7 +40,11 @@ internal class MessageAdapterResolverTest {
         // Given
         val type = Array<Int>::class.java
         val messageAdapter = mock<MessageAdapter<Any>>()
-        given(messageAdapterFactory1.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+        given(messageAdapterFactory1.create(type, emptyArray())).willThrow(
+            IllegalArgumentException(
+                "Unsupported type"
+            )
+        )
         given(messageAdapterFactory2.create(type, emptyArray())).willReturn(messageAdapter)
 
         // When
@@ -53,7 +58,12 @@ internal class MessageAdapterResolverTest {
     fun resolve_givenTypeHasBeenResolved_shouldReturnTheMemoizedMessageAdapter() {
         // Given
         val type = Array<Int>::class.java
-        given(messageAdapterFactory1.create(type, emptyArray())).willAnswer { mock<MessageAdapter<Any>>() }
+        given(
+            messageAdapterFactory1.create(
+                type,
+                emptyArray()
+            )
+        ).willAnswer { mock<MessageAdapter<Any>>() }
         val firstResolvedMessageAdapter = messageAdapterResolver.resolve(type, emptyArray())
 
         // When
@@ -67,8 +77,16 @@ internal class MessageAdapterResolverTest {
     fun resolve_givenTypeIsNotSupportedByAnyMessageAdapterFactory_shouldThrowIllegalStateException() {
         // Given
         val type = Array<Int>::class.java
-        given(messageAdapterFactory1.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
-        given(messageAdapterFactory2.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+        given(messageAdapterFactory1.create(type, emptyArray())).willThrow(
+            IllegalArgumentException(
+                "Unsupported type"
+            )
+        )
+        given(messageAdapterFactory2.create(type, emptyArray())).willThrow(
+            IllegalArgumentException(
+                "Unsupported type"
+            )
+        )
 
         // Then
         assertThatIllegalStateException()

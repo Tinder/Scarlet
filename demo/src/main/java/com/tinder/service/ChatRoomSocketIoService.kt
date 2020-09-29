@@ -144,7 +144,7 @@ class ChatRoomSocketIoService : LifecycleService() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent): IBinder? {
         super.onBind(intent)
         Timber.d("chatroom onbind")
         return messenger.binder

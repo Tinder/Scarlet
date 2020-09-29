@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ © 2018 Match Group, LLC.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:orientation="vertical">
-
-  <com.github.bassaer.chatmessageview.view.ChatView
-    android:id="@+id/chat_view"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:date_separator_font_size="@dimen/text_xs"
-    app:message_font_size="@dimen/text_s"
-    app:message_max_width="250dp"
-    app:option_button_enable="true"
-    app:time_label_font_size="@dimen/text_xxs"
-    app:username_font_size="@dimen/text_xs"/>
+    android:orientation="vertical">
+
+    <com.github.bassaer.chatmessageview.view.ChatView
+        android:id="@+id/chat_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:date_separator_font_size="@dimen/text_xs"
+        app:message_font_size="@dimen/text_s"
+        app:message_max_width="250dp"
+        app:option_button_enable="true"
+        app:time_label_font_size="@dimen/text_xxs"
+        app:username_font_size="@dimen/text_xs" />
 
 </LinearLayout>

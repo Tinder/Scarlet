@@ -9,9 +9,9 @@ import com.google.protobuf.InvalidProtocolBufferException
 import com.tinder.scarlet.Deserialization
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send

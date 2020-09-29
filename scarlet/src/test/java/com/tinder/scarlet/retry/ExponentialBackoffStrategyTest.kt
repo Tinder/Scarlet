@@ -42,7 +42,8 @@ internal class ExponentialBackoffStrategyTest {
                 param(baseDuration = 2, maxDuration = 0)
             )
 
-            private fun param(baseDuration: Long, maxDuration: Long) = arrayOf(baseDuration, maxDuration)
+            private fun param(baseDuration: Long, maxDuration: Long) =
+                arrayOf(baseDuration, maxDuration)
         }
     }
 
@@ -77,21 +78,86 @@ internal class ExponentialBackoffStrategyTest {
                 param(baseDuration = 2, maxDuration = 10, retryCount = 0, expectedWaitDuration = 2),
                 param(baseDuration = 2, maxDuration = 10, retryCount = 1, expectedWaitDuration = 4),
                 param(baseDuration = 2, maxDuration = 10, retryCount = 2, expectedWaitDuration = 8),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 3, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 4, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 5, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 10, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 50, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 100, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 500, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 1000, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 10000, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 100000, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 1000000, expectedWaitDuration = 10),
-                param(baseDuration = 2, maxDuration = 10, retryCount = 10000000, expectedWaitDuration = 10)
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 3,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 4,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 5,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 10,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 50,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 100,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 500,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 1000,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 10000,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 100000,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 1000000,
+                    expectedWaitDuration = 10
+                ),
+                param(
+                    baseDuration = 2,
+                    maxDuration = 10,
+                    retryCount = 10000000,
+                    expectedWaitDuration = 10
+                )
             )
 
-            private fun param(baseDuration: Long, maxDuration: Long, retryCount: Int, expectedWaitDuration: Long) =
+            private fun param(
+                baseDuration: Long,
+                maxDuration: Long,
+                retryCount: Int,
+                expectedWaitDuration: Long
+            ) =
                 arrayOf(baseDuration, maxDuration, retryCount, expectedWaitDuration)
         }
     }

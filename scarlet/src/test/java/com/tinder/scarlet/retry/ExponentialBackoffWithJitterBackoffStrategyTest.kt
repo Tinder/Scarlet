@@ -13,7 +13,7 @@ import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.util.Random
+import java.util.*
 
 @RunWith(Enclosed::class)
 internal class ExponentialBackoffWithJitterBackoffStrategyTest {
@@ -46,7 +46,8 @@ internal class ExponentialBackoffWithJitterBackoffStrategyTest {
                 param(baseDuration = 2, maxDuration = 0)
             )
 
-            private fun param(baseDuration: Long, maxDuration: Long) = arrayOf(baseDuration, maxDuration)
+            private fun param(baseDuration: Long, maxDuration: Long) =
+                arrayOf(baseDuration, maxDuration)
         }
     }
 
@@ -61,7 +62,8 @@ internal class ExponentialBackoffWithJitterBackoffStrategyTest {
         private val random = mock<Random> {
             on { nextInt(any()) } doAnswer { it.getArgument<Int>(0) * jitterPercent / 100 }
         }
-        private val retryStrategy = ExponentialWithJitterBackoffStrategy(baseDuration, maxDuration, random)
+        private val retryStrategy =
+            ExponentialWithJitterBackoffStrategy(baseDuration, maxDuration, random)
 
         @Test
         fun waitDurationMillis() {
@@ -140,15 +142,24 @@ internal class ExponentialBackoffWithJitterBackoffStrategyTest {
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 10, retryCount = 100000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 10,
+                    retryCount = 100000,
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 10, retryCount = 1000000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 10,
+                    retryCount = 1000000,
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 10, retryCount = 10000000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 10,
+                    retryCount = 10000000,
                     expectedWaitDuration = 100
                 ),
                 param(
@@ -212,15 +223,24 @@ internal class ExponentialBackoffWithJitterBackoffStrategyTest {
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 50, retryCount = 100000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 50,
+                    retryCount = 100000,
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 50, retryCount = 1000000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 50,
+                    retryCount = 1000000,
                     expectedWaitDuration = 100
                 ),
                 param(
-                    baseDuration = 20, maxDuration = 100, jitterPercentage = 50, retryCount = 10000000,
+                    baseDuration = 20,
+                    maxDuration = 100,
+                    jitterPercentage = 50,
+                    retryCount = 10000000,
                     expectedWaitDuration = 100
                 )
             )
@@ -232,7 +252,13 @@ internal class ExponentialBackoffWithJitterBackoffStrategyTest {
                 retryCount: Int,
                 expectedWaitDuration: Long
             ) =
-                arrayOf(baseDuration, maxDuration, jitterPercentage, retryCount, expectedWaitDuration)
+                arrayOf(
+                    baseDuration,
+                    maxDuration,
+                    jitterPercentage,
+                    retryCount,
+                    expectedWaitDuration
+                )
         }
     }
 }

@@ -9,15 +9,15 @@ import com.tinder.scarlet.internal.coordinator.LifecycleEventSource
 import com.tinder.scarlet.internal.coordinator.Session
 import com.tinder.scarlet.internal.coordinator.StateMachineFactory
 import com.tinder.scarlet.internal.coordinator.TimerEventSource
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializationAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializedValueAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToEventAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToLifecycleStateAdapter
-import com.tinder.scarlet.internal.statetransition.StateTransitionToStateTransitionAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToProtocolEventAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToProtocolSpecificEventAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToStateAdapter
-import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
+import com.tinder.scarlet.internal.statetransition.StateTransitionToStateTransitionAdapter
 import com.tinder.scarlet.internal.stub.ProxyFactory
 import com.tinder.scarlet.internal.stub.StubInterface
 import com.tinder.scarlet.internal.stub.StubMethod
@@ -48,7 +48,11 @@ class Scarlet private constructor(
     private val stubInterfaceFactory: StubInterface.Factory
     private val proxyFactory: ProxyFactory
 
-    constructor(protocol: Protocol, configuration: Configuration) : this(protocol, configuration, null)
+    constructor(protocol: Protocol, configuration: Configuration) : this(
+        protocol,
+        configuration,
+        null
+    )
 
     init {
         val coordinator = Coordinator(

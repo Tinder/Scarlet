@@ -21,13 +21,13 @@ class FlowStreamAdapterTest {
 
     @get:Rule
     internal val connection = OkHttpWebSocketConnection.create<Service>(
-            observeWebSocketEvent = { observeEvents() },
-            serverConfiguration = OkHttpWebSocketConnection.Configuration(
-                    streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
-            ),
-            clientConfiguration = OkHttpWebSocketConnection.Configuration(
-                    streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
-            )
+        observeWebSocketEvent = { observeEvents() },
+        serverConfiguration = OkHttpWebSocketConnection.Configuration(
+            streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
+        ),
+        clientConfiguration = OkHttpWebSocketConnection.Configuration(
+            streamAdapterFactories = listOf(CoroutinesStreamAdapterFactory())
+        )
     )
 
     @Test
@@ -66,11 +66,11 @@ class FlowStreamAdapterTest {
         assertThat(isSendBytesSuccessful).isTrue()
 
         connection.serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
 
         job1.invokeOnCompletion {

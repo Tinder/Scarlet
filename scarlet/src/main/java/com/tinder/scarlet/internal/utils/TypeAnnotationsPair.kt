@@ -5,7 +5,7 @@
 package com.tinder.scarlet.internal.utils
 
 import java.lang.reflect.Type
-import java.util.Arrays
+import java.util.*
 
 internal data class TypeAnnotationsPair(val type: Type, val annotations: Array<Annotation>) {
     override fun equals(other: Any?): Boolean {

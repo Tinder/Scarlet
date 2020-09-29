@@ -15,11 +15,11 @@ import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializationAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToDeserializedValueAdapter
 import com.tinder.scarlet.internal.statetransition.StateTransitionToStateTransitionAdapter
-import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
-import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.utils.onlyMethod
@@ -222,7 +222,9 @@ internal class StubMethodFactoryTest {
             fun create_shouldThrowIllegalArgumentException() {
                 // Given
                 val stateTransitionAdapter = mock<StateTransitionAdapter<Any>>()
-                given(stateTransitionAdapterResolver.resolve(any(), anyArray())).willReturn(stateTransitionAdapter)
+                given(stateTransitionAdapterResolver.resolve(any(), anyArray())).willReturn(
+                    stateTransitionAdapter
+                )
                 val streamAdapter = mock<StreamAdapter<Any, Any>>()
                 given(streamAdapterResolver.resolve(any())).willReturn(streamAdapter)
 
@@ -346,8 +348,11 @@ internal class StubMethodFactoryTest {
             @Test
             fun create_shouldCreateServiceMethod() {
                 // Given
-                val stateTransitionAdapter = Mockito.mock(stateTransitionAdapterClass) as StateTransitionAdapter<Any>
-                given(stateTransitionAdapterResolver.resolve(any(), anyArray())).willReturn(stateTransitionAdapter)
+                val stateTransitionAdapter =
+                    Mockito.mock(stateTransitionAdapterClass) as StateTransitionAdapter<Any>
+                given(stateTransitionAdapterResolver.resolve(any(), anyArray())).willReturn(
+                    stateTransitionAdapter
+                )
                 val streamAdapter = mock<StreamAdapter<Any, Any>>()
                 given(streamAdapterResolver.resolve(any())).willReturn(streamAdapter)
 
@@ -357,7 +362,9 @@ internal class StubMethodFactoryTest {
                 // Then
                 assertThat(stubMethod).isInstanceOf(StubMethod.Receive::class.java)
                 val receiveStubMethod = stubMethod as StubMethod.Receive
-                assertThat(receiveStubMethod.stateTransitionAdatper).isInstanceOf(stateTransitionAdapterClass)
+                assertThat(receiveStubMethod.stateTransitionAdatper).isInstanceOf(
+                    stateTransitionAdapterClass
+                )
                 then(stateTransitionAdapterResolver).should().resolve(any(), anyArray())
                 then(streamAdapterResolver).should().resolve(any())
             }

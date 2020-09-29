@@ -122,7 +122,8 @@ class ChatMessageRepository(
             val ratio = imageMaxWidth.toFloat() / Math.max(bitmap.width, bitmap.height)
             val (targetWidth, targetHeight) = (bitmap.width * ratio).toInt() to (bitmap.height * ratio).toInt()
             val thumbnail = ThumbnailUtils.extractThumbnail(bitmap, targetWidth, targetHeight)
-            val chatMessage = ChatMessage.Image(generateMessageId(), thumbnail, ChatMessage.Source.SENT)
+            val chatMessage =
+                ChatMessage.Image(generateMessageId(), thumbnail, ChatMessage.Source.SENT)
             addChatMessage(chatMessage)
 
             echoService.sendBitmap(bitmap)
