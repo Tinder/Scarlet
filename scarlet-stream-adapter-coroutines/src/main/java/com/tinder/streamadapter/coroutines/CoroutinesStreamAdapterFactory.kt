@@ -17,8 +17,8 @@ class CoroutinesStreamAdapterFactory : StreamAdapter.Factory {
 
     override fun create(type: Type): StreamAdapter<Any, Any> {
         return when (type.getRawType()) {
-            ReceiveChannel::class.java -> ReceiveChannelStreamAdapter()
             Flow::class.java -> FlowStreamAdapter()
+            ReceiveChannel::class.java -> ReceiveChannelStreamAdapter()
             else -> throw IllegalArgumentException()
         }
     }
