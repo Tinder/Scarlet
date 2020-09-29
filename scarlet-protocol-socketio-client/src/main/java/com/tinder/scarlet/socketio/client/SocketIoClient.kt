@@ -19,9 +19,9 @@ import io.socket.engineio.client.Transport
 import org.json.JSONObject
 
 class SocketIoClient(
-        private val url: () -> String,
-        private val requestHeaders: () -> RequestHeaders = { RequestHeaders(mapOf()) },
-        private val options: IO.Options = IO.Options()
+    private val url: () -> String,
+    private val requestHeaders: () -> RequestHeaders = { RequestHeaders(mapOf()) },
+    private val options: IO.Options = IO.Options()
 ) : Protocol {
 
     override fun createChannelFactory(): Channel.Factory {
@@ -43,8 +43,10 @@ class SocketIoClient(
         return SocketIoEvent.Adapter.Factory()
     }
 
-    data class MainChannelOpenRequest(val url: String,
-                                      val requestHeaders: RequestHeaders) : Protocol.OpenRequest
+    data class MainChannelOpenRequest(
+        val url: String,
+        val requestHeaders: RequestHeaders
+    ) : Protocol.OpenRequest
 
     data class RequestHeaders(val headers: Map<String, String>)
 }
@@ -181,10 +183,10 @@ internal class SocketIoMessageChannel(
 
 fun Socket.addRequestHeaders(requestHeaders: SocketIoClient.RequestHeaders) {
     io().on(Manager.EVENT_TRANSPORT) { transportData ->
-
         val transport = transportData[0] as Transport
 
         transport.on(Transport.EVENT_REQUEST_HEADERS) { headersData ->
+            @Suppress("UNCHECKED_CAST")
             val headersOut = headersData[0] as MutableMap<String, List<String>>
 
             requestHeaders.headers.forEach { (key, value) ->
