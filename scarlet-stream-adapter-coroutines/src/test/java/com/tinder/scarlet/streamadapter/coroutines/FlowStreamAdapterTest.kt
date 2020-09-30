@@ -47,7 +47,6 @@ class FlowStreamAdapterTest {
             testTextFlow.collect {
                 receivedTextItems.add(it)
             }
-
         }
         val job2 = launch {
             testBytesFlow.collect {

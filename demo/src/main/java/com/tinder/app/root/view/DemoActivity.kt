@@ -41,8 +41,11 @@ class DemoActivity : AppCompatActivity() {
         tabLayout.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(viewPager))
     }
 
-    private class ViewPagerAdapter constructor(fm: FragmentManager, private val pageCount: Int) :
-        FragmentStatePagerAdapter(fm) {
+    private class ViewPagerAdapter(
+        fm: FragmentManager,
+        private val pageCount: Int
+    ) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
         override fun getItem(position: Int): Fragment {
             val (_, createFragment) = TAB_ITEMS[position]
             return createFragment()
