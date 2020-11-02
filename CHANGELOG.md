@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## Version 0.1.11
+_2020-11-02_
+
+* Fix: Remove premature determination of `Lifecycle.State.Started` when `ApplicationResumedLifecycle` is used.
+* New: Add `ServiceStartedLifecycle` to support `Service`.
+
 ## Version 0.1.10
 _2020-01-17_
 
