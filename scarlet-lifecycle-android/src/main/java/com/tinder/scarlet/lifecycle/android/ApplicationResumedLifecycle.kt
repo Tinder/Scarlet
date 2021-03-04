@@ -17,7 +17,6 @@ internal class ApplicationResumedLifecycle(
 ) : Lifecycle by lifecycleRegistry {
 
     init {
-        lifecycleRegistry.onNext(Lifecycle.State.Started)
         application.registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks())
     }
 

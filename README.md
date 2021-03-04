@@ -84,13 +84,13 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 <dependency>
     <groupId>com.tinder.scarlet</groupId>
     <artifactId>scarlet</artifactId>
-    <version>0.1.9</version>
+    <version>0.1.11</version>
 </dependency>
 ```
 
 ##### Gradle:
 ```groovy
-implementation 'com.tinder.scarlet:scarlet:0.1.9'
+implementation 'com.tinder.scarlet:scarlet:0.1.11'
 ```
 
 ### Plug-in Roadmap
