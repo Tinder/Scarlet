@@ -110,7 +110,9 @@ class EchoBotFragment : Fragment(), EchoBotTarget {
                     return
                 }
                 val photoPaths = mutableListOf<String>()
-                photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA))
+                photoPaths.addAll(
+                    requireNotNull(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA))
+                )
                 if (photoPaths.isEmpty()) {
                     return
                 }
@@ -155,7 +157,7 @@ class EchoBotFragment : Fragment(), EchoBotTarget {
     }
 
     private fun showImagePicker() {
-        FilePickerBuilder.getInstance().setMaxCount(1)
+        FilePickerBuilder.instance.setMaxCount(1)
             .setActivityTheme(R.style.AppTheme)
             .pickPhoto(this)
     }
@@ -177,19 +179,19 @@ class EchoBotFragment : Fragment(), EchoBotTarget {
         private val SCARLET_USER = ChatUser(1, "Scarlet", AVATAR)
 
         private fun ChatMessage.toMessage(): Message = Message.Builder()
-            .setCreatedAt(timestamp.toCalendar(Locale.getDefault()))
+            .setSendTime(timestamp.toCalendar(Locale.getDefault()))
             .apply {
                 when (this@toMessage) {
-                    is ChatMessage.Text -> setMessageText(value)
+                    is ChatMessage.Text -> setText(value)
                     is ChatMessage.Image -> setPicture(bitmap)
                         .setType(Message.Type.PICTURE)
                 }
                 when (source) {
                     ChatMessage.Source.SENT -> setUser(DEMO_USER)
-                        .setRightMessage(true)
+                        .setRight(true)
                         .hideIcon(true)
                     ChatMessage.Source.RECEIVED -> setUser(SCARLET_USER)
-                        .setRightMessage(false)
+                        .setRight(false)
                 }
             }
             .build()
