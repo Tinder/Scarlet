@@ -4,10 +4,10 @@
 
 package com.tinder.scarlet.internal.connection
 
-import com.nhaarman.mockito_kotlin.argThat
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
-import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
+import com.nhaarman.mockitokotlin2.times
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.internal.connection.subscriber.LifecycleStateSubscriber
