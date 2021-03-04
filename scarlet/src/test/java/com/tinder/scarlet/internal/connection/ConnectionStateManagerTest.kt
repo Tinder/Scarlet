@@ -4,9 +4,9 @@
 
 package com.tinder.scarlet.internal.connection
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.ShutdownReason
@@ -241,7 +241,7 @@ internal class ConnectionStateManagerTest {
                         .subscribe(processor!!::onNext)
                     processor!!.doOnSubscribe { subscriptionCount += 1 }.toStream()
                 }
-                given(close(com.nhaarman.mockito_kotlin.any())).willAnswer {
+                given(close(com.nhaarman.mockitokotlin2.any())).willAnswer {
                     Flowable.empty<WebSocket.Event>()
                         .delay(delayMillis, TimeUnit.MILLISECONDS, scheduler)
                         .subscribe(processor!!)

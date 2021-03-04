@@ -4,10 +4,10 @@
 
 package com.tinder.scarlet.websocket.okhttp
 
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
 import okhttp3.WebSocket
 import okio.ByteString
 import org.assertj.core.api.Assertions.assertThat

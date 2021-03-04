@@ -44,7 +44,6 @@ ext.versions = [
     okSse: '0.9.0',
 
     junit: '4.12',
-    mockito: '1.6.0',
     assertJ: '3.8.0',
 
     stateMachine: "0.2.0"
@@ -102,7 +101,7 @@ ext.libs = [
     okSse: "com.github.heremaps:oksse:$versions.okSse",
 
     junit: "junit:junit:$versions.junit",
-    mockito: "com.nhaarman:mockito-kotlin-kt1.1:$versions.mockito",
+    mockito: "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0",
     assertJ: "org.assertj:assertj-core:$versions.assertJ",
 
     kotlin: [

@@ -4,11 +4,11 @@
 
 package com.tinder.scarlet.internal.servicemethod
 
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.anyArray
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyArray
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
 import com.tinder.scarlet.Deserialization
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.StreamAdapter

@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.servicemethod
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.Deserialization
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.Lifecycle

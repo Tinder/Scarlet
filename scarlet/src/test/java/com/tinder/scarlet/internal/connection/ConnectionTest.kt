@@ -4,9 +4,9 @@
 
 package com.tinder.scarlet.internal.connection
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.Session

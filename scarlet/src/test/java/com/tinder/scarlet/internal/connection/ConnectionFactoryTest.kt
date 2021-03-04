@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.internal.connection
 
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.retry.BackoffStrategy

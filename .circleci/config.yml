@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/android:api-28-alpha
+      - image: circleci/android:api-30
     environment:
         TERM: dumb
         JAVA_TOOL_OPTIONS: "-Xmx1g"
