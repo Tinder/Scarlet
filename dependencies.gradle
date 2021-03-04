@@ -18,8 +18,7 @@ ext.versions = [
     stetho: '1.5.0',
     stethoOkHttp: '1.5.0',
 
-    moshi: '1.5.0',
-    moshiCodeGen: '1.6.0',
+    moshi: '1.11.0',
     gson: '2.8.2',
     protobuf: '3.11.0',
     jacksonDatabind: '2.9.5',
@@ -35,14 +34,12 @@ ext.versions = [
     jodaTime: '2.9.9',
     glide: '4.12.0',
 
-    okHttp: '3.11.0',
-    okio: '1.13.0',
-    mockWebServer: '3.11.0',
+    okHttp: '4.9.1',
+    okio: '2.10.0',
     timber: '4.6.0',
     okSse: '0.9.0',
 
     junit: '4.12',
-    mockito: '1.6.0',
     assertJ: '3.8.0',
 
     stateMachine: "0.2.0"
@@ -69,8 +66,8 @@ ext.libs = [
     stetho: "com.facebook.stetho:stetho:$versions.stetho",
     stethoOkHttp: "com.facebook.stetho:stetho-okhttp3:$versions.stethoOkHttp",
 
-    moshi: "com.squareup.moshi:moshi-kotlin:$versions.moshi",
-    moshiCodeGen: "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshiCodeGen",
+    moshi: "com.squareup.moshi:moshi:$versions.moshi",
+    moshiCodeGen: "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
     gson: "com.google.code.gson:gson:$versions.gson",
     protobuf: "com.google.protobuf:protobuf-java:$versions.protobuf",
 
@@ -94,12 +91,12 @@ ext.libs = [
     okHttp: "com.squareup.okhttp3:okhttp:$versions.okHttp",
     okHttpLoggingInterceptor: "com.squareup.okhttp3:logging-interceptor:$versions.okHttp",
     okio: "com.squareup.okio:okio:$versions.okio",
-    mockWebServer: "com.squareup.okhttp3:mockwebserver:$versions.mockWebServer",
+    mockWebServer: "com.squareup.okhttp3:mockwebserver:$versions.okHttp",
     timber: "com.jakewharton.timber:timber:$versions.timber",
     okSse: "com.github.heremaps:oksse:$versions.okSse",
 
     junit: "junit:junit:$versions.junit",
-    mockito: "com.nhaarman:mockito-kotlin-kt1.1:$versions.mockito",
+    mockito: "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0",
     assertJ: "org.assertj:assertj-core:$versions.assertJ",
 
     kotlin: [

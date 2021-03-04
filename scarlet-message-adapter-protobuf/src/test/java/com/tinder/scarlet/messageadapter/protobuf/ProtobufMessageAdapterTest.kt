@@ -20,7 +20,7 @@ import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
-import okio.ByteString
+import okio.ByteString.Companion.decodeBase64
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +43,7 @@ internal class ProtobufMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val phone = PhoneProtos.Phone.newBuilder().setNumber("(519) 867-5309").build()
-        val expectedSerializedPhone = ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwOQ==")!!.toByteArray()
+        val expectedSerializedPhone = "Cg4oNTE5KSA4NjctNTMwOQ==".decodeBase64()!!.toByteArray()
         val serverPhoneObserver = server.receivePhone().test()
 
         // When
@@ -85,7 +85,7 @@ internal class ProtobufMessageAdapterTest {
     fun deserializeUsingRegistry() {
         // Given
         givenConnectionIsEstablished(withRegistry = true)
-        val serializedPhone = ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwORAB")!!.toByteArray()
+        val serializedPhone = "Cg4oNTE5KSA4NjctNTMwORAB".decodeBase64()!!.toByteArray()
         val serverPhoneObserver = server.receivePhone().test()
 
         // When
@@ -110,7 +110,7 @@ internal class ProtobufMessageAdapterTest {
         // Given
         givenConnectionIsEstablished()
         val phone = PhoneProtos.Phone.newBuilder().setNumber("(519) 867-5309").build()
-        val serializedPhone = ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwOQ==")!!.toByteArray()
+        val serializedPhone = "Cg4oNTE5KSA4NjctNTMwOQ==".decodeBase64()!!.toByteArray()
         val serverStringDeserializationObserver = server.receiveWrongClassDeserialization().test()
 
         // When
@@ -131,7 +131,7 @@ internal class ProtobufMessageAdapterTest {
     fun deserializeWrongValue() {
         // Given
         givenConnectionIsEstablished()
-        val data = ByteString.decodeBase64("////")!!.toByteArray()
+        val data = "////".decodeBase64()!!.toByteArray()
         val serverPhoneObserver = server.receivePhoneDeserialization().test()
 
         // When

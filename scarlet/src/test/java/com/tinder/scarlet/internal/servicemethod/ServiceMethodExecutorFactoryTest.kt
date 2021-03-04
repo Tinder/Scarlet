@@ -4,10 +4,10 @@
 
 package com.tinder.scarlet.internal.servicemethod
 
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.internal.connection.Connection
 import com.tinder.scarlet.internal.utils.RuntimePlatform

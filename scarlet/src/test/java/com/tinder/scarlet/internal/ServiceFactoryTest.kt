@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.internal
 
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.internal.connection.Connection
 import com.tinder.scarlet.internal.servicemethod.ServiceMethodExecutor
 import com.tinder.scarlet.ws.Send

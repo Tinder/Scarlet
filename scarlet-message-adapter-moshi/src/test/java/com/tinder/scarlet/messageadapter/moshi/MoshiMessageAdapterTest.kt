@@ -6,10 +6,10 @@ package com.tinder.scarlet.messageadapter.moshi
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.tinder.scarlet.WebSocket.Event
@@ -28,7 +28,7 @@ import com.tinder.scarlet.ws.Send
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -196,7 +196,7 @@ internal class MoshiMessageAdapterTest {
         // Given
         givenConnectionIsEstablished(Factory.Config())
         val jsonWithUtf8Bom = Buffer()
-            .write(ByteString.decodeHex("EFBBBF"))
+            .write("EFBBBF".decodeHex())
             .writeUtf8("""{"name":"value"}""")
             .readByteString()
             .toByteArray()
@@ -220,7 +220,7 @@ internal class MoshiMessageAdapterTest {
         // Given
         givenConnectionIsEstablished(Factory.Config())
         val jsonWithUtf16Bom = Buffer()
-            .write(ByteString.decodeHex("FEFF"))
+            .write("FEFF".decodeHex())
             .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
             .readByteString()
             .toByteArray()
@@ -254,7 +254,6 @@ internal class MoshiMessageAdapterTest {
     private fun createMoshi(): Moshi = Moshi.Builder()
         .add(VerifyJsonQualifierJsonAdapterFactory())
         .add(Adapters())
-        .add(KotlinJsonAdapterFactory())
         .build()
 
     private fun createServer(factory: Factory): Service = Scarlet.Builder()
@@ -298,6 +297,7 @@ internal class MoshiMessageAdapterTest {
             val name: String?
         }
 
+        @JsonClass(generateAdapter = true)
         data class AnImplementation(override val name: String?) : AnInterface
 
         class VerifyJsonQualifierJsonAdapterFactory : JsonAdapter.Factory {

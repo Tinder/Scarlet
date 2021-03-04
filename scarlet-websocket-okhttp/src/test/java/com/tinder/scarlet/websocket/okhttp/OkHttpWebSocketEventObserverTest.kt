@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.websocket.okhttp
 
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.ShutdownReason
 import com.tinder.scarlet.WebSocket

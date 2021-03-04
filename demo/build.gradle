@@ -54,5 +54,7 @@ dependencies {
     implementation libs.filePicker
     implementation libs.glide
 
+    kapt libs.moshiCodeGen
+
     testImplementation libs.junit
 }

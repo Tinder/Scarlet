@@ -5,7 +5,6 @@
 package com.tinder.app.gdax.inject
 
 import android.app.Application
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.tinder.app.gdax.api.GdaxService
 import com.tinder.app.gdax.api.MoshiAdapters
@@ -58,7 +57,6 @@ interface GdaxComponent {
         fun provideGdaxService(client: OkHttpClient, lifecycle: Lifecycle): GdaxService {
             val moshi = Moshi.Builder()
                 .add(MoshiAdapters())
-                .add(KotlinJsonAdapterFactory())
                 .build()
             val scarlet = Scarlet.Builder()
                 .webSocketFactory(client.newWebSocketFactory("wss://ws-feed.gdax.com"))

@@ -5,7 +5,9 @@
 package com.tinder.app.gdax.api.model
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class Ticker(
     val type: String,
     @Json(name = "product_id")

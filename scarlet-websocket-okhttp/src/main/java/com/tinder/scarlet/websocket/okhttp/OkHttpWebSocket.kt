@@ -9,8 +9,12 @@ import com.tinder.scarlet.ShutdownReason
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.utils.toStream
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion
+import okhttp3.RequestBody
 import okhttp3.WebSocketListener
 import okio.ByteString
+import okio.ByteString.Companion.toByteString
 
 class OkHttpWebSocket internal constructor(
     private val okHttpWebSocketHolder: OkHttpWebSocketHolder,
@@ -30,7 +34,7 @@ class OkHttpWebSocket internal constructor(
         is Message.Text -> okHttpWebSocketHolder.send(message.value)
         is Message.Bytes -> {
             val bytes = message.value
-            val byteString = ByteString.of(bytes, 0, bytes.size)
+            val byteString = bytes.toByteString(0, bytes.size)
             okHttpWebSocketHolder.send(byteString)
         }
     }
