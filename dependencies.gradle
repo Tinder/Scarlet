@@ -1,13 +1,11 @@
 ext.versions = [
     minSdkVersion: 21,
     minSdkVersionAndroidLifecycle: 19,
-    targetSdkVersion: 28,
-    compileSdkVersion: 28,
-    buildToolsVersion: "28.0.3",
+    targetSdkVersion: 30,
+    compileSdkVersion: 30,
 
-    appCompat: '1.0.0',
-    material: '1.0.0',
-    multiDex: '2.0.0',
+    appCompat: '1.2.0',
+    material: '1.3.0',
     constraintLayout: '1.1.2',
 
     reactiveStreams: '1.0.2',
@@ -15,7 +13,7 @@ ext.versions = [
     rxAndroid: '2.0.2',
     rxKotlin: '2.2.0',
     rxJava1: '1.3.4',
-    kotlinxCoroutines: '1.0.0',
+    kotlinxCoroutines: '1.4.3',
 
     stetho: '1.5.0',
     stethoOkHttp: '1.5.0',
@@ -32,10 +30,10 @@ ext.versions = [
     jsr250Annotations: '1.0',
 
     mpAndroidChart: 'v3.0.3',
-    chatMessageView: '1.8.8',
-    filePicker: '2.1.2',
+    chatMessageView: '2.0.1',
+    filePicker: '2.2.5',
     jodaTime: '2.9.9',
-    glide: '4.5.0',
+    glide: '4.12.0',
 
     okHttp: '3.11.0',
     okio: '1.13.0',
@@ -53,7 +51,6 @@ ext.versions = [
 ext.libs = [
     appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
     material: "com.google.android.material:material:$versions.material",
-    multiDex: "androidx.multidex:multidex:$versions.multiDex",
     constraintLayout: "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
 
     reactiveStreams: "org.reactivestreams:reactive-streams:$versions.reactiveStreams",
