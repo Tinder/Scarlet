@@ -21,20 +21,20 @@ internal class ApplicationResumedLifecycle(
     }
 
     private inner class ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
-        override fun onActivityPaused(activity: Activity?) = lifecycleRegistry.onNext(
+        override fun onActivityPaused(activity: Activity) = lifecycleRegistry.onNext(
             Lifecycle.State.Stopped.WithReason(ShutdownReason(1000, "App is paused"))
         )
 
-        override fun onActivityResumed(activity: Activity?) = lifecycleRegistry.onNext(Lifecycle.State.Started)
+        override fun onActivityResumed(activity: Activity) = lifecycleRegistry.onNext(Lifecycle.State.Started)
 
-        override fun onActivityStarted(activity: Activity?) {}
+        override fun onActivityStarted(activity: Activity) {}
 
-        override fun onActivityDestroyed(activity: Activity?) {}
+        override fun onActivityDestroyed(activity: Activity) {}
 
-        override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-        override fun onActivityStopped(activity: Activity?) {}
+        override fun onActivityStopped(activity: Activity) {}
 
-        override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {}
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     }
 }

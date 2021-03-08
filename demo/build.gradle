@@ -8,14 +8,12 @@ repositories {
 
 android {
     compileSdkVersion versions.compileSdkVersion
-    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
         applicationId "com.tinder.scarlet"
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -38,7 +36,6 @@ dependencies {
 
     implementation libs.appCompat
     implementation libs.material
-    implementation libs.multiDex
     implementation libs.constraintLayout
     implementation libs.rxJava
     implementation libs.rxAndroid

@@ -42,7 +42,7 @@ class GdaxFragment : Fragment(), GdaxTarget {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         (context!!.applicationContext as GdaxComponent.ComponentProvider).gdaxComponent
             .inject(this)
 
