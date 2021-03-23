@@ -16,11 +16,11 @@ buildscript {
 }
 
 plugins {
-    id 'org.jlleitschuh.gradle.ktlint' version '4.1.0'
+    id 'org.jlleitschuh.gradle.ktlint' version '10.0.0'
 }
 
 ktlint {
-    version = '0.29.0'
+    version = '0.41.0'
 }
 
 allprojects {
@@ -43,6 +43,12 @@ subprojects { project ->
     tasks.withType(JavaCompile).configureEach {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    plugins.withType(com.android.build.gradle.BasePlugin).configureEach { plugin ->
+        plugin.extension.compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
     }
 }
 
