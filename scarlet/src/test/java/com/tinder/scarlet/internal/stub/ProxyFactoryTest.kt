@@ -4,10 +4,10 @@
 
 package com.tinder.scarlet.internal.stub
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.then
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.then
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.internal.utils.RuntimePlatform
 import com.tinder.scarlet.ws.Receive

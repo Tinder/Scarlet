@@ -4,10 +4,10 @@
 
 package com.tinder.scarlet.internal.coordinator
 
-import com.nhaarman.mockitokotlin2.given
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.then
+import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.then
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.retry.BackoffStrategy
 import io.reactivex.schedulers.TestScheduler

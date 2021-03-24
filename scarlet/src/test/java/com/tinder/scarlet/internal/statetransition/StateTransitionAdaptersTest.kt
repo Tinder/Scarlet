@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.statetransition
 
-import com.nhaarman.mockitokotlin2.given
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.StateTransition
