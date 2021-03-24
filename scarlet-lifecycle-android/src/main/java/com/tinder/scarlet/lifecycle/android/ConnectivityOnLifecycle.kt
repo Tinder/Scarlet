@@ -13,6 +13,7 @@ import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 
+@Suppress("DEPRECATION")
 internal class ConnectivityOnLifecycle(
     applicationContext: Context,
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry()

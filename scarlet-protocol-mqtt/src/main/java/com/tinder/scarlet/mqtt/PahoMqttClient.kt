@@ -65,7 +65,7 @@ class PahoMqttTopicFilter(
     override fun createChannelFactory(): Channel.Factory {
         return SimpleChannelFactory { listener, parent ->
             require(parent is MqttMainChannel)
-            MqttMessageChannel(parent as MqttMainChannel, topicFilter, listener)
+            MqttMessageChannel(parent, topicFilter, listener)
         }
     }
 
@@ -140,16 +140,13 @@ class MqttMainChannel(
     }
 
     inner class InnerMqttCallback : MqttCallback {
-        override fun messageArrived(topic: String, message: MqttMessage) {
-            topic
-        }
+        override fun messageArrived(topic: String, message: MqttMessage) {}
 
         override fun connectionLost(cause: Throwable) {
             listener.onFailed(this@MqttMainChannel, true, cause)
         }
 
-        override fun deliveryComplete(token: IMqttDeliveryToken) {
-        }
+        override fun deliveryComplete(token: IMqttDeliveryToken) {}
     }
 }
 
@@ -178,7 +175,7 @@ class MqttMessageChannel(
                     listener.onFailed(this@MqttMessageChannel, true, exception)
                 }
             }
-        ) { topic, message ->
+        ) { _, message ->
             // TODO topic may be different from topic filter. should be added to meta data
             messageQueueListener?.onMessageReceived(
                 this,

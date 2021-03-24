@@ -64,7 +64,7 @@ class GozirraStompDestination(
     override fun createChannelFactory(): Channel.Factory {
         return SimpleChannelFactory { listener, parent ->
             require(parent is StompMainChannel)
-            StompMessageChannel(parent as StompMainChannel, destination, listener)
+            StompMessageChannel(parent, destination, listener)
         }
     }
 
@@ -155,6 +155,7 @@ class StompMessageChannel(
         client?.subscribe(
             destination,
             { headers, message ->
+                @Suppress("UNCHECKED_CAST")
                 messageQueueListener?.onMessageReceived(
                     this,
                     this,

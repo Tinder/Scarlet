@@ -58,11 +58,7 @@ class SocketIoEventName(
     override fun createChannelFactory(): Channel.Factory {
         return SimpleChannelFactory { listener, parent ->
             require(parent is SocketIoMainChannel)
-            SocketIoMessageChannel(
-                parent as SocketIoMainChannel,
-                eventName,
-                listener
-            )
+            SocketIoMessageChannel(parent, eventName, listener)
         }
     }
 
@@ -128,8 +124,7 @@ internal class SocketIoMessageChannel(
             return
         }
         socket?.on(eventName) {
-            val value = it[0]
-            when (value) {
+            when (val value = it[0]) {
                 is JSONObject -> {
                     messageQueueListener?.onMessageReceived(
                         this, this,
