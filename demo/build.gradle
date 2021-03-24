@@ -70,6 +70,7 @@ dependencies {
     implementation rootProject.ext.glide
     implementation rootProject.ext.jsonPatch
     implementation rootProject.ext.koin
+    implementation rootProject.ext.moshiReflect
 
     testImplementation rootProject.ext.junit
 }

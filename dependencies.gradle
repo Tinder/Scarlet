@@ -31,6 +31,7 @@ ext {
     stethoOkHttp = "com.facebook.stetho:stetho-okhttp3:$stethoVersion"
 
     moshi = 'com.squareup.moshi:moshi:1.11.0'
+    moshiReflect = 'com.squareup.moshi:moshi-kotlin:1.11.0'
     moshiCodeGen = 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
     kotlinxSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0"
     gson = 'com.google.code.gson:gson:2.8.6'
