@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.4.10'
-    ext.dokka_version = '1.4.10'
+    ext.kotlin_version = '1.4.32'
+    ext.dokka_version = '1.4.30'
 
     repositories {
         gradlePluginPortal()
@@ -10,17 +10,17 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:4.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.13.0'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.14.2'
     }
 }
 
 plugins {
-    id 'org.jlleitschuh.gradle.ktlint' version '9.4.0'
-    id "com.github.ben-manes.versions" version "0.33.0"
+    id 'org.jlleitschuh.gradle.ktlint' version '10.0.0'
+    id "com.github.ben-manes.versions" version "0.38.0"
 }
 
 ktlint {

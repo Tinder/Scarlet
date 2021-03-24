@@ -1,7 +1,3 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'kotlin'
 apply plugin: 'java-library'

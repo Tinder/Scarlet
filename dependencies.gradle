@@ -3,72 +3,73 @@ ext {
     minSdkVersionAndroidLifecycle = 19
     targetSdkVersion = 30
     compileSdkVersion = 30
-    buildToolsVersion = '30.0.2'
+    buildToolsVersion = '30.0.3'
 
     appCompat = 'androidx.appcompat:appcompat:1.2.0'
-    lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    liveDateReactiveSterams = 'androidx.lifecycle:lifecycle-reactivestreams:2.2.0'
+    lifecycleProcess = 'androidx.lifecycle:lifecycle-process:2.3.1'
+    lifecycleService = 'androidx.lifecycle:lifecycle-service:2.3.1'
+    liveDateReactiveSterams = 'androidx.lifecycle:lifecycle-reactivestreams:2.3.1'
     multiDex = 'androidx.multidex:multidex:2.0.1'
-    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.0.1'
-    material = 'com.google.android.material:material:1.2.0'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.0.4'
+    material = 'com.google.android.material:material:1.3.0'
 
     rxBinding = 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
     reactiveStreams = 'org.reactivestreams:reactive-streams:1.0.3'
-    rxJava3 = 'io.reactivex.rxjava3:rxjava:3.0.6'
+    rxJava3 = 'io.reactivex.rxjava3:rxjava:3.0.11'
     rxAndroid3 = 'io.reactivex.rxjava3:rxandroid:3.0.0'
     rxKotlin3 = 'io.reactivex.rxjava3:rxkotlin:3.0.1'
-    rxJava = 'io.reactivex.rxjava2:rxjava:2.2.19'
+    rxJava = 'io.reactivex.rxjava2:rxjava:2.2.21'
     rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.1.1'
     rxKotlin = 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     rxJava1 = 'io.reactivex:rxjava:1.3.8'
-    kotlinCoroutines = 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
-    kotlinCoroutinesRxInterop = 'org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.3.9'
-    kotlinCoroutinesTest = 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9'
+    kotlinCoroutines = 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
+    kotlinCoroutinesRxInterop = 'org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.4.3'
+    kotlinCoroutinesTest = 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
 
     def stethoVersion = "1.5.1"
     stetho = "com.facebook.stetho:stetho:$stethoVersion"
     stethoOkHttp = "com.facebook.stetho:stetho-okhttp3:$stethoVersion"
 
-    moshi = 'com.squareup.moshi:moshi-kotlin:1.8.0'
-    moshiCodeGen = 'com.squareup.moshi:moshi-kotlin-codegen:1.8.0'
-    kotlinxSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0-RC2"
+    moshi = 'com.squareup.moshi:moshi-kotlin:1.11.0'
+    moshiCodeGen = 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
+    kotlinxSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0"
     gson = 'com.google.code.gson:gson:2.8.6'
-    protobuf = 'com.google.protobuf:protobuf-java:3.13.0'
-    jacksonDatabind = 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
-    jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.11.2'
-    jsonPatch = 'com.github.fge:json-patch:1.9'
+    protobuf = 'com.google.protobuf:protobuf-java:3.15.6'
+    jacksonDatabind = 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
+    jacksonModuleKotlin = 'com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2'
+    jsonPatch = 'com.github.fge:json-patch:1.13'
 
     koin = 'org.koin:koin-androidx-viewmodel:1.0.2'
 
     mpAndroidChart = 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     chatMessageView = 'com.github.bassaer:chatmessageview:1.8.8'
     filePicker = 'com.droidninja:filepicker:2.1.2'
-    jodaTime = 'joda-time:joda-time:2.10.6'
-    glide = 'com.github.bumptech.glide:glide:4.11.0'
+    jodaTime = 'joda-time:joda-time:2.10.10'
+    glide = 'com.github.bumptech.glide:glide:4.12.0'
 
-    def okHttpVersion = "4.9.0"
+    def okHttpVersion = "4.9.1"
     okHttp = "com.squareup.okhttp3:okhttp:$okHttpVersion"
     okHttpServerSentEvent = "com.squareup.okhttp3:okhttp-sse:$okHttpVersion"
     okHttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
     mockWebServer = "com.squareup.okhttp3:mockwebserver:$okHttpVersion"
 
-    okio = 'com.squareup.okio:okio:2.8.0'
+    okio = 'com.squareup.okio:okio:2.10.0'
     timber = 'com.jakewharton.timber:timber:4.7.1'
     okSse = 'com.github.heremaps:oksse:0.9.0'
-    socketIoClient = 'io.socket:socket.io-client:1.0.0'
+    socketIoClient = 'io.socket:socket.io-client:1.0.1'
     nettySocketIoServer = 'com.corundumstudio.socketio:netty-socketio:1.7.18'
     pahoMqtt = 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
-    activeMqJUnit = 'org.apache.activemq.tooling:activemq-junit:5.16.0'
-    activeMqBroker = 'org.apache.activemq:activemq-broker:5.16.0'
-    activeMqStomp = 'org.apache.activemq:activemq-stomp:5.16.0'
-    activeMqMqtt = 'org.apache.activemq:activemq-mqtt:5.16.0'
-    activeHttp = 'org.apache.activemq:activemq-http:5.16.0'
+    activeMqJUnit = 'org.apache.activemq.tooling:activemq-junit:5.16.1'
+    activeMqBroker = 'org.apache.activemq:activemq-broker:5.16.1'
+    activeMqStomp = 'org.apache.activemq:activemq-stomp:5.16.1'
+    activeMqMqtt = 'org.apache.activemq:activemq-mqtt:5.16.1'
+    activeHttp = 'org.apache.activemq:activemq-http:5.16.1'
     slf4jSimple = 'org.slf4j:slf4j-simple:1.7.30'
 
 
-    junit = 'junit:junit:4.13'
+    junit = 'junit:junit:4.13.2'
     mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
-    assertJ = 'org.assertj:assertj-core:3.17.2'
+    assertJ = 'org.assertj:assertj-core:3.19.0'
 
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
