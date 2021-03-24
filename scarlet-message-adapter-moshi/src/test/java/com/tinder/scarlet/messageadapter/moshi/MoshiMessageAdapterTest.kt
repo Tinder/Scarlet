@@ -22,7 +22,7 @@ import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import okio.Buffer
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -140,7 +140,7 @@ internal class MoshiMessageAdapterTest {
             // Given
             connection.open()
             val jsonWithUtf8Bom = Buffer()
-                .write(ByteString.decodeHex("EFBBBF"))
+                .write("EFBBBF".decodeHex())
                 .writeUtf8("""{"name":"value"}""")
                 .readByteString()
                 .toByteArray()
@@ -164,7 +164,7 @@ internal class MoshiMessageAdapterTest {
             // Given
             connection.open()
             val jsonWithUtf16Bom = Buffer()
-                .write(ByteString.decodeHex("FEFF"))
+                .write("FEFF".decodeHex())
                 .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
                 .readByteString()
                 .toByteArray()
@@ -261,8 +261,7 @@ internal class MoshiMessageAdapterTest {
             )
             serverAnImplementationObserver.awaitValues(
                 any {
-                    org.assertj.core.api.Assertions.assertThat(this)
-                        .isEqualTo(com.tinder.scarlet.messageadapter.moshi.AnImplementation(null))
+                    assertThat(this).isEqualTo(AnImplementation(null))
                 }
             )
         }
