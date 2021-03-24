@@ -39,11 +39,7 @@ class SocketIoEventName(
     override fun createChannelFactory(): Channel.Factory {
         return SimpleChannelFactory { listener, parent ->
             require(parent is SocketIoMainChannel)
-            SocketIoMessageChannel(
-                parent as SocketIoMainChannel,
-                eventName,
-                listener
-            )
+            SocketIoMessageChannel(parent, eventName, listener)
         }
     }
 
@@ -107,7 +103,7 @@ internal class SocketIoMessageChannel(
         server?.addEventListener(
             eventName,
             Any::class.java
-        ) { client, data, ackRequest ->
+        ) { _, data, _ ->
             when (data) {
                 is String -> messageQueueListener?.onMessageReceived(this, this, Message.Text(data))
                 is ByteArray -> messageQueueListener?.onMessageReceived(

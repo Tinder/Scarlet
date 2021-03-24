@@ -348,7 +348,7 @@ internal class StubMethodFactoryTest {
             @Test
             fun create_shouldCreateServiceMethod() {
                 // Given
-                val stateTransitionAdapter =
+                @Suppress("UNCHECKED_CAST") val stateTransitionAdapter =
                     Mockito.mock(stateTransitionAdapterClass) as StateTransitionAdapter<Any>
                 given(stateTransitionAdapterResolver.resolve(any(), anyArray())).willReturn(
                     stateTransitionAdapter
