@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.coordinator
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
 import io.reactivex.schedulers.TestScheduler
 import org.junit.Test
 import org.junit.runner.RunWith

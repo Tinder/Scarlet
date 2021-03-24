@@ -69,7 +69,7 @@ ext {
 
 
     junit = 'junit:junit:4.13.2'
-    mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
+    mockito = 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     assertJ = 'org.assertj:assertj-core:3.19.0'
 
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

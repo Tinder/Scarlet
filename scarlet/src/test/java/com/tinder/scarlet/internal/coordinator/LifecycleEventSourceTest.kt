@@ -4,9 +4,9 @@
 
 package com.tinder.scarlet.internal.coordinator
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.only
-import com.nhaarman.mockito_kotlin.then
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.only
+import com.nhaarman.mockitokotlin2.then
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState
 import com.tinder.scarlet.lifecycle.LifecycleRegistry

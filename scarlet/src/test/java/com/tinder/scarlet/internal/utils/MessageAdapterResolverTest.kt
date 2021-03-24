@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.utils
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
 import com.tinder.scarlet.MessageAdapter
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalStateException
