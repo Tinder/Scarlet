@@ -30,8 +30,7 @@ import java.util.concurrent.TimeUnit
 
 class ReceiveChannelTest {
 
-    @get:Rule
-    private val mockWebServer = MockWebServer()
+    @get:Rule val mockWebServer = MockWebServer()
     private val serverUrlString by lazy { mockWebServer.url("/").toString() }
 
     private val serverLifecycleRegistry = LifecycleRegistry()
