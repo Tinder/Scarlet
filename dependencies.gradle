@@ -20,7 +20,7 @@ ext.versions = [
 
     moshi: '1.11.0',
     gson: '2.8.2',
-    protobuf: '3.11.0',
+    protobuf: '3.15.6',
     jacksonDatabind: '2.9.5',
     jacksonModuleKotlin: '2.9.5',
     jsonPatch: '1.9',
