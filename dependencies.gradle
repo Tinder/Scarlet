@@ -34,9 +34,8 @@ ext.versions = [
     jodaTime: '2.9.9',
     glide: '4.12.0',
 
-    okHttp: '3.11.0',
+    okHttp: '4.9.1',
     okio: '1.13.0',
-    mockWebServer: '3.11.0',
     timber: '4.6.0',
     okSse: '0.9.0',
 
@@ -92,7 +91,7 @@ ext.libs = [
     okHttp: "com.squareup.okhttp3:okhttp:$versions.okHttp",
     okHttpLoggingInterceptor: "com.squareup.okhttp3:logging-interceptor:$versions.okHttp",
     okio: "com.squareup.okio:okio:$versions.okio",
-    mockWebServer: "com.squareup.okhttp3:mockwebserver:$versions.mockWebServer",
+    mockWebServer: "com.squareup.okhttp3:mockwebserver:$versions.okHttp",
     timber: "com.jakewharton.timber:timber:$versions.timber",
     okSse: "com.github.heremaps:oksse:$versions.okSse",
 

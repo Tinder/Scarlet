@@ -19,6 +19,6 @@ internal class StaticUrlRequestFactoryTest {
         val request2 = staticUrlRequestFactory.createRequest()
 
         // Then
-        assertThat(request1.url()).isEqualTo(request2.url())
+        assertThat(request1.url).isEqualTo(request2.url)
     }
 }

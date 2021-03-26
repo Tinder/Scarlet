@@ -35,8 +35,7 @@ import java.util.concurrent.TimeUnit
 
 internal class GsonMessageAdapterTest {
 
-    @get:Rule
-    private val mockWebServer = MockWebServer()
+    @get:Rule val mockWebServer = MockWebServer()
     private val serverUrlString by lazy { mockWebServer.url("/").toString() }
 
     private val serverLifecycleRegistry = LifecycleRegistry()
