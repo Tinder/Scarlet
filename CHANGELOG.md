@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+## Version 0.1.12
+_2021-04-05_
+
+* Various build tools and dependencies upgrade
+    * Gradle 6.8.3
+    * Kotlin 1.4.31
+    * Protobuf 3.15.6
+    * OkHttp 4.9.1
+* Support JDK 11
+
 ## Version 0.1.11
 _2020-11-02_
 
