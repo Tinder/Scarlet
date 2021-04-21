@@ -3,7 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api rootProject.ext.rxJava
+    api rootProject.ext.rxJava2
 
     implementation project(':scarlet-core')
     implementation rootProject.ext.kotlinStdlib

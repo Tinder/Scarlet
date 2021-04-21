@@ -10,7 +10,7 @@ dependencies {
     implementation rootProject.ext.okHttpServerSentEvent
 
     implementation project(':scarlet-core-internal')
-    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.rxJava2
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation project(':scarlet-test-utils')

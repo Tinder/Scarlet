@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -55,9 +55,9 @@ dependencies {
     implementation rootProject.ext.liveDateReactiveSterams
     implementation rootProject.ext.lifecycleService
     implementation rootProject.ext.rxBinding
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxAndroid
-    implementation rootProject.ext.rxKotlin
+    implementation rootProject.ext.rxJava2
+    implementation rootProject.ext.rxAndroid2
+    implementation rootProject.ext.rxKotlin2
     implementation rootProject.ext.okHttpLoggingInterceptor
     implementation rootProject.ext.stetho
     implementation rootProject.ext.stethoOkHttp
