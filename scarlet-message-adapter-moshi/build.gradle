@@ -3,6 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
+    api rootProject.ext.okio
     api rootProject.ext.moshi
 
     implementation project(':scarlet-core')
@@ -12,5 +13,6 @@ dependencies {
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
     testImplementation rootProject.ext.kotlinReflect
+    testImplementation rootProject.ext.moshiReflect
     testImplementation rootProject.ext.assertJ
 }

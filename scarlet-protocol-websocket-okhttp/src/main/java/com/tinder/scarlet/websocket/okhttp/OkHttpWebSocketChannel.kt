@@ -13,6 +13,7 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import okio.ByteString.Companion.toByteString
 
 class OkHttpWebSocketChannel(
     private val webSocketFactory: WebSocketFactory,
@@ -23,7 +24,10 @@ class OkHttpWebSocketChannel(
 
     override fun open(openRequest: Protocol.OpenRequest) {
         val webSocketOpenRequest = openRequest as OkHttpWebSocket.OpenRequest
-        webSocketFactory.createWebSocket(webSocketOpenRequest.okHttpRequest, InnerWebSocketListener())
+        webSocketFactory.createWebSocket(
+            webSocketOpenRequest.okHttpRequest,
+            InnerWebSocketListener()
+        )
     }
 
     override fun close(closeRequest: Protocol.CloseRequest) {
@@ -50,7 +54,7 @@ class OkHttpWebSocketChannel(
             is Message.Text -> webSocket.send(message.value)
             is Message.Bytes -> {
                 val bytes = message.value
-                val byteString = ByteString.of(bytes, 0, bytes.size)
+                val byteString = bytes.toByteString(0, bytes.size)
                 webSocket.send(byteString)
             }
         }

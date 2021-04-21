@@ -1,35 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ © 2018 Match Group, LLC.
   -->
 
 <resources>
-  <!-- Space Size. The space is based on material design guideline
-         https://material.google.com/layout/metrics-keylines.html# -->
-  <dimen name="space_xxxxs">1dp</dimen>
-  <dimen name="space_xxxs">2dp</dimen>
-  <dimen name="space_xxs">4dp</dimen>
-  <dimen name="space_xs">8dp</dimen>
-  <dimen name="space_s">16dp</dimen>
-  <dimen name="space_m">20dp</dimen>
-  <dimen name="space_l">24dp</dimen>
-  <dimen name="space_xl">36dp</dimen>
-  <dimen name="space_xxl">48dp</dimen>
-  <dimen name="space_xxxl">56dp</dimen>
-  <dimen name="space_xxxxl">96dp</dimen>
+    <!-- Space Size. The space is based on material design guideline
+           https://material.google.com/layout/metrics-keylines.html# -->
+    <dimen name="space_xxxxs">1dp</dimen>
+    <dimen name="space_xxxs">2dp</dimen>
+    <dimen name="space_xxs">4dp</dimen>
+    <dimen name="space_xs">8dp</dimen>
+    <dimen name="space_s">16dp</dimen>
+    <dimen name="space_m">20dp</dimen>
+    <dimen name="space_l">24dp</dimen>
+    <dimen name="space_xl">36dp</dimen>
+    <dimen name="space_xxl">48dp</dimen>
+    <dimen name="space_xxxl">56dp</dimen>
+    <dimen name="space_xxxxl">96dp</dimen>
 
-  <!-- Text Size. The Style is based on material design guideline
-       https://material.google.com/style/typography.html#typography-typeface -->
-  <dimen name="text_xxxxs">8sp</dimen>
-  <!-- Should be removed eventually. Too small according to Material Design -->
-  <dimen name="text_xxxs">10sp</dimen>
-  <dimen name="text_xxs">12sp</dimen>
-  <dimen name="text_xs">14sp</dimen>
-  <dimen name="text_s">16sp</dimen>
-  <dimen name="text_sm">18sp</dimen>
-  <dimen name="text_m">20sp</dimen>
-  <dimen name="text_l">24sp</dimen>
-  <dimen name="text_xl">34sp</dimen>
-  <dimen name="text_xxl">45sp</dimen>
-  <dimen name="text_xxxl">56sp</dimen>
+    <!-- Text Size. The Style is based on material design guideline
+         https://material.google.com/style/typography.html#typography-typeface -->
+    <dimen name="text_xxxxs">8sp</dimen>
+    <!-- Should be removed eventually. Too small according to Material Design -->
+    <dimen name="text_xxxs">10sp</dimen>
+    <dimen name="text_xxs">12sp</dimen>
+    <dimen name="text_xs">14sp</dimen>
+    <dimen name="text_s">16sp</dimen>
+    <dimen name="text_sm">18sp</dimen>
+    <dimen name="text_m">20sp</dimen>
+    <dimen name="text_l">24sp</dimen>
+    <dimen name="text_xl">34sp</dimen>
+    <dimen name="text_xxl">45sp</dimen>
+    <dimen name="text_xxxl">56sp</dimen>
 </resources>

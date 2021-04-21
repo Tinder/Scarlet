@@ -36,7 +36,7 @@ internal class StateTransitionAdapterResolver(
             }
         }
         throw IllegalStateException(
-            "Cannot resolve state transition adapter for type: $type, annotations: $annotations."
+            "Cannot resolve state transition adapter for type: $type, annotations: ${annotations.toList()}."
         )
     }
 }

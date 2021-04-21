@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ © 2018 Match Group, LLC.
   -->
 
@@ -18,6 +17,6 @@
         app:message_max_width="250dp"
         app:option_button_enable="true"
         app:time_label_font_size="@dimen/text_xxs"
-        app:username_font_size="@dimen/text_xs"/>
+        app:username_font_size="@dimen/text_xs" />
 
 </LinearLayout>

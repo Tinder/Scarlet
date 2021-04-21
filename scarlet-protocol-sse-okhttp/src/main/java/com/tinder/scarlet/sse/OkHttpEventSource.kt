@@ -103,11 +103,11 @@ class OkHttpEventSourceChannel(
             )
         }
 
-        override fun onClosed(eventSource: EventSource?) {
+        override fun onClosed(eventSource: EventSource) {
             listener.onClosed(this@OkHttpEventSourceChannel)
         }
 
-        override fun onFailure(eventSource: EventSource?, t: Throwable?, response: Response?) {
+        override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
             listener.onFailed(this@OkHttpEventSourceChannel, true, t)
         }
     }

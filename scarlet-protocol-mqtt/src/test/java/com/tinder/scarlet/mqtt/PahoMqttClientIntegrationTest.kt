@@ -23,6 +23,7 @@ class PahoMqttClientIntegrationTest {
             brokerService.addConnector(BROKER_CONNECTOR_URL)
         }
     }
+
     @get:Rule
     val connection1 = PahoMqttConnection.create<MqttQueueTestService>(
         { observeProtocolEvent() },
@@ -32,6 +33,7 @@ class PahoMqttClientIntegrationTest {
             TOPIC
         )
     )
+
     @get:Rule
     val connection2 = PahoMqttConnection.create<MqttQueueTestService>(
         { observeProtocolEvent() },

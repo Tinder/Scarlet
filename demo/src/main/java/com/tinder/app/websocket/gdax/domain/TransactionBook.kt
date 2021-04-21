@@ -13,7 +13,8 @@ class TransactionBook(
 
     fun addingTransaction(product: Product, transaction: Transaction): TransactionBook {
         val newHistory = TransactionBook(transactions)
-        newHistory.transactions[product] = (newHistory.transactions[product] ?: emptyList()) + transaction
+        newHistory.transactions[product] = (newHistory.transactions[product]
+            ?: emptyList()) + transaction
         return newHistory
     }
 }

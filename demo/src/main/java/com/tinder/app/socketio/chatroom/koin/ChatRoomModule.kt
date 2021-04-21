@@ -4,6 +4,8 @@
 
 package com.tinder.app.socketio.chatroom.koin
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.tinder.app.socketio.chatroom.api.AddUserTopic
 import com.tinder.app.socketio.chatroom.api.ChatRoomService
 import com.tinder.app.socketio.chatroom.api.NewMessageTopic
@@ -26,9 +28,12 @@ val chatRoomModule = module {
     // TODO sub module private
 
     factory("default") {
+        val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
         Scarlet.Configuration(
             lifecycle = get("foreground"),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
+            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
     }

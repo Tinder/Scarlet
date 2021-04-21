@@ -27,7 +27,7 @@ import com.tinder.app.websocket.echo.domain.ChatMessage
 import droidninja.filepicker.FilePickerBuilder
 import droidninja.filepicker.FilePickerConst
 import org.koin.android.ext.android.inject
-import java.util.Locale
+import java.util.*
 
 class EchoBotFragment : Fragment() {
 
@@ -71,7 +71,7 @@ class EchoBotFragment : Fragment() {
         }
 
         viewModel.chatMessages
-            .observe(this, Observer<List<ChatMessage>> { chatMessages ->
+            .observe(viewLifecycleOwner, Observer<List<ChatMessage>> { chatMessages ->
                 val numberOfMessages = chatView.getMessageView().messageList.size
                 if (numberOfMessages == 0) {
                     setMessages(chatMessages)
@@ -85,7 +85,7 @@ class EchoBotFragment : Fragment() {
             })
 
         viewModel.authStatus
-            .observe(this, Observer<AuthStatus> {
+            .observe(viewLifecycleOwner, Observer<AuthStatus> {
                 when (it) {
                     AuthStatus.LOGGED_IN -> showLoggedIn()
                     AuthStatus.LOGGED_OUT -> showLoggedOut()
@@ -123,7 +123,7 @@ class EchoBotFragment : Fragment() {
                     return
                 }
                 val photoPaths = mutableListOf<String>()
-                photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA))
+                photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA)!!)
                 if (photoPaths.isEmpty()) {
                     return
                 }

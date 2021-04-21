@@ -1,7 +1,3 @@
-/*
- * © 2018 Match Group, LLC.
- */
-
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
@@ -12,7 +8,7 @@ dependencies {
     api rootProject.ext.nettySocketIoServer
 
     implementation project(':scarlet-core-internal')
-    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.rxJava2
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation project(':scarlet-test-utils')

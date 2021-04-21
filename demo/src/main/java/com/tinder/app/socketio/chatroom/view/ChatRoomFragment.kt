@@ -23,7 +23,7 @@ import com.tinder.R
 import com.tinder.app.socketio.chatroom.domain.model.ChatMessage
 import io.reactivex.Flowable
 import org.koin.android.ext.android.inject
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ChatRoomFragment : Fragment() {

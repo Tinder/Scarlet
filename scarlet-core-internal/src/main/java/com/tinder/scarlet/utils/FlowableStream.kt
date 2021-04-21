@@ -14,7 +14,8 @@ class FlowableStream<T>(
 ) : Stream<T>, Publisher<T> by flowable {
 
     override fun start(observer: Stream.Observer<T>): Stream.Disposable {
-        val disposable = flowable.subscribe(observer::onNext, observer::onError, observer::onComplete)
+        val disposable =
+            flowable.subscribe(observer::onNext, observer::onError, observer::onComplete)
         return FlowableStreamDisposable(disposable)
     }
 

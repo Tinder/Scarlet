@@ -5,8 +5,8 @@
 package com.tinder.scarlet
 
 data class StateTransition(
-    val fromState: State,
-    val event: Event,
-    val toState: State,
-    val sideEffect: SideEffect?
+        val fromState: State,
+        val event: Event,
+        val toState: State,
+        val sideEffect: SideEffect?
 )

@@ -11,7 +11,8 @@ import rx.Subscriber
 
 class ObservableStreamAdapter<T> : StreamAdapter<T, Observable<T>> {
 
-    override fun adapt(stream: Stream<T>): Observable<T> = Observable.unsafeCreate(StreamOnSubscribe(stream))
+    override fun adapt(stream: Stream<T>): Observable<T> =
+        Observable.unsafeCreate(StreamOnSubscribe(stream))
 
     private class StreamOnSubscribe<T>(private val stream: Stream<T>) : Observable.OnSubscribe<T> {
 

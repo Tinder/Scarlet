@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.streamadapter.builtin
 
-import com.nhaarman.mockito_kotlin.mock
+import org.mockito.kotlin.mock
 import com.tinder.scarlet.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test

@@ -13,7 +13,8 @@ class LoggedInLifecycle private constructor(
     private val lifecycleRegistry: LifecycleRegistry
 ) : Lifecycle by lifecycleRegistry {
 
-    constructor(authStatusRepository: AuthStatusRepository) : this(authStatusRepository,
+    constructor(authStatusRepository: AuthStatusRepository) : this(
+        authStatusRepository,
         LifecycleRegistry()
     )
 

@@ -5,8 +5,8 @@
 package com.tinder.scarlet.internal.statetransition
 
 import com.tinder.scarlet.Event
-import com.tinder.scarlet.ProtocolSpecificEventAdapter
 import com.tinder.scarlet.ProtocolSpecificEvent
+import com.tinder.scarlet.ProtocolSpecificEventAdapter
 import com.tinder.scarlet.StateTransition
 import com.tinder.scarlet.utils.getRawType
 import java.lang.reflect.Type

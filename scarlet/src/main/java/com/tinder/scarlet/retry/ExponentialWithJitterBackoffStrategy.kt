@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.retry
 
-import java.util.Random
+import java.util.*
 
 class ExponentialWithJitterBackoffStrategy(
     val baseDurationMillis: Long,
@@ -12,7 +12,8 @@ class ExponentialWithJitterBackoffStrategy(
     private val random: Random = Random()
 ) : BackoffStrategy {
 
-    private val exponentialBackoffRetryStrategy = ExponentialBackoffStrategy(baseDurationMillis, maxDurationMillis)
+    private val exponentialBackoffRetryStrategy =
+        ExponentialBackoffStrategy(baseDurationMillis, maxDurationMillis)
 
     override fun backoffDurationMillisAt(retryCount: Int): Long {
         val duration = exponentialBackoffRetryStrategy.backoffDurationMillisAt(retryCount)

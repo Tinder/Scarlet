@@ -24,7 +24,8 @@ internal class BuiltInMessageAdapterFactoryTest {
     @Test
     fun create_givenByteArrayType_shouldReturnByteArrayMessageAdapter() {
         // When
-        val messageAdapter = builtInMessageAdapterFactory.create(ByteArray::class.java, emptyArray())
+        val messageAdapter =
+            builtInMessageAdapterFactory.create(ByteArray::class.java, emptyArray())
 
         // Then
         assertThat(messageAdapter).isInstanceOf(ByteArrayMessageAdapter::class.java)

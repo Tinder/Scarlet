@@ -6,9 +6,9 @@
 
 package com.tinder.scarlet.testutils
 
-import com.tinder.scarlet.Message
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState
+import com.tinder.scarlet.Message
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.socketio.SocketIoEvent
 import com.tinder.scarlet.sse.EventSourceEvent
@@ -21,9 +21,10 @@ inline fun <reified T : LifecycleState> ValueAssert<Event.OnLifecycleStateChange
         assertThat(lifecycleState).isInstanceOf(T::class.java)
     }
 
-inline fun <reified T : ProtocolEvent> ValueAssert<Event.OnProtocolEvent>.withProtocolEvent() = assert {
-    assertThat(protocolEvent).isInstanceOf(T::class.java)
-}
+inline fun <reified T : ProtocolEvent> ValueAssert<Event.OnProtocolEvent>.withProtocolEvent() =
+    assert {
+        assertThat(protocolEvent).isInstanceOf(T::class.java)
+    }
 
 fun ValueAssert<ProtocolEvent.OnMessageReceived>.containingText2(expectedText: String): ValueAssert<ProtocolEvent.OnMessageReceived> {
     return assert {

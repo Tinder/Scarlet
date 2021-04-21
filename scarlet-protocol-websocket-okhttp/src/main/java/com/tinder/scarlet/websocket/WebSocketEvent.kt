@@ -5,10 +5,10 @@
 package com.tinder.scarlet.websocket
 
 import com.tinder.scarlet.Message
-import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.ProtocolEvent
-import com.tinder.scarlet.ProtocolSpecificEventAdapter
 import com.tinder.scarlet.ProtocolSpecificEvent
+import com.tinder.scarlet.ProtocolSpecificEventAdapter
+import com.tinder.scarlet.utils.getRawType
 import com.tinder.scarlet.websocket.okhttp.OkHttpWebSocket
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -20,7 +20,8 @@ sealed class WebSocketEvent : ProtocolSpecificEvent {
      *
      * @property webSocket The `WebSocket` instance used for this connection.
      */
-    data class OnConnectionOpened(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) : WebSocketEvent()
+    data class OnConnectionOpened(val okHttpWebSocket: WebSocket, val okHttpResponse: Response) :
+        WebSocketEvent()
 
     /**
      * Invoked when a [text message][Message.Text] or [binary message][Message.Bytes] has been received.
@@ -57,7 +58,10 @@ sealed class WebSocketEvent : ProtocolSpecificEvent {
             return when (event) {
                 is ProtocolEvent.OnOpened -> {
                     val response = event.response as OkHttpWebSocket.OpenResponse
-                    WebSocketEvent.OnConnectionOpened(response.okHttpWebSocket, response.okHttpResponse)
+                    WebSocketEvent.OnConnectionOpened(
+                        response.okHttpWebSocket,
+                        response.okHttpResponse
+                    )
                 }
                 is ProtocolEvent.OnMessageReceived -> {
                     WebSocketEvent.OnMessageReceived(event.message)
@@ -78,7 +82,10 @@ sealed class WebSocketEvent : ProtocolSpecificEvent {
         }
 
         class Factory : ProtocolSpecificEventAdapter.Factory {
-            override fun create(type: Type, annotations: Array<Annotation>): ProtocolSpecificEventAdapter {
+            override fun create(
+                type: Type,
+                annotations: Array<Annotation>
+            ): ProtocolSpecificEventAdapter {
                 val receivingClazz = type.getRawType()
                 require(WebSocketEvent::class.java.isAssignableFrom(receivingClazz)) {
                     "Only subclasses of WebSocketEvent are supported"

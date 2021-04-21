@@ -15,7 +15,8 @@ internal class FlowableLifecycle(
 
     override fun combineWith(others: List<Lifecycle>): Lifecycle {
         val lifecycles = others + this
-        val flowable = Flowable.combineLatest(lifecycles) { it.map { it as LifecycleState }.combine() }
+        val flowable =
+            Flowable.combineLatest(lifecycles) { it.map { it as LifecycleState }.combine() }
         return FlowableLifecycle(flowable)
     }
 }

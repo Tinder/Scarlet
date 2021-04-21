@@ -9,20 +9,20 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
 import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import okio.Buffer
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -140,7 +140,7 @@ internal class MoshiMessageAdapterTest {
             // Given
             connection.open()
             val jsonWithUtf8Bom = Buffer()
-                .write(ByteString.decodeHex("EFBBBF"))
+                .write("EFBBBF".decodeHex())
                 .writeUtf8("""{"name":"value"}""")
                 .readByteString()
                 .toByteArray()
@@ -164,7 +164,7 @@ internal class MoshiMessageAdapterTest {
             // Given
             connection.open()
             val jsonWithUtf16Bom = Buffer()
-                .write(ByteString.decodeHex("FEFF"))
+                .write("FEFF".decodeHex())
                 .writeString("""{"name":"value"}""", Charset.forName("UTF-16"))
                 .readByteString()
                 .toByteArray()
@@ -186,6 +186,7 @@ internal class MoshiMessageAdapterTest {
         private val config = MoshiMessageAdapter.Factory.Config(
             lenient = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },
@@ -227,6 +228,7 @@ internal class MoshiMessageAdapterTest {
             lenient = true,
             serializeNull = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },
@@ -258,8 +260,9 @@ internal class MoshiMessageAdapterTest {
                 any<WebSocketEvent.OnMessageReceived>().containingText(jsonWithNullValues)
             )
             serverAnImplementationObserver.awaitValues(
-                any { org.assertj.core.api.Assertions.assertThat(this)
-                    .isEqualTo(com.tinder.scarlet.messageadapter.moshi.AnImplementation(null)) }
+                any {
+                    assertThat(this).isEqualTo(AnImplementation(null))
+                }
             )
         }
     }
@@ -270,6 +273,7 @@ internal class MoshiMessageAdapterTest {
             serializeNull = true,
             failOnUnknown = true
         )
+
         @get:Rule
         internal val connection = OkHttpWebSocketConnection.create<Service>(
             observeWebSocketEvent = { observeEvents() },

@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.stub
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.then
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.assertj.core.api.Assertions.assertThatIllegalStateException
 import org.junit.Test

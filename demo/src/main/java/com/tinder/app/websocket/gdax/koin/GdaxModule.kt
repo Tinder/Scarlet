@@ -4,8 +4,8 @@
 
 package com.tinder.app.websocket.gdax.koin
 
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.tinder.app.websocket.gdax.api.GdaxService
 import com.tinder.app.websocket.gdax.api.MoshiAdapters
 import com.tinder.app.websocket.gdax.domain.TransactionRepository

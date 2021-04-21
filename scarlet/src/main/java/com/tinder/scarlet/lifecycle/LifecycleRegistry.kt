@@ -61,7 +61,11 @@ class LifecycleRegistry private constructor(
                 .distinctUntilChanged()
                 .compose {
                     if (throttleDurationMillis > 0L) {
-                        it.throttleWithTimeout(throttleDurationMillis, TimeUnit.MILLISECONDS, throttleScheduler)
+                        it.throttleWithTimeout(
+                            throttleDurationMillis,
+                            TimeUnit.MILLISECONDS,
+                            throttleScheduler
+                        )
                     } else {
                         it
                     }

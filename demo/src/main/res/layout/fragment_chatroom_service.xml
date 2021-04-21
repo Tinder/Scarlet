@@ -1,23 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ © 2019 Match Group, LLC.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/stockName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/space_xxl"
         android:layout_marginTop="@dimen/space_l"
         android:layout_marginEnd="@dimen/space_xs"
-        android:layout_marginStart="@dimen/space_xxl"
-        android:layout_gravity="center"
         android:autoLink="web"
-        android:linksClickable="true"
         android:lines="10"
+        android:linksClickable="true"
         android:text="Interact with this demo at\n https://socket-io-chat.now.sh/\nIncoming Messages will show up as notifications" />
 
 </LinearLayout>

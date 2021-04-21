@@ -11,5 +11,6 @@ sealed class Deserialization<T> {
 
     data class Success<T>(val value: T, val incomingMessage: Message) : Deserialization<T>()
 
-    data class Error<T>(val throwable: Throwable, val incomingMessage: Message) : Deserialization<T>()
+    data class Error<T>(val throwable: Throwable, val incomingMessage: Message) :
+        Deserialization<T>()
 }

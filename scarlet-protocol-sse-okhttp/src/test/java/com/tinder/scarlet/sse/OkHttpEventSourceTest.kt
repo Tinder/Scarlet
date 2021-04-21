@@ -20,6 +20,7 @@ class OkHttpEventSourceTest {
 
     @get:Rule
     val server = MockWebServer()
+
     @get:Rule
     internal val connection = OkHttpSseConnection.create<Service>(
         observeEventSourceEvent = { observeEventSourceEvent() },

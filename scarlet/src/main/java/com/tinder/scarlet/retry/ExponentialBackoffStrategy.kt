@@ -15,7 +15,7 @@ class ExponentialBackoffStrategy(
     }
 
     override fun backoffDurationMillisAt(retryCount: Int): Long =
-            // This will not overflow because double "flushes to infinity"
+        // This will not overflow because double "flushes to infinity"
         Math.min(
             maxDurationMillis.toDouble(),
             initialDurationMillis.toDouble() * Math.pow(2.0, retryCount.toDouble())
