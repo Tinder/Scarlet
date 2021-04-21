@@ -73,7 +73,7 @@ ext {
     slf4jSimple = "org.slf4j:slf4j-simple:1.7.30"
 
     junit = "junit:junit:4.13.2"
-    mockito = "org.mockito.kotlin:mockito-kotlin:3.1.0"
+    mockito = "org.mockito.kotlin:mockito-kotlin:2.2.11"
     assertJ = "org.assertj:assertj-core:3.19.0"
 
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
