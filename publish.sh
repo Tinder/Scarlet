@@ -6,7 +6,7 @@
 # http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/
 
 REPO_URL="git@github.com:Tinder/Scarlet.git"
-BRANCH="master"
+BRANCH="main"
 
 set -e
 
