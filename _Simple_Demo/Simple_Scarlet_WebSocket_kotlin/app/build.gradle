@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 29
+
+    dataBinding {
+        enabled = true
+    }
+
+    defaultConfig {
+        applicationId "com.carpa.simple_scarlet_websocket_kotlin"
+        minSdkVersion 24
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //Navigation component
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
+
+    //Scarlet library
+    implementation 'com.tinder.scarlet:scarlet:0.1.10'
+
+    //Scarlet helpers
+    implementation 'com.tinder.scarlet:message-adapter-moshi:0.1.10'
+    implementation 'com.tinder.scarlet:stream-adapter-rxjava2:0.1.10'
+    implementation 'com.tinder.scarlet:message-adapter-protobuf:0.1.10'
+    implementation 'com.tinder.scarlet:lifecycle-android:0.1.10'
+    implementation "com.tinder.scarlet:websocket-okhttp:0.1.10"
+
+    //For logging
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //For LiveDataReactiveStreams
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams:2.2.0'
+
+}

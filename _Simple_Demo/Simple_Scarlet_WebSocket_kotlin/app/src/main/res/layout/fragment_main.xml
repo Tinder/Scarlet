@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.carpa.simple_scarlet_websocket_kotlin.main.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".main.MainFragment">
+
+        <TextView
+            android:id="@+id/connection_status"
+            style="@style/standardTxt"
+            android:maxLines="3"
+            android:minLines="1"
+            android:text="@{@string/is_connection_opened(viewModel.isConnected())}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/received_msg_txt"
+            app:layout_constraintStart_toStartOf="@+id/received_msg_txt"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.264"
+            tools:text="@string/is_connection_opened" />
+
+        <TextView
+            android:id="@+id/received_msg_txt"
+            style="@style/standardTxt"
+            android:maxLines="3"
+            android:minLines="1"
+            android:text="@{viewModel.msgRec != null ? viewModel.msgRec.component1() : @string/no_message_received}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.784"
+            tools:text="@string/no_message_received" />
+
+        <Button
+            android:id="@+id/sendMsgBtn"
+            android:layout_width="145dp"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> viewModel.onSendMsg(messToSendEdTxt)}"
+            android:text="@string/send"
+            app:layout_constraintBottom_toTopOf="@+id/received_msg_txt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.939"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.713" />
+
+        <EditText
+            android:id="@+id/mess_to_send_ed_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:ems="10"
+            android:hint="@string/hi_nice_app"
+            android:inputType="text"
+            app:layout_constraintBottom_toTopOf="@+id/received_msg_txt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.08"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.714" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
