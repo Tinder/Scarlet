@@ -14,7 +14,7 @@ ext {
     constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
     material = "com.google.android.material:material:1.4.0"
 
-    def coroutinesVersion = "1.4.3"
+    def coroutinesVersion = "1.5.1"
     kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     kotlinCoroutinesRxInterop = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$coroutinesVersion"
     kotlinCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
