@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.statetransition
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
+import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.assertj.core.api.Assertions.assertThatIllegalStateException
@@ -18,17 +18,25 @@ class StateTransitionAdapterResolverTest {
 
     private val stateTransitionAdapterFactory1 = mock<StateTransitionAdapter.Factory>()
     private val stateTransitionAdapterFactory2 = mock<StateTransitionAdapter.Factory>()
-    private val stateTransitionAdapterResolver = StateTransitionAdapterResolver(listOf(stateTransitionAdapterFactory1, stateTransitionAdapterFactory2))
+    private val stateTransitionAdapterResolver = StateTransitionAdapterResolver(
+        listOf(
+            stateTransitionAdapterFactory1,
+            stateTransitionAdapterFactory2
+        )
+    )
 
     @Test
     fun resolve_givenTypeIsSupportedByTheFirstStateTransitionAdapterFactory_shouldReturnStateTransitionAdapter() {
         // Given
         val type = Array<Int>::class.java
         val stateTransitionAdapter = mock<StateTransitionAdapter<Any>>()
-        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(stateTransitionAdapter)
+        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(
+            stateTransitionAdapter
+        )
 
         // When
-        val resolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
+        val resolvedStateTransitionAdapter =
+            stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
         assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
@@ -40,10 +48,13 @@ class StateTransitionAdapterResolverTest {
         val type = Array<Int>::class.java
         val stateTransitionAdapter = mock<StateTransitionAdapter<Any>>()
         given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(null)
-        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willReturn(stateTransitionAdapter)
+        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willReturn(
+            stateTransitionAdapter
+        )
 
         // When
-        val resolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
+        val resolvedStateTransitionAdapter =
+            stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
         assertThat(resolvedStateTransitionAdapter).isEqualTo(stateTransitionAdapter)
@@ -53,14 +64,23 @@ class StateTransitionAdapterResolverTest {
     fun resolve_givenTypeHasBeenResolved_shouldReturnTheMemoizedStateTransitionAdapter() {
         // Given
         val type = Array<Int>::class.java
-        given(stateTransitionAdapterFactory1.create(type, emptyArray())).willAnswer { mock<StateTransitionAdapter<Any>>() }
-        val firstResolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
+        given(
+            stateTransitionAdapterFactory1.create(
+                type,
+                emptyArray()
+            )
+        ).willAnswer { mock<StateTransitionAdapter<Any>>() }
+        val firstResolvedStateTransitionAdapter =
+            stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // When
-        val secondResolvedStateTransitionAdapter = stateTransitionAdapterResolver.resolve(type, emptyArray())
+        val secondResolvedStateTransitionAdapter =
+            stateTransitionAdapterResolver.resolve(type, emptyArray())
 
         // Then
-        assertThat(secondResolvedStateTransitionAdapter).isSameAs(firstResolvedStateTransitionAdapter)
+        assertThat(secondResolvedStateTransitionAdapter).isSameAs(
+            firstResolvedStateTransitionAdapter
+        )
     }
 
     @Test
@@ -83,7 +103,9 @@ class StateTransitionAdapterResolverTest {
         // Given
         val type = Array<Int>::class.java
         given(stateTransitionAdapterFactory1.create(type, emptyArray())).willReturn(null)
-        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willThrow(IllegalArgumentException("Unsupported type"))
+        given(stateTransitionAdapterFactory2.create(type, emptyArray())).willThrow(
+            IllegalArgumentException("Unsupported type")
+        )
 
         // Then
         assertThatIllegalArgumentException()

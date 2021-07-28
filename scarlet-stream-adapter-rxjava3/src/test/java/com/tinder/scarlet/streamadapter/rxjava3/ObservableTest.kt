@@ -2,9 +2,9 @@ package com.tinder.scarlet.streamadapter.rxjava3
 
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
 import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -17,17 +17,17 @@ class ObservableTest {
 
     @get:Rule
     internal val connection = OkHttpWebSocketConnection.create<FlowableTest.Service>(
-            observeWebSocketEvent = { observeEvents() },
-            serverConfiguration = OkHttpWebSocketConnection.Configuration(
-                    streamAdapterFactories = listOf(
-                            RxJava3StreamAdapterFactory()
-                    )
-            ),
-            clientConfiguration = OkHttpWebSocketConnection.Configuration(
-                    streamAdapterFactories = listOf(
-                            RxJava3StreamAdapterFactory()
-                    )
+        observeWebSocketEvent = { observeEvents() },
+        serverConfiguration = OkHttpWebSocketConnection.Configuration(
+            streamAdapterFactories = listOf(
+                RxJava3StreamAdapterFactory()
             )
+        ),
+        clientConfiguration = OkHttpWebSocketConnection.Configuration(
+            streamAdapterFactories = listOf(
+                RxJava3StreamAdapterFactory()
+            )
+        )
     )
 
     @Test
@@ -51,11 +51,11 @@ class ObservableTest {
         assertThat(isSendTextSuccessful).isTrue()
         assertThat(isSendBytesSuccessful).isTrue()
         connection.serverWebSocketEventObserver.awaitValues(
-                any<WebSocketEvent.OnConnectionOpened>(),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
-                any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
+            any<WebSocketEvent.OnConnectionOpened>(),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingText(textMessage2),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage1),
+            any<WebSocketEvent.OnMessageReceived>().containingBytes(bytesMessage2)
         )
         assertThat(testTextSubscriber.values()).containsExactly(textMessage1, textMessage2)
         assertThat(testBytesSubscriber.values()).containsExactly(bytesMessage1, bytesMessage2)

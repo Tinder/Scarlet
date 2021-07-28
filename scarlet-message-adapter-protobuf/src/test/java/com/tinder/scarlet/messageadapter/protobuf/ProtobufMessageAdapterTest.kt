@@ -9,13 +9,13 @@ import com.google.protobuf.InvalidProtocolBufferException
 import com.tinder.scarlet.Deserialization
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingBytes
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
-import okio.ByteString
+import okio.ByteString.Companion.decodeBase64
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -47,8 +47,7 @@ internal class ProtobufMessageAdapterTest {
             // Given
             connection.open()
             val phone = PhoneProtos.Phone.newBuilder().setNumber("(519) 867-5309").build()
-            val expectedSerializedPhone =
-                ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwOQ==")!!.toByteArray()
+            val expectedSerializedPhone = "Cg4oNTE5KSA4NjctNTMwOQ==".decodeBase64()!!.toByteArray()
             val serverPhoneObserver = connection.server.receivePhone().test()
 
             // When
@@ -91,8 +90,7 @@ internal class ProtobufMessageAdapterTest {
             // Given
             connection.open()
             val phone = PhoneProtos.Phone.newBuilder().setNumber("(519) 867-5309").build()
-            val serializedPhone =
-                ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwOQ==")!!.toByteArray()
+            val serializedPhone = "Cg4oNTE5KSA4NjctNTMwOQ==".decodeBase64()!!.toByteArray()
             val serverStringDeserializationObserver =
                 connection.server.receiveWrongClassDeserialization().test()
 
@@ -114,7 +112,7 @@ internal class ProtobufMessageAdapterTest {
         fun deserializeWrongValue() {
             // Given
             connection.open()
-            val data = ByteString.decodeBase64("////")!!.toByteArray()
+            val data = "////".decodeBase64()!!.toByteArray()
             val serverPhoneObserver = connection.server.receivePhoneDeserialization().test()
 
             // When
@@ -157,8 +155,7 @@ internal class ProtobufMessageAdapterTest {
         fun deserializeUsingRegistry() {
             // Given
             connection.open()
-            val serializedPhone =
-                ByteString.decodeBase64("Cg4oNTE5KSA4NjctNTMwORAB")!!.toByteArray()
+            val serializedPhone = "Cg4oNTE5KSA4NjctNTMwORAB".decodeBase64()!!.toByteArray()
             val serverPhoneObserver = connection.server.receivePhone().test()
 
             // When

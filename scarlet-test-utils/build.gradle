@@ -10,6 +10,6 @@ dependencies {
     api project(':scarlet-protocol-stomp')
     api project(':scarlet-protocol-mqtt')
     api rootProject.ext.assertJ
-    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.rxJava2
     implementation rootProject.ext.kotlinStdlib
 }

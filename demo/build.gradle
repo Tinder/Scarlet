@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 android {
@@ -23,10 +23,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
         exclude 'META-INF/ASL-2.0.txt'
         exclude 'META-INF/LGPL-3.0.txt'
+        exclude 'META-INF/*'
     }
 }
 
@@ -47,11 +52,11 @@ dependencies {
     implementation rootProject.ext.multiDex
     implementation rootProject.ext.constraintLayout
     implementation rootProject.ext.liveDateReactiveSterams
-    implementation rootProject.ext.lifecycleExtensions
+    implementation rootProject.ext.lifecycleService
     implementation rootProject.ext.rxBinding
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxAndroid
-    implementation rootProject.ext.rxKotlin
+    implementation rootProject.ext.rxJava2
+    implementation rootProject.ext.rxAndroid2
+    implementation rootProject.ext.rxKotlin2
     implementation rootProject.ext.okHttpLoggingInterceptor
     implementation rootProject.ext.stetho
     implementation rootProject.ext.stethoOkHttp
@@ -64,6 +69,7 @@ dependencies {
     implementation rootProject.ext.glide
     implementation rootProject.ext.jsonPatch
     implementation rootProject.ext.koin
+    implementation rootProject.ext.moshiReflect
 
     testImplementation rootProject.ext.junit
 }

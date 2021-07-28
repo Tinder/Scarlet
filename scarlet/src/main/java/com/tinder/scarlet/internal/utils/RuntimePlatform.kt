@@ -32,7 +32,10 @@ internal sealed class RuntimePlatform {
         ): Any {
             // Because the service interface might not be public, we need to use a MethodHandle lookup
             // that ignores the visibility of the declaringClass.
-            val constructor = Lookup::class.java.getDeclaredConstructor(Class::class.java, Int::class.javaPrimitiveType)
+            val constructor = Lookup::class.java.getDeclaredConstructor(
+                Class::class.java,
+                Int::class.javaPrimitiveType
+            )
             constructor.isAccessible = true
             return constructor.newInstance(declaringClass, -1 /* trusted */)
                 .unreflectSpecial(method, declaringClass)

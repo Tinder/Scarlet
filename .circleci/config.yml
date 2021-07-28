@@ -3,12 +3,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/android:api-28-alpha
+      - image: circleci/android:api-30
     environment:
-        TERM: dumb
-        JAVA_TOOL_OPTIONS: "-Xmx1g"
-        GRADLE_OPTS: '-Dorg.gradle.parallel=false -Dorg.gradle.daemon=false'
-        CIRCLE_TEST_REPORTS: test-reports
+      TERM: dumb
+      JAVA_TOOL_OPTIONS: "-Xmx1g"
+      GRADLE_OPTS: '-Dorg.gradle.parallel=false -Dorg.gradle.daemon=false'
+      CIRCLE_TEST_REPORTS: test-reports
     steps:
       - checkout
       - run:

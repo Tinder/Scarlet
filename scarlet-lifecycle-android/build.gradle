@@ -23,10 +23,10 @@ android {
 
 dependencies {
     implementation project(':scarlet')
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.rxKotlin
+    implementation rootProject.ext.rxJava2
+    implementation rootProject.ext.rxKotlin2
     implementation rootProject.ext.appCompat
-    implementation rootProject.ext.lifecycleExtensions
+    implementation rootProject.ext.lifecycleProcess
     implementation rootProject.ext.kotlinStdlib
 
     testImplementation rootProject.ext.junit

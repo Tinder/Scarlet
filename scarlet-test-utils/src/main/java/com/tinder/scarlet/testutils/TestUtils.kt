@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 
 fun <T : Any> Stream<T>.test() = TestStreamObserver(this)
 
-inline fun <reified T : Any> any(noinline assertion: T.() -> Unit = {}): ValueAssert<T> = ValueAssert<T>()
-    .assert { assertThat(this).isInstanceOf(T::class.java) }
-    .assert(assertion)
+inline fun <reified T : Any> any(noinline assertion: T.() -> Unit = {}): ValueAssert<T> =
+    ValueAssert<T>()
+        .assert { assertThat(this).isInstanceOf(T::class.java) }
+        .assert(assertion)

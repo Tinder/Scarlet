@@ -6,12 +6,12 @@ package com.tinder.scarlet.internal.stub
 
 import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.StreamAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
+import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import com.tinder.scarlet.internal.utils.StreamAdapterResolver
 import com.tinder.scarlet.utils.getParameterUpperBound
 import com.tinder.scarlet.utils.hasUnresolvableType
-import com.tinder.scarlet.internal.statetransition.StateTransitionAdapter
-import com.tinder.scarlet.internal.statetransition.StateTransitionAdapterResolver
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -80,7 +80,8 @@ internal sealed class StubMethod {
             val messageType = streamType.getFirstTypeArgument()
             val annotations = method.annotations
 
-            val stateTransitionAdatper = stateTransitionAdapterResolver.resolve(messageType, annotations)
+            val stateTransitionAdatper =
+                stateTransitionAdapterResolver.resolve(messageType, annotations)
             val streamAdapter = streamAdapterResolver.resolve(streamType)
             return Receive(
                 stateTransitionAdatper,
@@ -90,20 +91,33 @@ internal sealed class StubMethod {
     }
 
     companion object {
-        private inline fun Method.requireParameterTypes(vararg types: Class<*>, lazyMessage: () -> Any) {
+        private inline fun Method.requireParameterTypes(
+            vararg types: Class<*>,
+            lazyMessage: () -> Any
+        ) {
             require(genericParameterTypes.size == types.size, lazyMessage)
-            require(genericParameterTypes.zip(types).all { (t1, t2) -> t2 === t1 || t2.isInstance(t1) }, lazyMessage)
+            require(
+                genericParameterTypes.zip(types).all { (t1, t2) -> t2 === t1 || t2.isInstance(t1) },
+                lazyMessage
+            )
         }
 
-        private inline fun Method.requireReturnTypeIsOneOf(vararg types: Class<*>, lazyMessage: () -> Any) =
-            require(types.any { it === genericReturnType || it.isInstance(genericReturnType) }, lazyMessage)
+        private inline fun Method.requireReturnTypeIsOneOf(
+            vararg types: Class<*>,
+            lazyMessage: () -> Any
+        ) =
+            require(
+                types.any { it === genericReturnType || it.isInstance(genericReturnType) },
+                lazyMessage
+            )
 
         private inline fun Method.requireReturnTypeIsResolvable(lazyMessage: () -> Any) =
             require(!genericReturnType.hasUnresolvableType(), lazyMessage)
 
         private fun Method.getFirstParameterType(): Type = genericParameterTypes.first()
 
-        private fun Method.getFirstParameterAnnotations(): Array<Annotation> = parameterAnnotations.first()
+        private fun Method.getFirstParameterAnnotations(): Array<Annotation> =
+            parameterAnnotations.first()
 
         private fun ParameterizedType.getFirstTypeArgument(): Type = getParameterUpperBound(0)
     }

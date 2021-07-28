@@ -41,12 +41,11 @@ class ProtobufMessageAdapter<T : MessageLite> private constructor(
 
         override fun create(type: Type, annotations: Array<Annotation>): MessageAdapter<*> {
             require(type is Class<*>)
-            val c = type as Class<*>
             require(MessageLite::class.java.isAssignableFrom(type))
 
             var parser: Parser<MessageLite>
             try {
-                val method = c.getDeclaredMethod("parser")
+                val method = type.getDeclaredMethod("parser")
                 @Suppress("UNCHECKED_CAST")
                 parser = method.invoke(null) as Parser<MessageLite>
             } catch (e: InvocationTargetException) {
@@ -54,25 +53,25 @@ class ProtobufMessageAdapter<T : MessageLite> private constructor(
             } catch (ignored: NoSuchMethodException) {
                 // If the method is missing, fall back to original static field for pre-3.0 support.
                 try {
-                    val field = c.getDeclaredField("PARSER")
+                    val field = type.getDeclaredField("PARSER")
                     @Suppress("UNCHECKED_CAST")
                     parser = field.get(null) as Parser<MessageLite>
                 } catch (e: NoSuchFieldException) {
                     throw IllegalArgumentException(
-                        "Found a protobuf message but ${c.name} had no parser() method or PARSER field."
+                        "Found a protobuf message but ${type.name} had no parser() method or PARSER field."
                     )
                 } catch (e: IllegalAccessException) {
-                    throw IllegalArgumentException("Found a protobuf message but ${c.name} had no parser() method or PARSER field.")
+                    throw IllegalArgumentException("Found a protobuf message but ${type.name} had no parser() method or PARSER field.")
                 }
             } catch (ignored: IllegalAccessException) {
                 try {
-                    val field = c.getDeclaredField("PARSER")
+                    val field = type.getDeclaredField("PARSER")
                     @Suppress("UNCHECKED_CAST")
                     parser = field.get(null) as Parser<MessageLite>
                 } catch (e: NoSuchFieldException) {
-                    throw IllegalArgumentException("Found a protobuf message but ${c.name} had no parser() method or PARSER field.")
+                    throw IllegalArgumentException("Found a protobuf message but ${type.name} had no parser() method or PARSER field.")
                 } catch (e: IllegalAccessException) {
-                    throw IllegalArgumentException("Found a protobuf message but ${c.name} had no parser() method or PARSER field.")
+                    throw IllegalArgumentException("Found a protobuf message but ${type.name} had no parser() method or PARSER field.")
                 }
             }
             return ProtobufMessageAdapter(parser, registry)

@@ -10,9 +10,9 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.testutils.any
-import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
 import com.tinder.scarlet.testutils.containingText
+import com.tinder.scarlet.testutils.rule.OkHttpWebSocketConnection
+import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.websocket.WebSocketEvent
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -101,10 +101,11 @@ internal class JacksonMessageAdapterTest {
             override fun toMessage(data: String): Message = Message.Text(data)
 
             class Factory : MessageAdapter.Factory {
-                override fun create(type: Type, annotations: Array<Annotation>): MessageAdapter<*> = when (type) {
-                    String::class.java -> TextMessageAdapter()
-                    else -> throw IllegalArgumentException("$type is not supported.")
-                }
+                override fun create(type: Type, annotations: Array<Annotation>): MessageAdapter<*> =
+                    when (type) {
+                        String::class.java -> TextMessageAdapter()
+                        else -> throw IllegalArgumentException("$type is not supported.")
+                    }
             }
         }
 

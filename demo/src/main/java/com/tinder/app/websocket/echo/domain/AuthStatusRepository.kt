@@ -9,7 +9,8 @@ import io.reactivex.processors.BehaviorProcessor
 
 class AuthStatusRepository {
 
-    private val authStatusProcessor = BehaviorProcessor.createDefault<AuthStatus>(AuthStatus.LOGGED_IN)
+    private val authStatusProcessor =
+        BehaviorProcessor.createDefault<AuthStatus>(AuthStatus.LOGGED_IN)
 
     fun observeAuthStatus(): Flowable<AuthStatus> = authStatusProcessor
 

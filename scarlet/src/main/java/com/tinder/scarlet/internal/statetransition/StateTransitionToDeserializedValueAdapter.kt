@@ -4,11 +4,11 @@
 
 package com.tinder.scarlet.internal.statetransition
 
-import com.tinder.scarlet.MessageAdapter
-import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import com.tinder.scarlet.Event
+import com.tinder.scarlet.MessageAdapter
 import com.tinder.scarlet.ProtocolEvent
 import com.tinder.scarlet.StateTransition
+import com.tinder.scarlet.internal.utils.MessageAdapterResolver
 import java.lang.reflect.Type
 
 internal class StateTransitionToDeserializedValueAdapter(

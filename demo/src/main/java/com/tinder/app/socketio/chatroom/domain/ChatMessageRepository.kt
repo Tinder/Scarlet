@@ -44,7 +44,8 @@ class ChatMessageRepository(
         )
     private val defaultMessages = listOf(firstMessage)
     private val messagesRef = AtomicReference<List<ChatMessage>>(defaultMessages)
-    private val messagesProcessor = BehaviorProcessor.createDefault<List<ChatMessage>>(defaultMessages)
+    private val messagesProcessor =
+        BehaviorProcessor.createDefault<List<ChatMessage>>(defaultMessages)
 
     init {
         chatRoomService.observeStateTransition()

@@ -15,6 +15,8 @@ import android.os.IBinder
 import android.os.Messenger
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.tinder.R
 import com.tinder.app.socketio.chatroom.api.AddUserTopic
 import com.tinder.app.socketio.chatroom.api.ChatRoomService
@@ -43,9 +45,12 @@ class ChatRoomSocketIoService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
 
+        val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
         val config = Scarlet.Configuration(
             lifecycle = AndroidLifecycle.ofLifecycleServiceStarted(application, this),
-            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory()),
+            messageAdapterFactories = listOf(MoshiMessageAdapter.Factory(moshi)),
             streamAdapterFactories = listOf(RxJava2StreamAdapterFactory())
         )
         val serverUrl = "https://socket-io-chat.now.sh/"
@@ -144,7 +149,7 @@ class ChatRoomSocketIoService : LifecycleService() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent): IBinder? {
         super.onBind(intent)
         Timber.d("chatroom onbind")
         return messenger.binder

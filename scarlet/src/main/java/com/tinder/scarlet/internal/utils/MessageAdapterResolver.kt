@@ -24,7 +24,10 @@ internal class MessageAdapterResolver(
         return messageAdapter
     }
 
-    private fun findMessageAdapter(type: Type, annotations: Array<Annotation>): MessageAdapter<Any> {
+    private fun findMessageAdapter(
+        type: Type,
+        annotations: Array<Annotation>
+    ): MessageAdapter<Any> {
         val throwables = mutableListOf<Throwable>()
         for (adapterFactory in messageAdapterFactories) {
             try {
