@@ -1,9 +1,9 @@
 ext {
     minSdkVersion = 24
     minSdkVersionAndroidLifecycle = 19
-    targetSdkVersion = 28
-    compileSdkVersion = 28
-    buildToolsVersion = '28.0.3'
+    targetSdkVersion = 30
+    compileSdkVersion = 30
+    buildToolsVersion = '31.0.0'
 
     appCompat = 'androidx.appcompat:appcompat:1.0.0'
     lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.0.0'
@@ -62,7 +62,7 @@ ext {
 
 
     junit = 'junit:junit:4.12'
-    mockito = 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
+    mockito = 'org.mockito.kotlin:mockito-kotlin:2.2.11'
     assertJ = 'org.assertj:assertj-core:3.8.0'
 
     kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

@@ -4,7 +4,7 @@
 
 package com.tinder.scarlet.internal.common
 
-import com.nhaarman.mockito_kotlin.mock
+import org.mockito.kotlin.mock
 import com.tinder.scarlet.Deserialization
 import com.tinder.scarlet.Event
 import com.tinder.scarlet.LifecycleState

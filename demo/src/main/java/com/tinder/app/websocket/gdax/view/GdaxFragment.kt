@@ -106,7 +106,7 @@ class GdaxFragment : Fragment() {
                 setDrawValues(false)
             }
 
-        val minPrice = priceEntries.minBy { it.y }?.y ?: 0F
+        val minPrice = priceEntries.minByOrNull { it.y }?.y ?: 0F
         val minPriceEntries = listOf(
             Entry(minutesAgo.millisOfDay.toFloat(), minPrice),
             Entry(now.millisOfDay.toFloat(), minPrice)
