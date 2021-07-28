@@ -1,9 +1,9 @@
 ext {
     minSdkVersion = 24
     minSdkVersionAndroidLifecycle = 19
-    targetSdkVersion = 28
-    compileSdkVersion = 28
-    buildToolsVersion = '28.0.3'
+    targetSdkVersion = 30
+    compileSdkVersion = 30
+    buildToolsVersion = '31.0.0'
 
     appCompat = 'androidx.appcompat:appcompat:1.0.0'
     lifecycleExtensions = 'androidx.lifecycle:lifecycle-extensions:2.0.0'
