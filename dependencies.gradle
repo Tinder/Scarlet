@@ -49,7 +49,7 @@ ext {
     okHttpLoggingInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     okio = 'com.squareup.okio:okio:1.13.0'
     mockWebServer = 'com.squareup.okhttp3:mockwebserver:3.11.0'
-    timber = 'com.jakewharton.timber:timber:4.6.0'
+    timber = 'com.jakewharton.timber:timber:4.7.1'
     okSse = 'com.github.heremaps:oksse:0.9.0'
     socketIoClient = 'io.socket:socket.io-client:1.0.0'
     nettySocketIoServer = 'com.corundumstudio.socketio:netty-socketio:1.7.12'
