@@ -4,8 +4,8 @@
 
 package com.tinder.scarlet.internal.statetransition
 
-import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.mock
+import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.assertj.core.api.Assertions.assertThatIllegalStateException
