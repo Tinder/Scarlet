@@ -30,6 +30,7 @@ ext.versions = [
 
     mpAndroidChart: 'v3.0.3',
     chatMessageView: '2.0.1',
+    swipeToRefresh: '1.1.0',
     filePicker: '2.2.5',
     jodaTime: '2.9.9',
     glide: '4.12.0',
@@ -49,6 +50,7 @@ ext.libs = [
     appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
     material: "com.google.android.material:material:$versions.material",
     constraintLayout: "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
+    swipeToRefresh: "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swipeToRefresh",
 
     reactiveStreams: "org.reactivestreams:reactive-streams:$versions.reactiveStreams",
     rxJava: "io.reactivex.rxjava2:rxjava:$versions.rxJava",
