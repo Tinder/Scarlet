@@ -27,6 +27,7 @@ class ReceiveChannelAdapter<T> : StreamAdapter<T, ReceiveChannel<T>> {
         }
 
         override fun onNext(data: T) {
+            println("$data is ")
             _channel.sendBlocking(data)
         }
     }
