@@ -5,46 +5,32 @@
 package com.tinder.scarlet.streamadapter.coroutines
 
 import com.google.common.truth.Truth.assertThat
-import com.tinder.scarlet.Lifecycle
-import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.Stream
 import com.tinder.scarlet.WebSocket
-import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.testutils.TestStreamObserver
 import com.tinder.scarlet.testutils.any
 import com.tinder.scarlet.testutils.containingBytes
 import com.tinder.scarlet.testutils.containingText
 import com.tinder.scarlet.testutils.test
-import com.tinder.scarlet.websocket.mockwebserver.newWebSocketFactory
-import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
-import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class ReceiveChannelTest {
 
-    @get:Rule val mockWebServer = MockWebServer()
-    private val serverUrlString by lazy { mockWebServer.url("/").toString() }
-
-    private val serverLifecycleRegistry = LifecycleRegistry()
-    private lateinit var server: Service
-    private lateinit var serverEventObserver: TestStreamObserver<WebSocket.Event>
-
-    private val clientLifecycleRegistry = LifecycleRegistry()
-    private lateinit var client: Service
-    private lateinit var clientEventObserver: TestStreamObserver<WebSocket.Event>
+    @get:Rule val clientServerModel = object : ClientServerModel<Service>(Service::class.java) {
+        override fun observeWebSocketEvents(service: Service): TestStreamObserver<WebSocket.Event> {
+            return service.observeEvents().test()
+        }
+    }
 
     @Test
     fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
         // Given
-        givenConnectionIsEstablished()
+        val (client, server) = clientServerModel.givenConnectionIsEstablished()
         val textMessage1 = "Hello"
         val textMessage2 = "Hi!"
         val bytesMessage1 = "Yo".toByteArray()
@@ -62,7 +48,7 @@ class ReceiveChannelTest {
         assertThat(isSendTextSuccessful).isTrue()
         assertThat(isSendBytesSuccessful).isTrue()
 
-        serverEventObserver.awaitValues(
+        clientServerModel.awaitValues(
             any<WebSocket.Event.OnConnectionOpened<*>>(),
             any<WebSocket.Event.OnMessageReceived>().containingText(textMessage1),
             any<WebSocket.Event.OnMessageReceived>().containingText(textMessage2),
@@ -79,54 +65,7 @@ class ReceiveChannelTest {
         }
     }
 
-    private fun givenConnectionIsEstablished() {
-        createClientAndServer()
-        serverLifecycleRegistry.onNext(Lifecycle.State.Started)
-        clientLifecycleRegistry.onNext(Lifecycle.State.Started)
-        blockUntilConnectionIsEstablish()
-    }
-
-    private fun createClientAndServer() {
-        server = createServer()
-        serverEventObserver = server.observeEvents().test()
-        client = createClient()
-        clientEventObserver = client.observeEvents().test()
-    }
-
-    private fun createServer(): Service {
-        val webSocketFactory = mockWebServer.newWebSocketFactory()
-        val scarlet = Scarlet.Builder()
-            .webSocketFactory(webSocketFactory)
-            .lifecycle(serverLifecycleRegistry)
-            .addStreamAdapterFactory(CoroutinesStreamAdapterFactory())
-            .build()
-        return scarlet.create()
-    }
-
-    private fun createClient(): Service {
-        val okHttpClient = OkHttpClient.Builder()
-            .writeTimeout(500, TimeUnit.MILLISECONDS)
-            .readTimeout(500, TimeUnit.MILLISECONDS)
-            .build()
-        val webSocketFactory = okHttpClient.newWebSocketFactory(serverUrlString)
-        val scarlet = Scarlet.Builder()
-            .webSocketFactory(webSocketFactory)
-            .lifecycle(clientLifecycleRegistry)
-            .addStreamAdapterFactory(CoroutinesStreamAdapterFactory())
-            .build()
-        return scarlet.create()
-    }
-
-    private fun blockUntilConnectionIsEstablish() {
-        clientEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>()
-        )
-        serverEventObserver.awaitValues(
-            any<WebSocket.Event.OnConnectionOpened<*>>()
-        )
-    }
-
-    private interface Service {
+    interface Service {
         @Receive
         fun observeEvents(): Stream<WebSocket.Event>
 

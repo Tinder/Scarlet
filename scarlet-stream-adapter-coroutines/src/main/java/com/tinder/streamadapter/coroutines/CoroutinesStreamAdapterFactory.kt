@@ -16,6 +16,7 @@ import java.lang.reflect.Type
 class CoroutinesStreamAdapterFactory : StreamAdapter.Factory {
 
     override fun create(type: Type): StreamAdapter<Any, Any> {
+        println("RAW TYPE = $type")
         return when (type.getRawType()) {
             Flow::class.java -> FlowStreamAdapter()
             ReceiveChannel::class.java -> ReceiveChannelAdapter()
