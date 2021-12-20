@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
+import org.junit.Test
 import java.util.Arrays
 
 class FlowStreamAdapterTest {
@@ -27,6 +28,7 @@ class FlowStreamAdapterTest {
         }
     }
 
+    @Test
     fun `adapt - given a stream of strings, provides a Flow interface bound to the stream`() =
         runBlocking {
             // Given
