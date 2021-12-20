@@ -3,7 +3,7 @@ package com.tinder.streamadapter.coroutines
 import com.tinder.scarlet.Stream
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.channels.trySendBlocking
 
 internal class ChannelForwarder<T> : Stream.Observer<T> {
     private val _channel = Channel<T>()
@@ -27,6 +27,7 @@ internal class ChannelForwarder<T> : Stream.Observer<T> {
 
     override fun onNext(data: T) {
         println("$data is ")
-        _channel.sendBlocking(data)
+        _channel.trySendBlocking(data)
+            .exceptionOrNull() ?.let { throw it }
     }
 }
