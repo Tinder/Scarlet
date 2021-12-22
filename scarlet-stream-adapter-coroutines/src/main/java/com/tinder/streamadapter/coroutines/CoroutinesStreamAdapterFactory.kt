@@ -13,13 +13,16 @@ import java.lang.reflect.Type
 /**
  * A [stream adapter factory][StreamAdapter.Factory] that uses ReceiveChannel.
  */
-class CoroutinesStreamAdapterFactory : StreamAdapter.Factory {
+private const val DEFAULT_BUFFER = 128
+
+class CoroutinesStreamAdapterFactory(
+    private val bufferSize: Int = DEFAULT_BUFFER
+) : StreamAdapter.Factory {
 
     override fun create(type: Type): StreamAdapter<Any, Any> {
-        println("RAW TYPE = $type")
         return when (type.getRawType()) {
-            Flow::class.java -> FlowStreamAdapter()
-            ReceiveChannel::class.java -> ReceiveChannelAdapter()
+            Flow::class.java -> FlowStreamAdapter(bufferSize)
+            ReceiveChannel::class.java -> ReceiveChannelAdapter(bufferSize)
             else -> throw IllegalArgumentException()
         }
     }

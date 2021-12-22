@@ -29,7 +29,7 @@ class FlowStreamAdapterTest {
     }
 
     @Test
-    fun `adapt - given a stream of strings, provides a Flow interface bound to the stream`() = runTest {
+    fun `adapt - given a stream of strings, provides a Flow interface bound to the stream`() = runTest(dispatchTimeoutMs = 1000) {
         // Given
         val (client, server) = clientServerModel.givenConnectionIsEstablished()
         val textMessage1 = "Hello"
