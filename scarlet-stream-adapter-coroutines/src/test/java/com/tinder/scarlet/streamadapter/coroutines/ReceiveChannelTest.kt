@@ -15,20 +15,21 @@ import com.tinder.scarlet.testutils.test
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
 class ReceiveChannelTest {
 
-    @get:Rule val clientServerModel = object : ClientServerModel<Service>(Service::class.java) {
+    @get:Rule
+    val clientServerModel = object : ClientServerModel<Service>(Service::class.java) {
         override fun observeWebSocketEvents(service: Service): TestStreamObserver<WebSocket.Event> {
             return service.observeEvents().test()
         }
     }
 
     @Test
-    fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() {
+    fun send_givenConnectionIsEstablished_shouldBeReceivedByTheServer() = runTest {
         // Given
         val (client, server) = clientServerModel.givenConnectionIsEstablished()
         val textMessage1 = "Hello"
@@ -56,13 +57,11 @@ class ReceiveChannelTest {
             any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage2)
         )
 
-        runBlocking {
-            assertThat(testTextChannel.receive()).isEqualTo(textMessage1)
-            assertThat(testTextChannel.receive()).isEqualTo(textMessage2)
+        assertThat(testTextChannel.receive()).isEqualTo(textMessage1)
+        assertThat(testTextChannel.receive()).isEqualTo(textMessage2)
 
-            assertThat(testBytesChannel.receive()).isEqualTo(bytesMessage1)
-            assertThat(testBytesChannel.receive()).isEqualTo(bytesMessage2)
-        }
+        assertThat(testBytesChannel.receive()).isEqualTo(bytesMessage1)
+        assertThat(testBytesChannel.receive()).isEqualTo(bytesMessage2)
     }
 
     interface Service {

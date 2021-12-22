@@ -13,7 +13,7 @@ ext.versions = [
     rxAndroid: '2.0.2',
     rxKotlin: '2.2.0',
     rxJava1: '1.3.4',
-    kotlinxCoroutines: '1.5.2',
+    kotlinxCoroutines: '1.6.0',
 
     stetho: '1.5.0',
     stethoOkHttp: '1.5.0',
