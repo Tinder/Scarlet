@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import java.lang.reflect.Type
 
 /**
- * A [stream adapter factory][StreamAdapter.Factory] that uses ReceiveChannel.
+ * A [stream adapter factory][StreamAdapter.Factory] that allows for [ReceiveChannel]
+ * and [Flow] based streams.
+ * [bufferSize] is configurable for the underlying channels, defaults to [DEFAULT_BUFFER]
  */
 private const val DEFAULT_BUFFER = 128
 
