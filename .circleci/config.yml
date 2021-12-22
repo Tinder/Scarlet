@@ -15,9 +15,12 @@ jobs:
           name: Disable PreDexing
           command:  echo "disablePreDex" >> gradle.properties
       - run: if [ -e ./gradlew ]; then ./gradlew dependencies;else gradle dependencies;fi
+      - run: mkdir test-reports
       - run: ./gradlew test
       - run: mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - run: find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - store_test_results:
+          path: scarlet-stream-adapter-coroutines/build/test-results/test/
       - run:
           name: Deploy Snapshot
           command: ./publish.sh
