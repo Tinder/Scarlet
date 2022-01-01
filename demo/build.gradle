@@ -37,7 +37,6 @@ dependencies {
     implementation libs.appCompat
     implementation libs.material
     implementation libs.constraintLayout
-    implementation libs.swipeToRefresh
     implementation libs.rxJava
     implementation libs.rxAndroid
     implementation libs.rxKotlin
