@@ -13,7 +13,7 @@ import com.tinder.scarlet.State
 import com.tinder.scarlet.WebSocket
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +25,8 @@ import javax.inject.Inject
 
 @EchoBotScope
 class ChatMessageRepository @Inject constructor(
-    private val echoService: EchoService
+    private val echoService: EchoService,
+    private val coroutineScope: CoroutineScope
 ) {
     private val messageCount = AtomicInteger()
     private val messagesRef = AtomicReference<List<ChatMessage>>()
@@ -64,7 +65,7 @@ class ChatMessageRepository @Inject constructor(
                 addChatMessage(chatMessage)
             }.catch { e ->
                 Timber.e(e)
-            }.launchIn(GlobalScope)
+            }.launchIn(coroutineScope)
 
         echoService.observeText()
             .onEach { text ->
@@ -77,7 +78,7 @@ class ChatMessageRepository @Inject constructor(
                 addChatMessage(chatMessage)
             }.catch { e ->
                 Timber.e(e)
-            }.launchIn(GlobalScope)
+            }.launchIn(coroutineScope)
 
         echoService.observeBitmap()
             .onEach { bitmap ->
@@ -90,7 +91,7 @@ class ChatMessageRepository @Inject constructor(
                 addChatMessage(chatMessage)
             }.catch { e ->
                 Timber.e(e)
-            }.launchIn(GlobalScope)
+            }.launchIn(coroutineScope)
     }
 
     fun observeChatMessage(): Flowable<List<ChatMessage>> = messagesProcessor

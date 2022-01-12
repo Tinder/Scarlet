@@ -18,6 +18,8 @@ import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -63,6 +65,12 @@ interface EchoBotComponent {
                 .addStreamAdapterFactory(CoroutinesStreamAdapterFactory())
                 .build()
             return scarlet.create()
+        }
+
+        @Provides
+        @EchoBotScope
+        fun provideCoroutineScopeToRunIn(): CoroutineScope {
+            return CoroutineScope(SupervisorJob())
         }
     }
 
