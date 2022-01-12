@@ -36,8 +36,8 @@ class FlowStreamAdapterTest {
         val textMessage2 = "Hi!"
         val bytesMessage1 = "Yo".toByteArray()
         val bytesMessage2 = "Sup".toByteArray()
-        val testTextChannel = server.observeText()
-        val testBytesChannel = server.observeBytes()
+        val testTextFlow = server.observeText()
+        val testBytesFlow = server.observeBytes()
 
         // When
         client.sendText(textMessage1)
@@ -57,12 +57,12 @@ class FlowStreamAdapterTest {
             any<WebSocket.Event.OnMessageReceived>().containingBytes(bytesMessage2)
         )
 
-        assertThat(testTextChannel.take(2).toList()).containsExactly(
+        assertThat(testTextFlow.take(2).toList()).containsExactly(
             textMessage1,
             textMessage2
         ).inOrder()
 
-        val bytes = testBytesChannel.take(2).toList()
+        val bytes = testBytesFlow.take(2).toList()
         assertThat(bytes).comparingElementsUsing(BYTE_ARRAY_CORRESPONDENCE).containsExactly(
             bytesMessage1,
             bytesMessage2
