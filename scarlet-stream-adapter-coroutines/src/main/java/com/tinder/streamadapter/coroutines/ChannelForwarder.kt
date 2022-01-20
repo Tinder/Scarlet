@@ -4,6 +4,8 @@ import com.tinder.scarlet.Stream
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.onClosed
+import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 
 internal class ChannelForwarder<T>(bufferSize: Int) : Stream.Observer<T> {
@@ -26,7 +28,10 @@ internal class ChannelForwarder<T>(bufferSize: Int) : Stream.Observer<T> {
     }
 
     override fun onNext(data: T) {
-        channel.trySendBlocking(data)
-            .exceptionOrNull() ?.let { throw it }
+        channel.trySendBlocking(data).onClosed {
+            // ignore
+        }.onFailure {
+            // ignore
+        }
     }
 }
