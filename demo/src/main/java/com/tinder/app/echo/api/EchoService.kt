@@ -9,20 +9,20 @@ import com.tinder.scarlet.Event
 import com.tinder.scarlet.State
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
 interface EchoService {
     @Receive
-    fun observeState(): Flowable<State>
+    fun observeState(): Flow<State>
 
     @Receive
-    fun observeEvent(): Flowable<Event>
+    fun observeEvent(): Flow<Event>
 
     @Receive
-    fun observeText(): Flowable<String>
+    fun observeText(): Flow<String>
 
     @Receive
-    fun observeBitmap(): Flowable<Bitmap>
+    fun observeBitmap(): Flow<Bitmap>
 
     @Send
     fun sendText(message: String): Boolean

@@ -33,6 +33,7 @@ dependencies {
     implementation project(':scarlet-message-adapter-moshi')
     implementation project(':scarlet-message-adapter-protobuf')
     implementation project(':scarlet-stream-adapter-rxjava2')
+    implementation project(':scarlet-stream-adapter-coroutines')
 
     implementation libs.appCompat
     implementation libs.material

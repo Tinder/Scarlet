@@ -13,7 +13,10 @@ import com.tinder.scarlet.State
 import com.tinder.scarlet.WebSocket
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.joda.time.DateTime
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
@@ -22,7 +25,8 @@ import javax.inject.Inject
 
 @EchoBotScope
 class ChatMessageRepository @Inject constructor(
-    private val echoService: EchoService
+    private val echoService: EchoService,
+    private val coroutineScope: CoroutineScope
 ) {
     private val messageCount = AtomicInteger()
     private val messagesRef = AtomicReference<List<ChatMessage>>()
@@ -30,8 +34,7 @@ class ChatMessageRepository @Inject constructor(
 
     init {
         echoService.observeEvent()
-            .observeOn(Schedulers.io())
-            .subscribe({ event ->
+            .onEach { event ->
                 val description = when (event) {
                     is Event.OnLifecycle.StateChange<*> -> when (event.state) {
                         Lifecycle.State.Started -> "\uD83C\uDF1D On Lifecycle Start"
@@ -57,15 +60,15 @@ class ChatMessageRepository @Inject constructor(
                     }
                     Event.OnRetry -> "⏰ On Retry"
                 }
-                val chatMessage = ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
+                val chatMessage =
+                    ChatMessage.Text(generateMessageId(), description, ChatMessage.Source.RECEIVED)
                 addChatMessage(chatMessage)
-            }, { e ->
+            }.catch { e ->
                 Timber.e(e)
-            })
+            }.launchIn(coroutineScope)
 
         echoService.observeText()
-            .observeOn(Schedulers.io())
-            .subscribe({ text ->
+            .onEach { text ->
                 val chatMessage = ChatMessage.Text(
                     generateMessageId(),
                     text,
@@ -73,13 +76,12 @@ class ChatMessageRepository @Inject constructor(
                     DateTime.now().plusMillis(50)
                 )
                 addChatMessage(chatMessage)
-            }, { e ->
+            }.catch { e ->
                 Timber.e(e)
-            })
+            }.launchIn(coroutineScope)
 
         echoService.observeBitmap()
-            .observeOn(Schedulers.io())
-            .subscribe({ bitmap ->
+            .onEach { bitmap ->
                 val chatMessage = ChatMessage.Image(
                     generateMessageId(),
                     bitmap,
@@ -87,9 +89,9 @@ class ChatMessageRepository @Inject constructor(
                     DateTime.now().plusMillis(50)
                 )
                 addChatMessage(chatMessage)
-            }, { e ->
+            }.catch { e ->
                 Timber.e(e)
-            })
+            }.launchIn(coroutineScope)
     }
 
     fun observeChatMessage(): Flowable<List<ChatMessage>> = messagesProcessor
