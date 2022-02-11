@@ -9,3 +9,7 @@ dependencies {
     testImplementation libs.junit
     testImplementation libs.assertJ
 }
+
+subprojects {
+    tasks.withType(Javadoc).all { enabled = false }
+}
