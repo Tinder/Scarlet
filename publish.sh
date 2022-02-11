@@ -16,6 +16,6 @@ elif [ "${CIRCLE_BRANCH}" != "$BRANCH" ]; then
   echo "Skipping snapshot deployment: wrong branch. Expected '$BRANCH' but was '${CIRCLE_BRANCH}'."
 else
   echo "Deploying snapshot..."
-  ./gradlew clean uploadArchives
+  ./gradlew clean publish
   echo "Snapshot deployed!"
 fi
