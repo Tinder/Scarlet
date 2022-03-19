@@ -1,6 +1,5 @@
 Scarlet
 ===
-[![CircleCI](https://circleci.com/gh/Tinder/Scarlet.svg?style=svg)](https://circleci.com/gh/Tinder/Scarlet)
 
 A Retrofit inspired WebSocket client for Kotlin, Java, and Android.
 
