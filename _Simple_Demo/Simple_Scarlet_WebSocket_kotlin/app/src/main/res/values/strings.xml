@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Simple Scarlet WebSocket (K)</string>
+
+    <string name="send">Send</string>
+    <string name="no_message_received">No message received</string>
+    <string name="hi_nice_app">Hi, nice app</string>
+    <string name="set_url">Set Url</string>
+    <string name="wss">wss://</string>
+    <string name="url_value">URL_VALUE_KEY</string>
+    <string name="is_connection_opened">Is connection opened: %s</string>
+</resources>
