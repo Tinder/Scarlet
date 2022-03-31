@@ -105,6 +105,10 @@ internal class Connection(
                 on(webSocketOpen()) {
                     transitionTo(Connected(session = session))
                 }
+                on(lifecycleStop()) {
+                    initiateShutdown(it.state)
+                    transitionTo(Disconnecting)
+                }
                 on<OnWebSocket.Terminate>() {
                     val backoffDuration = backoffStrategy.backoffDurationMillisAt(retryCount)
                     val timerDisposable = scheduleRetry(backoffDuration)
@@ -198,6 +202,13 @@ internal class Connection(
         private fun requestNextLifecycleState() = lifecycleStateSubscriber.requestNext()
 
         private fun Connected.initiateShutdown(state: Lifecycle.State) {
+            when (state) {
+                is Lifecycle.State.Stopped.WithReason -> session.webSocket.close(state.shutdownReason)
+                Lifecycle.State.Stopped.AndAborted -> session.webSocket.cancel()
+            }
+        }
+
+        private fun Connecting.initiateShutdown(state: Lifecycle.State) {
             when (state) {
                 is Lifecycle.State.Stopped.WithReason -> session.webSocket.close(state.shutdownReason)
                 Lifecycle.State.Stopped.AndAborted -> session.webSocket.cancel()
