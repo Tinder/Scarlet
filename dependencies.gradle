@@ -48,6 +48,8 @@ ext.versions = [
 ]
 
 ext.libs = [
+    android: "org.robolectric:android-all:10-robolectric-5803371",
+
     appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
     material: "com.google.android.material:material:$versions.material",
     constraintLayout: "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
