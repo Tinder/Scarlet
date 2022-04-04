@@ -16,13 +16,13 @@ Tutorial
 
 Usage
 ---
-In this example, we read the realtime Bitcoin price from [Gdax WebSocket Feed][gdax-websocket-feed].
+In this example, we read the realtime Bitcoin price from [Coinbase WebSocket Feed][https://docs.pro.coinbase.com/].
 For more information, please check out the [demo app][demo-app].
 
 Declare a WebSocket client using an interface:
 
 ~~~ kotlin
-interface GdaxService {
+interface CoinbaseService {
 	@Receive
 	fun observeWebSocketEvent(): Flowable<WebSocket.Event>
 	@Send
@@ -36,12 +36,12 @@ Use Scarlet to create an implementation:
 
 ~~~ kotlin
 val scarletInstance = Scarlet.Builder()
-    .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed.gdax.com"))
+    .webSocketFactory(okHttpClient.newWebSocketFactory("wss://ws-feed-public.sandbox.pro.coinbase.com"))
     .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
     .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
     .build()
 
-val gdaxService = scarletInstance.create<GdaxService>()
+val coinbaseService = scarletInstance.create<CoinbaseService>()
 ~~~
 
 Send a `Subscribe` message upon connection open and the server will start streaming tickers which contain the latest price.
@@ -53,13 +53,13 @@ val BITCOIN_TICKER_SUBSCRIBE_MESSAGE = Subscribe(
     channels = listOf("ticker")
 )
 
-gdaxService.observeWebSocketEvent()
+coinbaseService.observeWebSocketEvent()
     .filter { it is WebSocket.Event.OnConnectionOpened<*> }
     .subscribe({
         gdaxService.sendSubscribe(BITCOIN_TICKER_SUBSCRIBE_MESSAGE)
     })
 
-gdaxService.observeTicker()
+coinbaseService.observeTicker()
     .subscribe({ ticker ->
         Log.d("Bitcoin price is ${ticker.price} at ${ticker.time}")
     })
