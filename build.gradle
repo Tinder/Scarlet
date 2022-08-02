@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.31'
+    ext.kotlin_version = '1.5.30'
     ext.dokka_version = '0.9.16'
     repositories {
         mavenCentral()
@@ -9,8 +9,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.8.0'
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.18.0'
+        classpath 'com.android.tools.build:gradle:7.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -35,6 +35,8 @@ allprojects {
 }
 
 subprojects { project ->
+    apply plugin: 'maven-publish'
+
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
             jvmTarget = "1.8"
@@ -49,6 +51,13 @@ subprojects { project ->
         plugin.extension.compileOptions {
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
+        }
+    }
+
+    publishing {
+        publications {
+            release(MavenPublication) {
+            }
         }
     }
 }
