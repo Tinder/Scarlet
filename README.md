@@ -90,7 +90,16 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 
 ##### Gradle:
 ```groovy
-implementation 'com.tinder.scarlet:scarlet:0.1.12'
+ def scarletVersion = "0.1.12"
+implementation "com.tinder.scarlet:scarlet:$scarletVersion"
+implementation "com.tinder.scarlet:websocket-okhttp:$scarletVersion"
+implementation "com.tinder.scarlet:stream-adapter-coroutines:$scarletVersion"
+implementation "com.tinder.scarlet:stream-adapter-rxjava2:$scarletVersion"
+implementation "com.tinder.scarlet:message-adapter-protobuf:$scarletVersion"
+implementation "com.tinder.scarlet:message-adapter-moshi:$scarletVersion"
+implementation "com.tinder.scarlet:message-adapter-jackson:$scarletVersion"
+implementation "com.tinder.scarlet:message-adapter-gson:$scarletVersion"
+implementation "com.tinder.scarlet:lifecycle-android:$scarletVersion"
 ```
 
 ### Plug-in Roadmap
@@ -154,3 +163,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  [kotliners]: https://www.conferenceforkotliners.com/
  [state-machine]: https://github.com/Tinder/StateMachine
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/com/tinder/scarlet/
+ [maven]: https://search.maven.org/search?q=g:com.tinder.scarlet
