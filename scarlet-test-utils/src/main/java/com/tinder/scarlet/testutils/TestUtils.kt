@@ -33,7 +33,7 @@ inline fun <reified T : WebSocket.Event> ValueAssert<Event.OnWebSocket.Event<*>>
 inline fun <reified T : State> ValueAssert<Event.OnStateChange<*>>.withState() = assert {
     assertThat(state).isInstanceOf(T::class.java)
 }
-
+// trigger ci
 fun ValueAssert<WebSocket.Event.OnMessageReceived>.containingText(expectedText: String) = assert {
     assertThat(message).isInstanceOf(Message.Text::class.java)
     val (text) = message as Message.Text
